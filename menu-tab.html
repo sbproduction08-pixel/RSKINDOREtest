@@ -1,153 +1,163 @@
 <style>
-    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; }
+    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; text-align: center; }
     
-    /* Search Bar with Highlight */
-    .search-box { width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid var(--gold); background: rgba(255,255,255,0.05); color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; box-sizing: border-box; }
-    .search-box:focus { box-shadow: 0 0 15px var(--gold); background: rgba(255,255,255,0.1); border-color: #fff; }
+    .search-box { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid var(--gold); background: rgba(255,255,255,0.05); color: #fff; outline: none; margin-bottom: 20px; box-sizing: border-box; }
 
-    /* Veg/Non-Veg Toggles */
-    .filter-toggles { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-    .t-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #444; background: #1a1a1a; color: #888; font-size: 12px; cursor: pointer; transition: 0.3s; }
-    .t-btn.active-veg { border-color: #25D366; color: #25D366; box-shadow: 0 0 10px rgba(37, 211, 102, 0.3); }
-    .t-btn.active-nonveg { border-color: #ff4d4d; color: #ff4d4d; box-shadow: 0 0 10px rgba(255, 77, 77, 0.3); }
+    /* Category Style */
+    .cat-title { color: var(--gold); font-size: 18px; font-weight: bold; margin: 25px 0 15px; border-left: 4px solid var(--gold); padding-left: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* Category Banner with Image Glow */
-    .cat-banner { position: relative; width: 100%; height: 130px; border-radius: 15px; overflow: hidden; margin: 30px 0 15px; border: 2px solid #333; transition: 0.4s; }
-    .cat-banner:hover { border-color: var(--gold); box-shadow: 0 0 20px var(--gold); }
-    .cat-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
-    .cat-title { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--gold); font-size: 22px; font-weight: bold; letter-spacing: 3px; text-shadow: 2px 2px 10px #000; width: 100%; text-align: center; }
+    /* Grid Layout */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 
-    /* Items Grid */
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .item-card { background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); border-radius: 10px; padding: 12px; text-align: left; transition: 0.3s; position: relative; }
-    .item-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.1); border-color: #fff; }
-    .item-name { font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #fff; text-transform: uppercase; }
+    /* Item Card */
+    .item-card { background: rgba(255,255,255,0.07); border-radius: 10px; padding: 12px; border: 1px solid rgba(212,175,55,0.1); position: relative; }
+    .item-card:hover { border-color: var(--gold); background: rgba(255,255,255,0.1); }
+    .item-name { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 5px; }
 
-    /* Pricing Display */
-    .price-wrap { background: #000; border-radius: 6px; padding: 8px; }
-    .p-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px; }
-    .p-label { color: #888; }
-    .p-val { color: var(--gold); font-weight: bold; }
+    /* Price Styling */
+    .price-tag { font-size: 12px; color: var(--gold); font-weight: bold; }
+    .half-full { display: flex; justify-content: space-between; font-size: 10px; color: #ccc; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; }
 
-    /* WhatsApp Order Glow Button */
-    .wa-glow-btn { background: #25D366; color: white; text-decoration: none; padding: 15px; border-radius: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 40px 0; box-shadow: 0 0 15px rgba(37,211,102,0.4); transition: 0.3s; }
-    .wa-glow-btn:hover { box-shadow: 0 0 25px #25D366; transform: scale(1.05); }
+    /* Hero Combo Section */
+    .hero-combo { grid-column: span 2; background: linear-gradient(45deg, #1a0d0d, #3a0d0d); border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.3); }
+    
+    .wa-float { background: #25D366; color: white; text-decoration: none; padding: 15px; border-radius: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 30px 0; box-shadow: 0 0 15px rgba(37,211,102,0.4); }
 </style>
 
-<div class="menu-tab-content">
+<div class="menu-content">
     <h2 class="menu-header">ROYAL MENU</h2>
 
-    <input type="text" id="menuSearch" class="search-box" placeholder="Search dish (e.g., Lollipop)..." onkeyup="runSearch()">
+    <input type="text" id="menuSearch" class="search-box" placeholder="Search for dishes..." onkeyup="filterMenu()">
 
-    <div class="filter-toggles">
-        <button class="t-btn" id="vegFilter" onclick="applyFilter('veg')">🥬 Veg Only</button>
-        <button class="t-btn" id="nonVegFilter" onclick="applyFilter('nonveg')">🍗 Non-Veg</button>
-    </div>
-
-    <div id="nv-section">
-        <div class="cat-banner">
-            <img src="nonveg-head.jpg" class="cat-img" alt="Non-Veg Banner">
-            <div class="cat-title">NON-VEG SPECIALS</div>
+    <div class="cat-title">👑 RSK Royal Combos</div>
+    <div class="menu-grid">
+        <div class="item-card hero-combo" data-name="tawa chicken paratha">
+            <div class="item-name">Tawa Chicken + Paratha</div>
+            <div class="price-tag">₹259</div>
         </div>
-        <div class="menu-grid">
-            <div class="item-card" data-name="chicken lollipop" data-type="nonveg">
-                <div class="item-name">Chicken Lollipop</div>
-                <div class="price-wrap">
-                    <div class="p-row"><span>HALF (3pc)</span><span class="p-val">₹100</span></div>
-                    <div class="p-row"><span>FULL (6pc)</span><span class="p-val">₹180</span></div>
-                </div>
-            </div>
-            <div class="item-card" data-name="chicken crispy" data-type="nonveg">
-                <div class="item-name">Chicken Crispy</div>
-                <div class="price-wrap">
-                    <div class="p-row"><span>HALF</span><span class="p-val">₹90</span></div>
-                    <div class="p-row"><span>FULL</span><span class="p-val">₹160</span></div>
-                </div>
-            </div>
-            <div class="item-card" data-name="chicken popcorn" data-type="nonveg">
-                <div class="item-name">Chicken Popcorn</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹100</span></div></div>
-            </div>
-            <div class="item-card" data-name="chicken wings" data-type="nonveg">
-                <div class="item-name">Chicken Wings</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹100</span></div></div>
-            </div>
-            <div class="item-card" data-name="chicken seekh kebab" data-type="nonveg">
-                <div class="item-name">Chicken Seekh</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹100</span></div></div>
-            </div>
-            <div class="item-card" data-name="chicken nuggets" data-type="nonveg">
-                <div class="item-name">Chicken Nuggets</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹100</span></div></div>
-            </div>
+        <div class="item-card hero-combo" data-name="tawa chicken kulcha">
+            <div class="item-name">Tawa Chicken + Kulcha</div>
+            <div class="price-tag">₹249</div>
+        </div>
+        <div class="item-card" data-name="paneer bhurji paratha">
+            <div class="item-name">Paneer Bhurji + Paratha</div>
+            <div class="price-tag">₹209</div>
+        </div>
+        <div class="item-card" data-name="paneer bhurji kulcha">
+            <div class="item-name">Paneer Bhurji + Kulcha</div>
+            <div class="price-tag">₹199</div>
+        </div>
+        <div class="item-card" data-name="tawa egg paratha">
+            <div class="item-name">Tawa Egg + Paratha</div>
+            <div class="price-tag">₹139</div>
+        </div>
+        <div class="item-card" data-name="egg bhurji kulcha">
+            <div class="item-name">Egg Bhurji + Kulcha</div>
+            <div class="price-tag">₹109</div>
         </div>
     </div>
 
-    <div id="v-section">
-        <div class="cat-banner">
-            <img src="veg-head.jpg" class="cat-img" alt="Veg Banner">
-            <div class="cat-title">VEG DELIGHTS</div>
+    <div class="cat-title">🍗 Non-Veg Specials</div>
+    <div class="menu-grid">
+        <div class="item-card" data-name="rsk special chicken">
+            <div class="item-name">RSK Special Chicken</div>
+            <div class="half-full"><span>H: ₹219</span> <span>F: ₹399</span></div>
         </div>
-        <div class="menu-grid">
-            <div class="item-card" data-name="veg nuggets" data-type="veg">
-                <div class="item-name">Veg Nuggets</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹80</span></div></div>
-            </div>
-            <div class="item-card" data-name="veg seekh kebab" data-type="veg">
-                <div class="item-name">Veg Seekh Kebab</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹80</span></div></div>
-            </div>
-            <div class="item-card" data-name="french fries" data-type="veg">
-                <div class="item-name">French Fries</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹60</span></div></div>
-            </div>
-            <div class="item-card" data-name="peri peri fries" data-type="veg">
-                <div class="item-name">Peri Peri Fries</div>
-                <div class="price-wrap"><div class="p-row"><span>PRICE</span><span class="p-val">₹80</span></div></div>
-            </div>
+        <div class="item-card" data-name="tawa chicken">
+            <div class="item-name">Tawa Chicken</div>
+            <div class="half-full"><span>H: ₹229</span> <span>F: ₹409</span></div>
+        </div>
+        <div class="item-card" data-name="diet paper chicken">
+            <div class="item-name">Diet Paper Chicken</div>
+            <div class="half-full"><span>H: ₹199</span> <span>F: ₹359</span></div>
+        </div>
+        <div class="item-card" data-name="fry chicken">
+            <div class="item-name">Fry Chicken</div>
+            <div class="half-full"><span>H: ₹149</span> <span>F: ₹279</span></div>
         </div>
     </div>
 
-    <a href="https://wa.me/917489999890?text=HI%20RSK,%20I%20WANT%20TO%20ORDER" class="wa-glow-btn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="25">
-        ORDER ON WHATSAPP
+    <div class="cat-title">🥬 Veg Delights</div>
+    <div class="menu-grid">
+        <div class="item-card" data-name="kastoori paneer">
+            <div class="item-name">Kastoori Paneer</div>
+            <div class="price-tag">₹179</div>
+        </div>
+        <div class="item-card" data-name="tawa paneer">
+            <div class="item-name">Tawa Paneer</div>
+            <div class="price-tag">₹189</div>
+        </div>
+        <div class="item-card" data-name="garlic bread">
+            <div class="item-name">Garlic Bread</div>
+            <div class="price-tag">₹159</div>
+        </div>
+        <div class="item-card" data-name="french fries">
+            <div class="item-name">French Fries</div>
+            <div class="price-tag">₹79</div>
+        </div>
+    </div>
+
+    <div class="cat-title">🍜 Maggie Corner</div>
+    <div class="menu-grid">
+        <div class="item-card" data-name="rsk special maggie">
+            <div class="item-name">RSK Special Maggie</div>
+            <div class="price-tag">₹99</div>
+        </div>
+        <div class="item-card" data-name="cheese maggie">
+            <div class="item-name">Cheese Maggie</div>
+            <div class="price-tag">₹89</div>
+        </div>
+        <div class="item-card" data-name="masala maggie">
+            <div class="item-name">Masala Maggie</div>
+            <div class="price-tag">₹49</div>
+        </div>
+    </div>
+
+    <div class="cat-title">🍳 Egg Station</div>
+    <div class="menu-grid">
+        <div class="item-card" data-name="tawa egg">
+            <div class="item-name">Tawa Egg</div>
+            <div class="price-tag">₹119</div>
+        </div>
+        <div class="item-card" data-name="egg bhurji">
+            <div class="item-name">Egg Bhurji</div>
+            <div class="price-tag">₹99</div>
+        </div>
+        <div class="item-card" data-name="boiled egg">
+            <div class="item-name">Boiled Egg (2pc)</div>
+            <div class="price-tag">₹25</div>
+        </div>
+    </div>
+
+    <div class="cat-title">🍞 Rice & Breads</div>
+    <div class="menu-grid">
+        <div class="item-card" data-name="chicken fried rice">
+            <div class="item-name">Chicken Fried Rice</div>
+            <div class="price-tag">₹149</div>
+        </div>
+        <div class="item-card" data-name="paratha">
+            <div class="item-name">Paratha</div>
+            <div class="price-tag">₹25</div>
+        </div>
+        <div class="item-card" data-name="kulcha">
+            <div class="item-name">Kulcha</div>
+            <div class="price-tag">₹20</div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/917489999890?text=Hi%20RSK,%20I%20want%20to%20order" class="wa-float">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20">
+        Order via WhatsApp
     </a>
 </div>
 
 <script>
-    // Search Functionality
-    function runSearch() {
-        let query = document.getElementById('menuSearch').value.toLowerCase();
-        let cards = document.querySelectorAll('.item-card');
-        cards.forEach(card => {
+    function filterMenu() {
+        let input = document.getElementById('menuSearch').value.toLowerCase();
+        let cards = document.getElementsByClassName('item-card');
+        for (let card of cards) {
             let name = card.getAttribute('data-name');
-            card.style.display = name.includes(query) ? "block" : "none";
-        });
-    }
-
-    // Filter Functionality
-    function applyFilter(type) {
-        let vBtn = document.getElementById('vegFilter');
-        let nvBtn = document.getElementById('nonVegFilter');
-        let cards = document.querySelectorAll('.item-card');
-        
-        if(type === 'veg') {
-            vBtn.classList.toggle('active-veg');
-            nvBtn.classList.remove('active-nonveg');
-        } else {
-            nvBtn.classList.toggle('active-nonveg');
-            vBtn.classList.remove('active-veg');
+            card.style.display = name.includes(input) ? "block" : "none";
         }
-
-        let isV = vBtn.classList.contains('active-veg');
-        let isNV = nvBtn.classList.contains('active-nonveg');
-
-        cards.forEach(card => {
-            let cType = card.getAttribute('data-type');
-            if(!isV && !isNV) card.style.display = "block";
-            else if(isV && cType === 'veg') card.style.display = "block";
-            else if(isNV && cType === 'nonveg') card.style.display = "block";
-            else card.style.display = "none";
-        });
     }
 </script>
