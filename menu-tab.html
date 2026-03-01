@@ -8,83 +8,76 @@
     .filter-btn { background: rgba(255,255,255,0.05); border: 1px solid #444; color: #ccc; padding: 8px 18px; border-radius: 20px; font-size: 11px; white-space: nowrap; cursor: pointer; font-weight: bold; transition: 0.3s; }
     .filter-btn.active { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px var(--gold); }
 
-    /* Hero Banner */
+    /* Banners & Highlights */
     .hero-banner-wrap { width: 100%; height: 200px; border-radius: 15px; overflow: hidden; border: 2px solid var(--gold); margin-bottom: 25px; box-shadow: 0 0 20px rgba(212,175,55,0.4); }
-    .hero-banner-img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* Section Banners */
     .img-frame { width: 100%; height: 130px; border-radius: 12px; overflow: hidden; border: 1px solid var(--gold); margin: 30px 0 15px; }
     .section-banner { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: brightness(0.8); }
     .img-frame:hover .section-banner { transform: scale(1.1); filter: brightness(1.1); }
     .cat-title { color: var(--gold); font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; }
 
-    /* Menu Grid & Item Cards */
+    /* Grid Layout */
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .item-card { background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; transition: 0.3s; }
+    .item-card { background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; transition: 0.2s; }
     .item-name { font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 5px; min-height: 32px; line-height: 1.3; }
     .price-tag { color: var(--gold); font-size: 11px; font-weight: bold; margin-bottom: 10px; }
 
-    /* Add/Less Counter Styling */
+    /* Add/Less Counter */
     .counter-row { display: flex; align-items: center; justify-content: space-between; background: var(--gold); border-radius: 6px; padding: 2px; margin-top: auto; }
     .count-btn { background: none; border: none; color: #000; font-size: 18px; font-weight: bold; width: 30px; cursor: pointer; }
     .count-val { color: #000; font-weight: 800; font-size: 14px; }
     .add-initial-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; width: 100%; margin-top: auto; }
 
-    /* Floating Cart Bar */
+    /* Cart Floating UI */
     .cart-bar { position: fixed; bottom: 85px; left: 5%; width: 90%; background: var(--gold); color: #000; padding: 15px; border-radius: 50px; display: none; justify-content: space-between; align-items: center; z-index: 3000; box-shadow: 0 5px 20px #000; cursor: pointer; }
-    .cart-info { font-weight: 900; font-size: 14px; }
-
-    /* Cart Modal (Popup) */
     .cart-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 4000; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
     .cart-items-list { flex: 1; overflow-y: auto; margin: 20px 0; border-top: 1px solid var(--gold); padding-top: 10px; }
     .cart-item-row { display: flex; justify-content: space-between; color: #fff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-    .cancel-btn { background: #ff4444; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; }
-    .confirm-btn { background: var(--gold); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: 900; }
 </style>
 
 <div class="menu-tab">
     <h2 class="menu-header">ROYAL MENU</h2>
-    
-    <input type="text" id="menuSearch" class="search-box" placeholder="Kya khaoge aaj? (Search 42 items...)" onkeyup="masterFilter()">
+    <input type="text" id="menuSearch" class="search-box" placeholder="Kya khaoge aaj?" onkeyup="runMasterFilter()">
     
     <div class="filter-scroll">
-        <button class="filter-btn active" onclick="updateCat('all', this)">All</button>
-        <button class="filter-btn" onclick="updateCat('combo', this)">Combos</button>
-        <button class="filter-btn" onclick="updateCat('nonveg', this)">Non-Veg</button>
-        <button class="filter-btn" onclick="updateCat('veg', this)">Veg</button>
-        <button class="filter-btn" onclick="updateCat('maggie', this)">Maggie</button>
-        <button class="filter-btn" onclick="updateCat('egg', this)">Egg Station</button>
-        <button class="filter-btn" onclick="updateCat('rice', this)">Rice & Breads</button>
+        <button class="filter-btn active" onclick="setCategory('all', this)">All</button>
+        <button class="filter-btn" onclick="setCategory('combo', this)">Combos</button>
+        <button class="filter-btn" onclick="setCategory('nonveg', this)">Non-Veg</button>
+        <button class="filter-btn" onclick="setCategory('veg', this)">Veg</button>
+        <button class="filter-btn" onclick="setCategory('maggie', this)">Maggie</button>
+        <button class="filter-btn" onclick="setCategory('egg', this)">Egg Station</button>
+        <button class="filter-btn" onclick="setCategory('rice', this)">Rice & Breads</button>
     </div>
 
     <div class="section-group" id="sec-combo">
         <div class="hero-banner-wrap"><img src="ROYAL COMBO.jpg" class="hero-banner-img"></div>
         <span class="cat-title">👑 Royal Combos</span>
         <div class="menu-grid">
-            <div class="item-card dish-item" data-name="tawa chicken paratha combo">
-                <div class="item-name">Tawa Chicken + Paratha</div><div class="price-tag">₹259</div>
-                <div id="btn-TawaChickenCombo"><button class="add-initial-btn" onclick="changeQty('Tawa Chicken Combo', 259, 1)">+ Add</button></div>
-            </div>
-            <div class="item-card dish-item" data-name="tawa chicken kulcha combo">
-                <div class="item-name">Tawa Chicken + Kulcha</div><div class="price-tag">₹249</div>
-                <div id="btn-TawaChickenKulcha"><button class="add-initial-btn" onclick="changeQty('Tawa Chicken Kulcha', 249, 1)">+ Add</button></div>
-            </div>
-            </div>
+            <div class="item-card dish-item" data-name="tawa chicken paratha combo"><div class="item-name">Tawa Chicken + Paratha</div><div class="price-tag">₹259</div><div id="btn-TawaChickenParatha"><button class="add-initial-btn" onclick="changeQty('Tawa Chicken Paratha', 259, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa chicken kulcha combo"><div class="item-name">Tawa Chicken + Kulcha</div><div class="price-tag">₹249</div><div id="btn-TawaChickenKulcha"><button class="add-initial-btn" onclick="changeQty('Tawa Chicken Kulcha', 249, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="paneer bhurji paratha combo"><div class="item-name">Paneer Bhurji + Paratha</div><div class="price-tag">₹209</div><div id="btn-PaneerBhurjiParatha"><button class="add-initial-btn" onclick="changeQty('Paneer Bhurji Paratha', 209, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="paneer bhurji kulcha combo"><div class="item-name">Paneer Bhurji + Kulcha</div><div class="price-tag">₹199</div><div id="btn-PaneerBhurjiKulcha"><button class="add-initial-btn" onclick="changeQty('Paneer Bhurji Kulcha', 199, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa paneer paratha combo"><div class="item-name">Tawa Paneer + Paratha</div><div class="price-tag">₹209</div><div id="btn-TawaPaneerParatha"><button class="add-initial-btn" onclick="changeQty('Tawa Paneer Paratha', 209, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa paneer kulcha combo"><div class="item-name">Tawa Paneer + Kulcha</div><div class="price-tag">₹199</div><div id="btn-TawaPaneerKulcha"><button class="add-initial-btn" onclick="changeQty('Tawa Paneer Kulcha', 199, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa egg paratha combo"><div class="item-name">Tawa Egg + Paratha</div><div class="price-tag">₹139</div><div id="btn-TawaEggParatha"><button class="add-initial-btn" onclick="changeQty('Tawa Egg Paratha', 139, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa egg kulcha combo"><div class="item-name">Tawa Egg + Kulcha</div><div class="price-tag">₹129</div><div id="btn-TawaEggKulcha"><button class="add-initial-btn" onclick="changeQty('Tawa Egg Kulcha', 129, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="egg bhurji paratha combo"><div class="item-name">Egg Bhurji + Paratha</div><div class="price-tag">₹119</div><div id="btn-EggBhurjiParatha"><button class="add-initial-btn" onclick="changeQty('Egg Bhurji Paratha', 119, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="egg bhurji kulcha combo"><div class="item-name">Egg Bhurji + Kulcha</div><div class="price-tag">₹109</div><div id="btn-EggBhurjiKulcha"><button class="add-initial-btn" onclick="changeQty('Egg Bhurji Kulcha', 109, 1)">+ Add</button></div></div>
+        </div>
     </div>
 
     <div class="section-group section-wrap" id="sec-nonveg">
         <div class="img-frame"><img src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&w=1000&q=80" class="section-banner"></div>
         <span class="cat-title">🍗 Non-Veg Specials</span>
         <div class="menu-grid">
-            <div class="item-card dish-item" data-name="rsk special chicken half">
-                <div class="item-name">RSK Special Chicken (H)</div><div class="price-tag">₹219</div>
-                <div id="btn-RSKChickenH"><button class="add-initial-btn" onclick="changeQty('RSK Chicken (H)', 219, 1)">+ Add</button></div>
-            </div>
-            <div class="item-card dish-item" data-name="rsk special chicken full">
-                <div class="item-name">RSK Special Chicken (F)</div><div class="price-tag">₹399</div>
-                <div id="btn-RSKChickenF"><button class="add-initial-btn" onclick="changeQty('RSK Chicken (F)', 399, 1)">+ Add</button></div>
-            </div>
-            </div>
+            <div class="item-card dish-item" data-name="rsk special chicken half"><div class="item-name">RSK Chicken (H)</div><div class="price-tag">₹219</div><div id="btn-RSKChickenH"><button class="add-initial-btn" onclick="changeQty('RSK Chicken (H)', 219, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="rsk special chicken full"><div class="item-name">RSK Chicken (F)</div><div class="price-tag">₹399</div><div id="btn-RSKChickenF"><button class="add-initial-btn" onclick="changeQty('RSK Chicken (F)', 399, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa chicken half"><div class="item-name">Tawa Chicken (H)</div><div class="price-tag">₹229</div><div id="btn-TawaChickenH"><button class="add-initial-btn" onclick="changeQty('Tawa Chicken (H)', 229, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="tawa chicken full"><div class="item-name">Tawa Chicken (F)</div><div class="price-tag">₹409</div><div id="btn-TawaChickenF"><button class="add-initial-btn" onclick="changeQty('Tawa Chicken (F)', 409, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="chilly chicken half"><div class="item-name">Chilly Chicken (H)</div><div class="price-tag">₹189</div><div id="btn-ChillyChickenH"><button class="add-initial-btn" onclick="changeQty('Chilly Chicken (H)', 189, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="chilly chicken full"><div class="item-name">Chilly Chicken (F)</div><div class="price-tag">₹349</div><div id="btn-ChillyChickenF"><button class="add-initial-btn" onclick="changeQty('Chilly Chicken (F)', 349, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="diet paper chicken"><div class="item-name">Diet Paper Chicken</div><div class="price-tag">₹199 / ₹359</div><div id="btn-DietPaper"><button class="add-initial-btn" onclick="changeQty('Diet Paper Chicken', 199, 1)">+ Add</button></div></div>
+            <div class="item-card dish-item" data-name="chicken cheese balls"><div class="item-name">Chicken Cheese Balls</div><div class="price-tag">₹189</div><div id="btn-CheeseBalls"><button class="add-initial-btn" onclick="changeQty('Chicken Cheese Balls', 189, 1)">+ Add</button></div></div>
+        </div>
     </div>
 
     <div class="section-group section-wrap" id="sec-rice">
@@ -108,15 +101,16 @@
         <h2 style="color:var(--gold); font-family:'Marcellus';">Royal Cart</h2>
         <div class="cart-items-list" id="modalItemsList"></div>
         <div style="color:var(--gold); font-size:20px; font-weight:bold; margin-bottom:20px;" id="modalTotal">Total: ₹0</div>
-        <button class="cancel-btn" onclick="cancelOrder()">❌ CANCEL ORDER</button>
-        <button class="confirm-btn" onclick="confirmOrder()">🚀 PLACE ORDER (WhatsApp)</button>
-        <button class="add-initial-btn" style="margin-top:10px; background:#444; color:#fff;" onclick="toggleCartModal(false)">CLOSE</button>
+        <button onclick="cancelOrder()" style="background:#ff4444; color:#fff; border:none; padding:12px; border-radius:8px; width:100%; margin-bottom:10px;">❌ CANCEL ORDER</button>
+        <button onclick="confirmOrder()" style="background:var(--gold); color:#000; border:none; padding:15px; border-radius:8px; width:100%; font-weight:900;">🚀 PLACE ORDER (WhatsApp)</button>
+        <button onclick="toggleCartModal(false)" style="background:#444; color:#fff; border:none; padding:10px; border-radius:8px; width:100%; margin-top:10px;">CLOSE</button>
     </div>
 </div>
 
 <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBPKkzFJT5Pqmn-_88ziR1nwcnoJWeXbIPjZGD4P9TYgTr45pcTt2yPxrYwTHe4HFe/exec";
     let cart = {};
-    let currentCategory = 'all';
+    let activeCat = 'all';
 
     function changeQty(name, price, delta) {
         if (!cart[name]) cart[name] = { price: price, qty: 0 };
@@ -127,92 +121,72 @@
 
     function updateUI(name, price) {
         const btnId = "btn-" + name.replace(/\s+/g, '');
-        const btnContainer = document.getElementById(btnId);
-        if(!btnContainer) return;
-
+        const container = document.getElementById(btnId);
+        if(!container) return;
         const qty = cart[name] ? cart[name].qty : 0;
-
         if (qty > 0) {
-            btnContainer.innerHTML = `
-                <div class="counter-row">
-                    <button class="count-btn" onclick="changeQty('${name}', ${price}, -1)">-</button>
-                    <span class="count-val">${qty}</span>
-                    <button class="count-btn" onclick="changeQty('${name}', ${price}, 1)">+</button>
-                </div>`;
+            container.innerHTML = `<div class="counter-row"><button class="count-btn" onclick="changeQty('${name}', ${price}, -1)">-</button><span class="count-val">${qty}</span><button class="count-btn" onclick="changeQty('${name}', ${price}, 1)">+</button></div>`;
         } else {
-            btnContainer.innerHTML = `<button class="add-initial-btn" onclick="changeQty('${name}', ${price}, 1)">+ Add</button>`;
+            container.innerHTML = `<button class="add-initial-btn" onclick="changeQty('${name}', ${price}, 1)">+ Add</button>`;
         }
         updateCartBar();
     }
 
     function updateCartBar() {
         let total = 0, count = 0;
-        for (let key in cart) {
-            total += cart[key].price * cart[key].qty;
-            count += cart[key].qty;
-        }
-        const bar = document.getElementById('cartBar');
-        if (count > 0) {
-            bar.style.display = 'flex';
-            document.getElementById('cartSummary').innerText = `${count} Items | ₹${total}`;
-        } else {
-            bar.style.display = 'none';
-        }
+        for (let k in cart) { total += cart[k].price * cart[k].qty; count += cart[k].qty; }
+        document.getElementById('cartBar').style.display = count > 0 ? 'flex' : 'none';
+        document.getElementById('cartSummary').innerText = `${count} Items | ₹${total}`;
     }
 
     function toggleCartModal(show) {
-        const modal = document.getElementById('cartModal');
-        modal.style.display = show ? 'flex' : 'none';
-        if (show) renderModalItems();
+        document.getElementById('cartModal').style.display = show ? 'flex' : 'none';
+        if (show) {
+            let list = document.getElementById('modalItemsList'), h = '', t = 0;
+            for (let k in cart) { let s = cart[k].price * cart[k].qty; t += s; h += `<div class="cart-item-row"><span>${k} x ${cart[k].qty}</span><span>₹${s}</span></div>`; }
+            list.innerHTML = h || 'Cart empty';
+            document.getElementById('modalTotal').innerText = `Total: ₹${t}`;
+        }
     }
 
-    function renderModalItems() {
-        const list = document.getElementById('modalItemsList');
-        let html = '', total = 0;
-        for (let key in cart) {
-            let subtotal = cart[key].price * cart[key].qty;
-            total += subtotal;
-            html += `<div class="cart-item-row"><span>${key} x ${cart[key].qty}</span><span>₹${subtotal}</span></div>`;
-        }
-        list.innerHTML = html || '<p style="color:#888;">Cart is empty</p>';
-        document.getElementById('modalTotal').innerText = `Total: ₹${total}`;
+    function sendToSheet(status) {
+        let itms = ""; let total = 0;
+        for (let k in cart) { itms += `${k} (${cart[k].qty}), `; total += cart[k].price * cart[k].qty; }
+        fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ status: status, customer: "Urvashi", items: itms, total: total }) });
     }
 
     function confirmOrder() {
-        let msg = "Pranam RSK! I'd like to place an order:%0A";
-        for (let key in cart) msg += `- ${key} (${cart[key].qty})%0A`;
+        sendToSheet("Confirmed");
+        let msg = "Pranam RSK! Order details:%0A";
+        for (let k in cart) msg += `- ${k} (${cart[k].qty})%0A`;
         window.open(`https://wa.me/7489999890?text=${msg}`, '_blank');
     }
 
     function cancelOrder() {
-        if(confirm("Are you sure you want to cancel?")) {
-            window.open(`https://wa.me/7489999890?text=Order%20Cancelled%20by%20Customer`, '_blank');
-            cart = {};
-            location.reload(); 
+        if(confirm("Cancel order?")) {
+            sendToSheet("Cancelled");
+            window.open(`https://wa.me/7489999890?text=Order%20Cancelled`, '_blank');
+            cart = {}; location.reload();
         }
     }
 
-    function updateCat(cat, btn) {
-        currentCategory = cat;
+    function setCategory(cat, btn) {
+        activeCat = cat;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        masterFilter();
+        runMasterFilter();
     }
 
-    function masterFilter() {
+    function runMasterFilter() {
         let query = document.getElementById('menuSearch').value.toLowerCase();
         document.querySelectorAll('.section-group').forEach(sec => {
-            let secCat = sec.id.replace('sec-', '');
-            let items = sec.querySelectorAll('.dish-item');
-            let hasVisible = false;
-
-            items.forEach(item => {
-                let name = item.getAttribute('data-name').toLowerCase();
-                let match = name.includes(query) && (currentCategory === 'all' || secCat === currentCategory);
-                item.style.display = match ? "flex" : "none";
-                if(match) hasVisible = true;
+            let secID = sec.id.replace('sec-', ''), items = sec.querySelectorAll('.dish-item'), hasV = false;
+            items.forEach(i => {
+                let m = i.getAttribute('data-name').toLowerCase().includes(query) && (activeCat === 'all' || secID === activeCat);
+                i.style.display = m ? "flex" : "none";
+                if(m) hasV = true;
             });
-            sec.style.display = hasVisible ? "block" : "none";
+            sec.style.display = hasV ? "block" : "none";
         });
     }
 </script>
