@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #D4AF37; --black: #0a0a0a; --royal-red: #3a0d0d; }
+        
         body { margin: 0; background: var(--black); background-image: radial-gradient(circle at center, var(--royal-red) 0%, var(--black) 100%); color: #fff; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
         /* --- HEADER --- */
@@ -15,29 +16,21 @@
         h1 { font-family: 'Marcellus', serif; color: var(--gold); margin: 15px 0 5px; letter-spacing: 2px; text-transform: uppercase; }
         .i-love-ind { width: 120px; margin-top: 5px; filter: drop-shadow(0 0 5px var(--gold)); }
 
-        /* --- FIXED TAB LINE --- */
+        /* --- STICKY NAV LINE --- */
         .bottom-nav { position: sticky; top: 0; z-index: 2000; width: 100%; background: rgba(15, 12, 5, 0.95); border-bottom: 2px solid var(--gold); display: flex; justify-content: space-around; padding: 15px 0; backdrop-filter: blur(10px); }
-        .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; letter-spacing: 1px; }
-        .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
+        .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; letter-spacing: 1px; transition: 0.3s; }
+        .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
 
-        .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; padding: 15px; padding-bottom: 100px; }
-        .page { display: none; animation: fadeIn 0.4s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* --- IMAGE ADJUSTMENTS --- */
-        .royal-frame { width: 100%; border: 2px solid var(--gold); border-radius: 15px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
-        .banner-img { width: 100%; display: block; }
-        
-        /* --- MENU & COMBO --- */
-        .menu-card { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .combo-img { width: 100%; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--gold); }
+        /* --- CONTENT AREA --- */
+        .app-container { max-width: 500px; margin: 0 auto; min-height: 70vh; padding: 15px; padding-bottom: 50px; }
+        #content-area { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- INSTA JUMPU --- */
-        .insta-jumpu { position: fixed; bottom: 30px; right: 20px; z-index: 1001; width: 55px; height: 55px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; animation: jump 3s infinite; box-shadow: 0 0 15px var(--gold); }
+        .insta-jumpu { position: fixed; bottom: 30px; right: 20px; z-index: 1001; width: 55px; height: 55px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; animation: jump 3s infinite; box-shadow: 0 0 15px var(--gold); text-decoration: none; }
         @keyframes jump { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-25px);} 60% {transform: translateY(-12px);} }
 
-        /* --- FOOTER LOGOS --- */
+        /* --- FOOTER --- */
         .footer-section { text-align: center; padding: 30px 20px; border-top: 1px solid rgba(212,175,55,0.2); background: rgba(0,0,0,0.5); }
         .fssai-main { width: 180px; margin-bottom: 15px; }
         .sub-logos { display: flex; justify-content: center; gap: 25px; align-items: center; }
@@ -59,217 +52,12 @@
     <div class="nav-item" id="btn-reach" onclick="showTab('reach')">Reach</div>
 </div>
 
-<div class="app-container">
-    <a href="https://www.instagram.com/rsk.indore/" class="insta-jumpu" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="30">
-    </a>
-
-    <div id="home" class="page">
-        <div class="royal-frame"><img src="MAIN_BANNER.jpeg" class="banner-img"></div>
-        <p style="text-align:center; color:var(--gold); font-style:italic;">"Numbers ki duniya se nikal kar, Swaad ki duniya tak ka safar"</p>
-        <div class="royal-frame"><img src="CART_ROYAL_TYPE.jpeg" class="banner-img"></div>
+<div class="app-container" id="content-area">
     </div>
 
-    <div id="menu" class="page">
-        <h2 style="color:var(--gold); font-family:'Marcellus'; border-bottom:1px solid var(--gold);">Royal Menu</h2>
-        
-        <div class="royal-frame">
-            <img src="ROYAL COMBO.jpg" class="banner-img">
-            <div style="padding:10px; text-align:center;">
-                <strong style="color:var(--gold);">Royal Combo</strong>
-                <p style="font-size:12px; margin:5px 0;">Swaad jo dil jeet le! ₹199/-</p>
-            </div>
-        </div>
-
-        <div class="menu-card">
-            <span>Fried Snacks (Veg/Non-Veg)</span>
-            <span style="color:var(--gold);">Starts @ ₹99</span>
-        </div>
-    </div>
-<style>
-    /* Side-by-Side Grid */
-    .menu-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 30px;
-    }
-
-    /* Category Image with Glow Effect */
-    .category-header {
-        position: relative;
-        width: 100%;
-        height: 150px;
-        border-radius: 15px;
-        overflow: hidden;
-        margin: 25px 0 15px 0;
-        border: 2px solid #333;
-        transition: 0.4s ease;
-        cursor: pointer;
-    }
-
-    /* Cursor ya Touch par Glow */
-    .category-header:hover {
-        border-color: #D4AF37;
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); /* Gold Glow */
-        transform: scale(1.02);
-    }
-
-    .cat-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.6; /* Photo thodi dark taaki text dikhe */
-    }
-
-    .cat-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: #D4AF37;
-        font-size: 22px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-        width: 100%;
-    }
-
-    /* Item Card Styling */
-    .item-card {
-        background: #111;
-        border-left: 3px solid #D4AF37;
-        border-radius: 8px;
-        padding: 12px;
-        text-align: left;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    .item-title {
-        font-size: 14px;
-        font-weight: bold;
-        color: #fff;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-    }
-
-    .price-box {
-        display: flex;
-        justify-content: space-between;
-        background: #1a1a1a;
-        padding: 5px 8px;
-        border-radius: 4px;
-    }
-
-    .p-label { color: #666; font-size: 10px; }
-    .p-amt { color: #D4AF37; font-weight: bold; font-size: 13px; }
-
-    /* Green WhatsApp Button */
-    .wa-btn {
-        background: #25D366;
-        color: white;
-        text-decoration: none;
-        padding: 15px;
-        border-radius: 50px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin: 30px 0;
-        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-    }
-</style>
-
-<div class="container">
-    <h1 class="menu-title" style="color:#D4AF37;">ROYAL MENU</h1>
-
-    <div class="category-header">
-        <img src="nonveg-head.jpg" class="cat-img" alt="Non-Veg Specials">
-        <div class="cat-text">🍗 NON-VEG SPECIALS</div>
-    </div>
-    
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-title">Chicken Lollipop</div>
-            <div class="price-box">
-                <div><span class="p-label">H</span> <span class="p-amt">₹100</span></div>
-                <div><span class="p-label">F</span> <span class="p-amt">₹180</span></div>
-            </div>
-        </div>
-
-        <div class="item-card">
-            <div class="item-title">Chicken Crispy</div>
-            <div class="price-box">
-                <div><span class="p-label">H</span> <span class="p-amt">₹90</span></div>
-                <div><span class="p-label">F</span> <span class="p-amt">₹160</span></div>
-            </div>
-        </div>
-
-        <div class="item-card">
-            <div class="item-title">Chicken Popcorn</div>
-            <div class="p-amt">₹100</div>
-        </div>
-
-        <div class="item-card">
-            <div class="item-title">Chicken Wings</div>
-            <div class="p-amt">₹100</div>
-        </div>
-    </div>
-
-    <div class="category-header">
-        <img src="veg-head.jpg" class="cat-img" alt="Veg Delights">
-        <div class="cat-text">🥬 VEG DELIGHTS</div>
-    </div>
-
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-title">French Fries</div>
-            <div class="p-amt">₹60</div>
-        </div>
-
-        <div class="item-card">
-            <div class="item-title">Peri Peri Fries</div>
-            <div class="p-amt">₹80</div>
-        </div>
-
-        <div class="item-card">
-            <div class="item-title">Veg Nuggets</div>
-            <div class="p-amt">₹80</div>
-        </div>
-
-        <div class="item-card">
-            <div class="item-title">Veg Seekh Kebab</div>
-            <div class="p-amt">₹80</div>
-        </div>
-    </div>
-
-    <a href="https://wa.me/917489999890?text=HI%20RSK%20I%20WANT%20TO%20ORDER" class="wa-btn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="25">
-        ORDER ON WHATSAPP
-    </a>
-</div>
-    
-    <p style="font-size: 11px; color: #555;">*Prices are subject to change</p>
-</div>
-    
-   
-    <div id="safar" class="page">
-        <h2 style="color:var(--gold); font-family:'Marcellus';">Hamaara Safar</h2>
-        <div class="royal-frame"><img src="IMAGEEE_CCCART.jpeg" class="banner-img"></div>
-        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; border-left:4px solid var(--gold);">
-            <p>"Accountant ki mehnat se 'Royal Street Kitchen' ke swaad tak. Ye kahani hai sapno ko sach karne ki."</p>
-        </div>
-    </div>
-
-    <div id="reach" class="page">
-        <div style="background: rgba(20, 5, 5, 0.9); border: 2px solid var(--gold); padding: 20px; border-radius: 15px; text-align:center;">
-            <h3 style="color:var(--gold);">Royal Court</h3>
-            <p>📍 Mahalaxmi Nagar, Indore</p>
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3680.123456789!2d75.8912345!3d22.7512345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDQ1JzAzLjUiTiA3NcKwNTMnMjguNCJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" width="100%" height="200" style="border:0; border-radius:10px; margin-top:10px;" allowfullscreen="" loading="lazy"></iframe>
-        </div>
-    </div>
-</div>
+<a href="https://www.instagram.com/rsk.indore/" class="insta-jumpu" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="30">
+</a>
 
 <div class="footer-section">
     <img src="FSSAI_Logo.png" class="fssai-main">
@@ -280,22 +68,36 @@
 </div>
 
 <script>
+    // Manager Function: Tab content mangwane ke liye
+    function showTab(tabId) {
+        // Nav Active State
+        var navItems = document.getElementsByClassName('nav-item');
+        for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
+        const activeBtn = document.getElementById('btn-' + tabId);
+        if(activeBtn) activeBtn.classList.add('active');
+
+        // Fetch Tab File
+        fetch(tabId + '-tab.html')
+            .then(response => {
+                if (!response.ok) throw new Error("File Missing");
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('content-area').innerHTML = data;
+            })
+            .catch(err => {
+                document.getElementById('content-area').innerHTML = "<div style='text-align:center; padding:50px;'>👑 Loading Royal Experience...</div>";
+            });
+
+        localStorage.setItem('activeTab', tabId);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // Page load hone par default tab
     window.onload = function() {
         var savedTab = localStorage.getItem('activeTab') || 'home';
         showTab(savedTab);
     };
-
-    function showTab(tabId) {
-        var pages = document.getElementsByClassName('page');
-        for (var i = 0; i < pages.length; i++) { pages[i].classList.remove('active'); }
-        var navItems = document.getElementsByClassName('nav-item');
-        for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
-        
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById('btn-' + tabId).classList.add('active');
-        localStorage.setItem('activeTab', tabId);
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
 </script>
 
 </body>
