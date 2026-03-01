@@ -13,18 +13,15 @@
         header { padding: 40px 20px; text-align: center; background: linear-gradient(to bottom, rgba(58, 13, 13, 0.9), transparent); }
         .main-logo { width: 110px; height: 110px; border-radius: 50%; border: 2px solid var(--gold); padding: 5px; box-shadow: 0 0 25px var(--gold); margin-bottom: 10px; }
         
-        /* UNIQUE CSS CROWN (No Image/No Emoji) */
-        .crown-container { width: 50px; height: 30px; margin: 0 auto -5px; position: relative; animation: crownFloat 3s infinite ease-in-out; }
-        .crown-base { width: 30px; height: 6px; background: var(--gold); position: absolute; bottom: 0; left: 10px; border-radius: 2px; box-shadow: 0 0 10px var(--gold); }
-        .crown-point { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 15px solid var(--gold); position: absolute; bottom: 6px; filter: drop-shadow(0 0 5px var(--gold)); }
-        .p1 { left: 5px; transform: rotate(-20deg); }
-        .p2 { left: 17px; height: 20px; border-bottom-width: 20px; z-index: 2; }
-        .p3 { left: 29px; transform: rotate(20deg); }
-
-        @keyframes crownFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .crown-shahi { 
+            font-size: 30px; display: block; margin-bottom: -10px;
+            background: linear-gradient(to bottom, #fff, var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px var(--gold));
+        }
 
         h1 { 
-            font-family: 'Marcellus', serif; font-weight: 400; font-size: 32px; margin: 5px 0; 
+            font-family: 'Marcellus', serif; font-size: 32px; margin: 5px 0; 
             letter-spacing: 4px; text-transform: uppercase;
             background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fcf6ba, #aa771c);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -46,16 +43,21 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- MENU & REACH --- */
+        /* --- MENU SYSTEM --- */
         .search-container { padding: 10px 15px; background: rgba(255,255,255,0.05); margin: 15px; border-radius: 10px; border: 1px solid var(--gold); }
         #menuSearch { width: 100%; background: transparent; border: none; color: #fff; outline: none; }
         .royal-frame { width: 100%; border: 2px solid var(--gold); border-radius: 15px; margin: 25px 0 15px; overflow: hidden; box-shadow: 0 0 15px rgba(212,175,55,0.2); }
         .banner-img { width: 100%; display: block; }
+        .cat-title { color: var(--gold); border-left: 4px solid var(--gold); padding-left: 10px; margin: 20px 0 10px; }
+        
         .menu-row { display: flex; gap: 8px; margin-bottom: 8px; }
         .menu-card { flex: 1; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 13px; }
         .price { color: var(--gold); font-weight: bold; margin-top: 5px; }
-        .reach-card { background: rgba(20, 5, 5, 0.9); border: 2px solid var(--gold); padding: 30px; border-radius: 20px; text-align:center; box-shadow: 0 0 20px rgba(212,175,55,0.2); }
-        .qr-wrapper { background: #fff; padding: 10px; border-radius: 15px; display: inline-block; border: 3px solid var(--gold); margin: 20px 0; }
+        .hf-label { font-size: 9px; color: #aaa; text-transform: uppercase; }
+
+        /* --- REACH --- */
+        .reach-card { background: rgba(20, 5, 5, 0.9); border: 2px solid var(--gold); padding: 30px; border-radius: 20px; text-align:center; }
+        .qr-wrapper { background: #fff; padding: 10px; border-radius: 15px; display: inline-block; border: 3px solid var(--gold); margin: 20px 0; box-shadow: 0 0 15px var(--gold); }
         .qr-wrapper img { width: 140px; display: block; }
     </style>
 </head>
@@ -63,12 +65,7 @@
 
 <header>
     <img src="MAIN_LOGO.jpeg" class="main-logo" alt="RSK Logo">
-    <div class="crown-container">
-        <div class="crown-point p1"></div>
-        <div class="crown-point p2"></div>
-        <div class="crown-point p3"></div>
-        <div class="crown-base"></div>
-    </div>
+    <span class="crown-shahi">👑</span>
     <h1>Royal Street Kitchen</h1>
     <img src="i_love_ind.png" class="indore-heartbeat" alt="I Love Indore">
 </header>
@@ -81,30 +78,54 @@
 </div>
 
 <div class="app-container">
-    <div id="reach" class="page">
-        <div class="reach-card">
-            <h2 style="color:var(--gold); font-family: 'Marcellus', serif;">Royal Serving Hours</h2>
-            <p>4:00 PM - 11:00 PM (All Day)</p>
-            <p style="color:#ff4d4d; font-weight: bold; border: 1px solid #ff4d4d; display: inline-block; padding: 5px 15px; border-radius: 5px;">⚠️ TUESDAY CLOSED</p>
-            
-            <div style="margin-top: 30px;">
-                <h3 style="color:var(--gold);">Location</h3>
-                <p>📍 Nearby Elite Apex Township,<br>Mahalaxmi Nagar, Indore</p>
-            </div>
-
-            <div class="qr-wrapper">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/917489999890" alt="WA QR">
-            </div>
-            <p style="font-size: 11px; color: #888;">Scan to chat on WhatsApp</p>
-
-            <a href="https://maps.google.com/?q=Mahalaxmi+Nagar+Indore" target="_blank" style="text-decoration:none;"><div style="background:var(--gold); color:#000; padding:15px; border-radius:10px; font-weight:bold; margin-top:10px;">Open in Google Maps</div></a>
-        </div>
-    </div>
-
     <div id="home" class="page">
         <div class="royal-frame"><img src="MAIN_BANNER.jpeg" class="banner-img"></div>
         <p style="text-align:center; color:var(--gold); font-style:italic;">"Numbers ki duniya se nikal kar, Swaad ki duniya tak ka safar"</p>
         <div class="royal-frame"><img src="CART_ROYAL_TYPE.jpeg" class="banner-img"></div>
+        <a href="https://wa.me/917489999890" style="text-decoration:none;"><div style="background:linear-gradient(135deg, var(--gold), #996515); color:#000; text-align:center; padding:18px; border-radius:50px; font-weight:900; margin-top:20px;">Order on WhatsApp</div></a>
+    </div>
+
+    <div id="menu" class="page">
+        <div class="search-container"><input type="text" id="menuSearch" placeholder="Chicken, Maggie, Paneer..." onkeyup="filterMenu()"></div>
+        
+        <div class="royal-frame"><img src="NON_VEG_HEAD.jpg" class="banner-img"></div>
+        <div class="cat-title"><h3>Non-Veg Starters</h3></div>
+        <div class="menu-row">
+            <div class="menu-card"><div>Chilly Chicken</div><div class="price">₹189 / ₹349</div><div class="hf-label">Half / Full</div></div>
+            <div class="menu-card"><div>Diet Paper Chicken</div><div class="price">₹199 / ₹359</div><div class="hf-label">Half / Full</div></div>
+        </div>
+        <div class="menu-row">
+            <div class="menu-card"><div>Creamy Paper Chicken</div><div class="price">₹219 / ₹399</div><div class="hf-label">Half / Full</div></div>
+            <div class="menu-card"><div>RSK Special Chicken</div><div class="price">₹219 / ₹399</div><div class="hf-label">Half / Full</div></div>
+        </div>
+        <div class="royal-frame"><img src="ROYAL_COMBO.jpg" class="banner-img"></div>
+        <div class="cat-title"><h3>RSK Royal Combos</h3></div>
+        <div class="menu-row">
+            <div class="menu-card"><div>Tawa Chicken + Paratha</div><div class="price">₹259</div></div>
+            <div class="menu-card"><div>Tawa Chicken + Kulcha</div><div class="price">₹249</div></div>
+        </div>
+    </div>
+
+    <div id="safar" class="page">
+        <div class="royal-frame"><img src="IMAGEEE_CCCART.jpeg" class="banner-img"></div>
+        <div style="background: rgba(58, 13, 13, 0.8); border: 2px solid var(--gold); padding: 25px; border-radius: 15px;">Numbers ki duniya se nikal kar Swaad ki duniya tak ka safar! Ek Accountant se Chef banne tak ka passion hi RSK ki neev hai.</div>
+    </div>
+
+    <div id="reach" class="page">
+        <div class="reach-card">
+            <h2 style="color:var(--gold);">Royal Serving Hours</h2>
+            <p>4:00 PM - 11:00 PM (All Day)</p>
+            <p style="color:#ff4d4d; font-weight: bold; border: 1px solid #ff4d4d; display: inline-block; padding: 5px 15px; border-radius: 5px;">⚠️ TUESDAY CLOSED</p>
+            <div style="margin-top: 25px;">
+                <h3 style="color:var(--gold);">Location</h3>
+                <p>📍 Nearby Elite Apex Township, Mahalaxmi Nagar, Indore</p>
+            </div>
+            <div class="qr-wrapper">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/917489999890" alt="WA QR">
+            </div>
+            <p style="font-size: 11px; color: #888;">Scan for WhatsApp Order</p>
+            <a href="https://maps.google.com/?q=Mahalaxmi+Nagar+Indore" target="_blank" style="text-decoration:none;"><div style="background:var(--gold); color:#000; padding:15px; border-radius:10px; font-weight:bold; margin-top:10px;">Open Maps</div></a>
+        </div>
     </div>
 </div>
 
@@ -123,6 +144,15 @@
         if(el) el.classList.add('active');
         localStorage.setItem('activeTab', tabId);
         window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function filterMenu() {
+        var input = document.getElementById('menuSearch').value.toUpperCase();
+        var cards = document.getElementsByClassName('menu-card');
+        for (var i = 0; i < cards.length; i++) {
+            var txt = cards[i].textContent || cards[i].innerText;
+            cards[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+        }
     }
 </script>
 </body>
