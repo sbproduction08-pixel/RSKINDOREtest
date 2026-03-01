@@ -68,35 +68,44 @@
 </div>
 
 <script>
-        function showTab(tabId) {
-            // Navigation highlight logic
-            var navItems = document.getElementsByClassName('nav-item');
-            for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if(activeBtn) activeBtn.classList.add('active');
-
-            // Doosri file se content khichne ka logic
-            fetch(tabId + '-tab.html')
-                .then(response => {
-                    if (!response.ok) throw new Error("File Missing");
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('content-area').innerHTML = data;
-                })
-                .catch(err => {
-                    document.getElementById('content-area').innerHTML = "<div style='text-align:center; padding:50px;'>👑 Loading Royal Experience...</div>";
-                });
-
-            localStorage.setItem('activeTab', tabId);
-            window.scrollTo({top: 0, behavior: 'smooth'});
+    function showTab(tabId) {
+        // 1. Navigation highlight
+        var navItems = document.getElementsByClassName('nav-item');
+        for (var i = 0; i < navItems.length; i++) { 
+            navItems[i].classList.remove('active'); 
         }
+        
+        const activeBtn = document.getElementById('btn-' + tabId);
+        if(activeBtn) activeBtn.classList.add('active');
 
-        window.onload = function() {
-            var savedTab = localStorage.getItem('activeTab') || 'home';
-            showTab(savedTab);
-        };
-    </script>
+        // 2. Content area mein loading dikhao
+        const contentArea = document.getElementById('content-area');
+        contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>👑 Loading...</div>";
 
+        // 3. Fetch ka sahi rasta (Path)
+        // ./ lagane se ye usi folder mein dhoondega
+        fetch('./' + tabId + '-tab.html')
+            .then(response => {
+                if (!response.ok) throw new Error("File Missing");
+                return response.text();
+            })
+            .then(data => {
+                contentArea.innerHTML = data;
+            })
+            .catch(err => {
+                console.error(err);
+                contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>File '" + tabId + "-tab.html' nahi mili. GitHub par naam check karein.</div>";
+            });
+
+        localStorage.setItem('activeTab', tabId);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    window.onload = function() {
+        var savedTab = localStorage.getItem('activeTab') || 'home';
+        showTab(savedTab);
+    };
+</script>
+    
 </body>
 </html>
