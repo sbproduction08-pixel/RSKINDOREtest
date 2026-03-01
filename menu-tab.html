@@ -1,119 +1,112 @@
 <style>
-    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-
-    /* --- ROYAL COMBO: HERO BOX ON RIGHT --- */
-    .combo-section { display: flex; justify-content: flex-end; margin-bottom: 30px; padding: 0 10px; }
-    .royal-combo-box { 
-        width: 200px; background: linear-gradient(145deg, #1a1a1a, #000);
-        border: 2px solid var(--gold); border-radius: 15px; overflow: hidden;
-        box-shadow: 0 0 20px rgba(212,175,55,0.4);
+    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
+    
+    /* Search Box Style */
+    .search-container { position: relative; margin-bottom: 20px; }
+    .search-box { 
+        width: 100%; padding: 15px 20px; border-radius: 30px; 
+        border: 1px solid var(--gold); background: #1a1a1a; 
+        color: #fff; outline: none; box-sizing: border-box;
+        font-family: 'Poppins', sans-serif; font-size: 14px;
     }
-    .combo-img-top { width: 100%; height: 130px; object-fit: cover; border-bottom: 1px solid var(--gold); }
-    .combo-info { padding: 12px; text-align: center; }
-    .combo-title { font-size: 14px; font-weight: bold; color: var(--gold); margin-bottom: 8px; font-family: 'Marcellus', serif; line-height: 1.2; }
+    .search-box::placeholder { color: rgba(212,175,55,0.5); }
 
-    /* --- SECTION HEADERS: LEFT ALIGNED WITH CIRCLE IMAGE --- */
-    .section-header { display: flex; align-items: center; gap: 15px; margin: 35px 0 15px; padding-left: 5px; }
-    .section-icon { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 12px rgba(212,175,55,0.3); background: #222; }
-    .cat-title { color: var(--gold); font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    /* Category Filter Buttons */
+    .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 10px; scrollbar-width: none; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .f-btn { 
+        background: rgba(255,255,255,0.05); border: 1px solid #444; color: #ccc; 
+        padding: 6px 15px; border-radius: 20px; font-size: 11px; white-space: nowrap; 
+        cursor: pointer; font-weight: bold;
+    }
+    .f-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
-    /* --- MENU GRID & CARDS --- */
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 10px; }
-    .item-card { background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .item-name { font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 5px; min-height: 32px; }
-    .price-tag { color: var(--gold); font-size: 11px; font-weight: bold; margin-bottom: 10px; }
+    /* --- ROYAL COMBO (RIGHT HERO) --- */
+    .combo-section { display: flex; justify-content: flex-end; margin-bottom: 25px; }
+    .royal-combo-box { 
+        width: 190px; background: #000; border: 2px solid var(--gold); 
+        border-radius: 15px; overflow: hidden; box-shadow: 0 0 15px var(--gold-glow);
+    }
+    .combo-img { width: 100%; height: 110px; object-fit: cover; }
+    .combo-info { padding: 10px; text-align: center; }
 
-    /* Buttons Style */
-    .btn-row { display: flex; gap: 5px; margin-top: auto; }
-    .add-btn { background: #fff; color: #000; border: none; padding: 10px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-    .half-btn { background: #eee; flex: 1; }
-    .full-btn { background: #fff; flex: 1; border: 1px solid var(--gold); }
-    .add-btn:active { background: var(--gold); transform: scale(0.95); }
+    /* --- MENU GRID & SECTION HEADERS --- */
+    .section-header { display: flex; align-items: center; gap: 12px; margin: 30px 0 15px; }
+    .section-icon { width: 45px; height: 45px; border-radius: 50%; border: 1.5px solid var(--gold); object-fit: cover; }
+    .cat-title { color: var(--gold); font-size: 15px; font-weight: bold; text-transform: uppercase; }
+
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .item-card { 
+        background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); 
+        border-radius: 8px; padding: 12px; display: flex; flex-direction: column; 
+    }
+    .item-name { font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 5px; min-height: 30px; }
+    .price-box { color: var(--gold); font-size: 11px; font-weight: bold; margin-bottom: 10px; }
+    .order-btn { 
+        background: var(--gold); color: #000; border: none; padding: 10px; 
+        border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer;
+    }
 
     .checkout-wrap { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 2000; }
     .place-order-btn { background: var(--gold); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; box-shadow: 0 5px 20px #000; cursor: pointer; }
 </style>
 
 <div class="menu-tab">
-    <h2 class="menu-header">Royal Menu</h2>
+    <h2 class="menu-header">ROYAL MENU</h2>
 
-    <div class="combo-section">
+    <div class="search-container">
+        <input type="text" id="menuSearch" class="search-box" placeholder="Kya khaoge aaj? (Search...)" onkeyup="filterMenu()">
+    </div>
+
+    <div class="filter-row">
+        <div class="f-btn active" onclick="filterCategory('all', this)">All</div>
+        <div class="f-btn" onclick="filterCategory('nonveg', this)">Non-Veg</div>
+        <div class="f-btn" onclick="filterCategory('veg', this)">Veg</div>
+        <div class="f-btn" onclick="filterCategory('maggie', this)">Maggie</div>
+        <div class="f-btn" onclick="filterCategory('egg', this)">Egg Station</div>
+    </div>
+
+    <div class="combo-section dish-item" data-name="tawa chicken paratha combo" data-cat="nonveg">
         <div class="royal-combo-box">
-            <img src="ROYAL COMBO.jpg" class="combo-img-top" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3132/3132693.png'">
+            <img src="ROYAL COMBO.jpg" class="combo-img">
             <div class="combo-info">
-                <div class="combo-title">Tawa Chicken + Paratha</div>
-                <div class="price-tag">₹259</div>
-                <button class="add-btn" onclick="window.addToCart('Tawa Chicken Combo', 259)">+ Add Combo</button>
+                <div class="combo-title" style="color:var(--gold); font-size:12px; font-weight:bold;">Royal Combo #1</div>
+                <div class="price-box" style="margin:5px 0;">₹259</div>
+                <button class="order-btn" onclick="window.addToCart('Tawa Chicken Combo', 259)">+ Add Combo</button>
             </div>
         </div>
     </div>
 
-    <div class="section-header">
-        <img src="https://img.freepik.com/free-photo/chicken-wings-barbecue-sweetly-sour-sauce-picnic-summer-menu-tasty-food-top-view-flat-lay_2829-6471.jpg" class="section-icon">
-        <span class="cat-title">Non-Veg Specials</span>
-    </div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">RSK Special Chicken</div>
-            <div class="price-tag">Half: ₹219 / Full: ₹399</div>
-            <div class="btn-row">
-                <button class="add-btn half-btn" onclick="window.addToCart('RSK Special Chicken (Half)', 219)">Half</button>
-                <button class="add-btn full-btn" onclick="window.addToCart('RSK Special Chicken (Full)', 399)">Full</button>
+    <div id="menu-content">
+        <div class="section-group" data-cat="nonveg">
+            <div class="section-header">
+                <img src="https://cdn-icons-png.flaticon.com/512/3075/3075908.png" class="section-icon">
+                <span class="cat-title">Non-Veg Specials</span>
             </div>
+            <div class="menu-grid">
+                <div class="item-card dish-item" data-name="rsk special chicken half full" data-cat="nonveg">
+                    <div class="item-name">RSK Special Chicken</div>
+                    <div class="price-box">Half: ₹219 / Full: ₹399</div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="order-btn" style="flex:1;" onclick="window.addToCart('RSK Chicken (H)', 219)">Half</button>
+                        <button class="order-btn" style="flex:1;" onclick="window.addToCart('RSK Chicken (F)', 399)">Full</button>
+                    </div>
+                </div>
+                </div>
         </div>
-        <div class="item-card">
-            <div class="item-name">Tawa Chicken</div>
-            <div class="price-tag">Half: ₹229 / Full: ₹409</div>
-            <div class="btn-row">
-                <button class="add-btn half-btn" onclick="window.addToCart('Tawa Chicken (Half)', 229)">Half</button>
-                <button class="add-btn full-btn" onclick="window.addToCart('Tawa Chicken (Full)', 409)">Full</button>
+
+        <div class="section-group" data-cat="veg">
+            <div class="section-header">
+                <img src="https://cdn-icons-png.flaticon.com/512/2919/2919158.png" class="section-icon">
+                <span class="cat-title">Veg Delights</span>
             </div>
-        </div>
-    </div>
-
-    <div class="section-header">
-        <img src="https://img.freepik.com/free-photo/paneer-tikka-kabab-is-indian-dish-made-from-chunks-cottage-cheese-marinated-spices-grilled-tandoor_466660-10940.jpg" class="section-icon">
-        <span class="cat-title">Veg Delights</span>
-    </div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">Kastoori Paneer</div>
-            <div class="price-tag">₹179</div>
-            <button class="add-btn" onclick="window.addToCart('Kastoori Paneer', 179)">+ Add</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Tawa Paneer</div>
-            <div class="price-tag">₹189</div>
-            <button class="add-btn" onclick="window.addToCart('Tawa Paneer', 189)">+ Add</button>
-        </div>
-    </div>
-
-    <div class="section-header">
-        <img src="https://img.freepik.com/free-photo/instant-noodles-with-egg-wooden-bowl_1150-13645.jpg" class="section-icon">
-        <span class="cat-title">Maggie Corner</span>
-    </div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">RSK Special Maggie</div>
-            <div class="price-tag">₹99</div>
-            <button class="add-btn" onclick="window.addToCart('RSK Special Maggie', 99)">+ Add</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Cheese Maggie</div>
-            <div class="price-tag">₹89</div>
-            <button class="add-btn" onclick="window.addToCart('Cheese Maggie', 89)">+ Add</button>
-        </div>
-    </div>
-
-    <div class="section-header">
-        <img src="https://img.freepik.com/free-photo/indian-egg-bhurji-fry-spicy-scrambled-eggs-cooked-with-onion-tomatoes-green-chilies_466660-91185.jpg" class="section-icon">
-        <span class="cat-title">Egg Station</span>
-    </div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">Tawa Egg</div>
-            <div class="price-tag">₹119</div>
-            <button class="add-btn" onclick="window.addToCart('Tawa Egg', 119)">+ Add</button>
+            <div class="menu-grid">
+                <div class="item-card dish-item" data-name="kastoori paneer" data-cat="veg">
+                    <div class="item-name">Kastoori Paneer</div>
+                    <div class="price-box">₹179</div>
+                    <button class="order-btn" onclick="window.addToCart('Kastoori Paneer', 179)">+ Add to Cart</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -123,3 +116,45 @@
         <button class="place-order-btn" onclick="window.checkout()">🚀 PLACE ORDER (Get Token)</button>
     </div>
 </div>
+
+<script>
+    // --- Search Logic ---
+    function filterMenu() {
+        let input = document.getElementById('menuSearch').value.toLowerCase();
+        let items = document.getElementsByClassName('dish-item');
+        
+        for (let i = 0; i < items.length; i++) {
+            let name = items[i].getAttribute('data-name');
+            if (name.includes(input)) {
+                items[i].style.display = "";
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+    }
+
+    // --- Category Filter Logic ---
+    function filterCategory(cat, btn) {
+        // Active button change
+        let btns = document.getElementsByClassName('f-btn');
+        for (let b of btns) b.classList.remove('active');
+        btn.classList.add('active');
+
+        let groups = document.getElementsByClassName('section-group');
+        let items = document.getElementsByClassName('dish-item');
+
+        if(cat === 'all') {
+            for(let g of groups) g.style.display = "block";
+            for(let i of items) i.style.display = "flex";
+        } else {
+            for(let g of groups) {
+                if(g.getAttribute('data-cat') === cat) g.style.display = "block";
+                else g.style.display = "none";
+            }
+            // Combo box handle
+            let combo = document.querySelector('.combo-section');
+            if(combo.getAttribute('data-cat') === cat) combo.style.display = "flex";
+            else combo.style.display = "none";
+        }
+    }
+</script>
