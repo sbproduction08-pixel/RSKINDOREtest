@@ -14,7 +14,7 @@
 
     /* --- SECTION HEADERS: LEFT ALIGNED WITH CIRCLE IMAGE --- */
     .section-header { display: flex; align-items: center; gap: 15px; margin: 35px 0 15px; padding-left: 5px; }
-    .section-icon { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 12px rgba(212,175,55,0.3); }
+    .section-icon { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 12px rgba(212,175,55,0.3); background: #222; }
     .cat-title { color: var(--gold); font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
     /* --- MENU GRID & CARDS --- */
@@ -23,14 +23,13 @@
     .item-name { font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 5px; min-height: 32px; }
     .price-tag { color: var(--gold); font-size: 11px; font-weight: bold; margin-bottom: 10px; }
 
-    /* Buttons Style (Updated for Half/Full) */
+    /* Buttons Style */
     .btn-row { display: flex; gap: 5px; margin-top: auto; }
     .add-btn { background: #fff; color: #000; border: none; padding: 10px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
     .half-btn { background: #eee; flex: 1; }
     .full-btn { background: #fff; flex: 1; border: 1px solid var(--gold); }
     .add-btn:active { background: var(--gold); transform: scale(0.95); }
 
-    /* Bottom Spacing & Floating Button */
     .checkout-wrap { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 2000; }
     .place-order-btn { background: var(--gold); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; box-shadow: 0 5px 20px #000; cursor: pointer; }
 </style>
@@ -40,7 +39,7 @@
 
     <div class="combo-section">
         <div class="royal-combo-box">
-            <img src="ROYAL COMBO.jpg" class="combo-img-top">
+            <img src="ROYAL COMBO.jpg" class="combo-img-top" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3132/3132693.png'">
             <div class="combo-info">
                 <div class="combo-title">Tawa Chicken + Paratha</div>
                 <div class="price-tag">₹259</div>
@@ -50,7 +49,7 @@
     </div>
 
     <div class="section-header">
-        <img src="nonveg-photo.jpg" class="section-icon">
+        <img src="https://img.freepik.com/free-photo/chicken-wings-barbecue-sweetly-sour-sauce-picnic-summer-menu-tasty-food-top-view-flat-lay_2829-6471.jpg" class="section-icon">
         <span class="cat-title">Non-Veg Specials</span>
     </div>
     <div class="menu-grid">
@@ -70,22 +69,51 @@
                 <button class="add-btn full-btn" onclick="window.addToCart('Tawa Chicken (Full)', 409)">Full</button>
             </div>
         </div>
-        </div>
+    </div>
 
     <div class="section-header">
-        <img src="veg-photo.jpg" class="section-icon">
+        <img src="https://img.freepik.com/free-photo/paneer-tikka-kabab-is-indian-dish-made-from-chunks-cottage-cheese-marinated-spices-grilled-tandoor_466660-10940.jpg" class="section-icon">
         <span class="cat-title">Veg Delights</span>
     </div>
     <div class="menu-grid">
         <div class="item-card">
             <div class="item-name">Kastoori Paneer</div>
             <div class="price-tag">₹179</div>
-            <button class="add-btn" onclick="window.addToCart('Kastoori Paneer', 179)">+ Add to Cart</button>
+            <button class="add-btn" onclick="window.addToCart('Kastoori Paneer', 179)">+ Add</button>
         </div>
         <div class="item-card">
-            <div class="item-name">Paneer Bhurji</div>
+            <div class="item-name">Tawa Paneer</div>
             <div class="price-tag">₹189</div>
-            <button class="add-btn" onclick="window.addToCart('Paneer Bhurji', 189)">+ Add to Cart</button>
+            <button class="add-btn" onclick="window.addToCart('Tawa Paneer', 189)">+ Add</button>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <img src="https://img.freepik.com/free-photo/instant-noodles-with-egg-wooden-bowl_1150-13645.jpg" class="section-icon">
+        <span class="cat-title">Maggie Corner</span>
+    </div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">RSK Special Maggie</div>
+            <div class="price-tag">₹99</div>
+            <button class="add-btn" onclick="window.addToCart('RSK Special Maggie', 99)">+ Add</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Cheese Maggie</div>
+            <div class="price-tag">₹89</div>
+            <button class="add-btn" onclick="window.addToCart('Cheese Maggie', 89)">+ Add</button>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <img src="https://img.freepik.com/free-photo/indian-egg-bhurji-fry-spicy-scrambled-eggs-cooked-with-onion-tomatoes-green-chilies_466660-91185.jpg" class="section-icon">
+        <span class="cat-title">Egg Station</span>
+    </div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Tawa Egg</div>
+            <div class="price-tag">₹119</div>
+            <button class="add-btn" onclick="window.addToCart('Tawa Egg', 119)">+ Add</button>
         </div>
     </div>
 
