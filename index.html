@@ -14,10 +14,13 @@
         h1 { font-family: 'Marcellus', serif; color: var(--gold); margin: 10px 0 5px; letter-spacing: 2px; text-transform: uppercase; font-size: 20px; }
         .i-love-ind { width: 100px; margin-top: 5px; filter: drop-shadow(0 0 5px var(--gold)); }
 
-        /* Welcome & Logout Section */
-        .user-panel { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; min-height: 25px; }
+        /* User Auth Panel */
+        .user-panel { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; min-height: 30px; }
         #welcome-user { color: var(--gold); font-weight: bold; font-size: 14px; font-family: 'Marcellus', serif; }
-        .logout-btn { display: none; background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; color: #ff4444; padding: 2px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        
+        .auth-btn { padding: 4px 12px; border-radius: 4px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: bold; transition: 0.3s; }
+        #loginBtn { background: var(--gold); border: 1px solid var(--gold); color: #000; display: inline-block; }
+        #logoutBtn { background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; color: #ff4444; display: none; }
 
         .bottom-nav { position: sticky; top: 0; z-index: 2000; width: 100%; background: rgba(15, 12, 5, 0.95); border-bottom: 2px solid var(--gold); display: flex; justify-content: space-around; padding: 15px 0; backdrop-filter: blur(10px); }
         .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; letter-spacing: 1px; }
@@ -44,7 +47,8 @@
     
     <div class="user-panel">
         <span id="welcome-user"></span>
-        <button onclick="window.logout()" id="logoutBtn" class="logout-btn">Logout</button>
+        <button onclick="window.registerUser()" id="loginBtn" class="auth-btn">Login / Register</button>
+        <button onclick="window.logout()" id="logoutBtn" class="auth-btn">Logout</button>
     </div>
 </header>
 
@@ -86,7 +90,7 @@
             .then(res => res.text())
             .then(data => {
                 contentArea.innerHTML = data;
-                updateUserUI(); // UI refresh on tab change
+                updateUserUI(); 
             })
             .catch(err => {
                 contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>File Missing: " + tabId + "</div>";
@@ -96,17 +100,20 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    // --- USER UI (WELCOME & LOGOUT) ---
+    // --- LOGIN/LOGOUT UI LOGIC ---
     function updateUserUI() {
         const userName = localStorage.getItem('userName');
         const welcomeDiv = document.getElementById('welcome-user');
+        const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         
-        if(userName && welcomeDiv) {
-            welcomeDiv.innerHTML = "Namaste, " + userName + "! ✨";
+        if(userName) {
+            if(welcomeDiv) welcomeDiv.innerHTML = "Namaste, " + userName + "! ✨";
+            if(loginBtn) loginBtn.style.display = 'none';
             if(logoutBtn) logoutBtn.style.display = 'inline-block';
         } else {
             if(welcomeDiv) welcomeDiv.innerHTML = "";
+            if(loginBtn) loginBtn.style.display = 'inline-block';
             if(logoutBtn) logoutBtn.style.display = 'none';
         }
     }
@@ -140,7 +147,7 @@
         }
     };
 
-    // --- CART & CHECKOUT (WITH FIXED TOKEN) ---
+    // --- CART & CHECKOUT ---
     window.addToCart = function(name, price) {
         window.cart.push({name, price});
         alert(name + " added! Niche 'Place Order' dabayein.");
