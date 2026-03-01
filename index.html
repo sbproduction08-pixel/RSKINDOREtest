@@ -68,37 +68,35 @@
 </div>
 
 <script>
-    // Manager Function: Tab content mangwane ke liye
-    function showTab(tabId) {
-        // Nav Active State
-        var navItems = document.getElementsByClassName('nav-item');
-        for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
-        const activeBtn = document.getElementById('btn-' + tabId);
-        if(activeBtn) activeBtn.classList.add('active');
+        function showTab(tabId) {
+            // Navigation highlight logic
+            var navItems = document.getElementsByClassName('nav-item');
+            for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) activeBtn.classList.add('active');
 
-        // Fetch Tab File
-        fetch(tabId + '-tab.html')
-            .then(response => {
-                if (!response.ok) throw new Error("File Missing");
-                return response.text();
-            })
-            .then(data => {
-                document.getElementById('content-area').innerHTML = data;
-            })
-            .catch(err => {
-                document.getElementById('content-area').innerHTML = "<div style='text-align:center; padding:50px;'>👑 Loading Royal Experience...</div>";
-            });
+            // Doosri file se content khichne ka logic
+            fetch(tabId + '-tab.html')
+                .then(response => {
+                    if (!response.ok) throw new Error("File Missing");
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('content-area').innerHTML = data;
+                })
+                .catch(err => {
+                    document.getElementById('content-area').innerHTML = "<div style='text-align:center; padding:50px;'>👑 Loading Royal Experience...</div>";
+                });
 
-        localStorage.setItem('activeTab', tabId);
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
+            localStorage.setItem('activeTab', tabId);
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
 
-    // Page load hone par default tab
-    window.onload = function() {
-        var savedTab = localStorage.getItem('activeTab') || 'home';
-        showTab(savedTab);
-    };
-</script>
+        window.onload = function() {
+            var savedTab = localStorage.getItem('activeTab') || 'home';
+            showTab(savedTab);
+        };
+    </script>
 
 </body>
 </html>
