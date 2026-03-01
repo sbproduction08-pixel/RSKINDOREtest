@@ -1,133 +1,88 @@
 <style>
-    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
-    
-    /* Category Banners with Image Overlay */
-    .section-banner { 
-        width: 100%; height: 100px; border-radius: 15px; margin: 25px 0 15px;
-        position: relative; overflow: hidden; border: 1px solid var(--gold);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    /* Full Width Image - Badi Image ke liye */
+    .full-banner {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        height: 220px;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 2px solid var(--gold);
+        margin-bottom: 20px;
     }
-    .section-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s; }
-    .section-banner:hover img { transform: scale(1.1); opacity: 0.8; }
-    .section-banner .overlay { 
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
-        display: flex; align-items: center; justify-content: center;
-    }
-    .section-banner span { color: var(--gold); font-weight: bold; font-size: 20px; letter-spacing: 3px; text-shadow: 2px 2px 8px #000; }
+    .full-banner img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Filter Bar */
-    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-    .filter-btn { 
-        padding: 8px 15px; border-radius: 20px; border: 1px solid var(--gold); 
-        background: transparent; color: #fff; font-size: 11px; cursor: pointer; white-space: nowrap;
+    /* Search & Filters */
+    .menu-controls { padding: 10px; position: sticky; top: 0; background: #000; z-index: 10; }
+    .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; }
+    .f-btn { 
+        background: transparent; border: 1px solid var(--gold); color: #fff; 
+        padding: 6px 15px; border-radius: 20px; font-size: 11px; cursor: pointer; white-space: nowrap;
     }
-    .filter-btn.active { background: var(--gold); color: #000; font-weight: bold; }
+    .f-btn:active { background: var(--gold); color: #000; }
 
-    /* Item Card Glow & Lift */
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    /* Menu Grid */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px; padding-bottom: 100px; }
     .item-card { 
-        background: rgba(255,255,255,0.03); border: 1px solid #222; border-radius: 12px; 
-        padding: 12px; transition: 0.4s; position: relative;
+        background: rgba(255,255,255,0.05); border: 1px solid #222; border-radius: 12px; 
+        padding: 12px; transition: 0.3s; position: relative; display: flex; flex-direction: column;
     }
-    .item-card:hover { 
-        transform: translateY(-8px); border-color: var(--gold); 
-        box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2); 
-    }
+    .item-card:hover { transform: translateY(-5px); border-color: var(--gold); }
 
-    .badge { 
-        position: absolute; top: -5px; right: -5px; background: var(--gold); color: #000;
-        font-size: 8px; font-weight: bold; padding: 3px 7px; border-radius: 4px; z-index: 2;
-    }
-
-    .item-name { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 8px; text-transform: uppercase; }
-    .price-box { background: #000; border-radius: 8px; padding: 8px; margin-bottom: 10px; border: 0.5px solid #333; }
-    .price-line { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 2px; }
-    .p-val { color: var(--gold); font-weight: bold; }
-
-    .order-btn { 
+    .price-tag { color: var(--gold); font-weight: bold; font-size: 15px; margin: 8px 0; }
+    
+    .add-btn { 
         background: var(--gold); color: #000; border: none; border-radius: 6px; 
-        padding: 8px; font-size: 11px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;
+        padding: 10px; font-size: 11px; font-weight: bold; cursor: pointer; width: 100%; 
     }
-    .order-btn:active { transform: scale(0.95); }
+
+    /* Floating Place Order Button */
+    .checkout-footer {
+        position: fixed; bottom: 85px; left: 0; width: 100%;
+        display: flex; justify-content: center; z-index: 100;
+    }
+    .view-cart-btn {
+        background: #fff; color: #000; padding: 15px 40px; border-radius: 50px;
+        font-weight: 900; border: none; box-shadow: 0 10px 30px rgba(212,175,55,0.4);
+        cursor: pointer; letter-spacing: 1px;
+    }
 </style>
 
-<div class="menu-tab">
-    <h2 class="menu-header">ROYAL MENU</h2>
-
-    <input type="text" id="menuSearch" class="search-box" placeholder="Khao kya khaoge?..." onkeyup="filterMenu()" style="width:100%; padding:12px; border-radius:25px; border:1px solid var(--gold); background:#1a1a1a; color:#fff; margin-bottom:15px; outline:none; box-sizing:border-box;">
-    
-    <div class="filter-bar">
-        <button class="filter-btn active" onclick="filterItems('all', this)">ALL</button>
-        <button class="filter-btn" onclick="filterItems('nonveg', this)">🍗 NON-VEG</button>
-        <button class="filter-btn" onclick="filterItems('veg', this)">🥬 VEG</button>
-        <button class="filter-btn" onclick="filterItems('maggie', this)">🍜 MAGGIE</button>
-    </div>
-
-    <div class="section-banner">
+<div class="menu-tab-content">
+    <div class="full-banner">
         <img src="ROYAL COMBO.jpg" alt="Royal Combo">
-        <div class="overlay"><span>👑 ROYAL COMBOS</span></div>
-    </div>
-    <div class="menu-grid">
-        <div class="item-card nonveg" data-name="tawa chicken paratha">
-            <div class="badge">BEST SELLER</div>
-            <div class="item-name">Tawa Chicken + Paratha</div>
-            <div class="price-box"><div class="price-line"><span>PRICE</span><span class="p-val">₹259</span></div></div>
-            <button class="order-btn" onclick="generateTokenAndOrder('Tawa Chicken + Paratha')">🛒 ORDER NOW</button>
-        </div>
-        <div class="item-card veg" data-name="paneer bhurji kulcha">
-            <div class="item-name">Paneer Bhurji + Kulcha</div>
-            <div class="price-box"><div class="price-line"><span>PRICE</span><span class="p-val">₹199</span></div></div>
-            <button class="order-btn" onclick="generateTokenAndOrder('Paneer Bhurji + Kulcha')">🛒 ORDER NOW</button>
+        <div style="position:absolute; bottom:0; left:0; width:100%; background:linear-gradient(transparent, #000); padding:20px;">
+            <span style="color:var(--gold); font-weight:bold; letter-spacing:2px;">👑 ROYAL SELECTION</span>
         </div>
     </div>
 
-    <div class="section-banner">
-        <img src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?q=80&w=500" alt="Non-Veg">
-        <div class="overlay"><span>🍗 NON-VEG HEROES</span></div>
-    </div>
-    <div class="menu-grid">
-        <div class="item-card nonveg" data-name="rsk special chicken">
-            <div class="badge">CHEF'S CHOICE</div>
-            <div class="item-name">RSK Special Chicken</div>
-            <div class="price-box">
-                <div class="price-line"><span>HALF</span><span class="p-val">₹219</span></div>
-                <div class="price-line"><span>FULL</span><span class="p-val">₹399</span></div>
-            </div>
-            <button class="order-btn" onclick="generateTokenAndOrder('RSK Special Chicken')">🛒 ORDER NOW</button>
+    <div class="menu-controls">
+        <input type="text" id="menuSearch" class="search-box" placeholder="Khao kya khaoge?..." onkeyup="filterMenu()" style="width:100%; padding:12px; border-radius:25px; border:1px solid var(--gold); background:#1a1a1a; color:#fff; outline:none; box-sizing:border-box;">
+        
+        <div class="filter-bar">
+            <button class="f-btn" onclick="filterItems('all')">SAB KUCH</button>
+            <button class="f-btn" onclick="filterItems('nonveg')">🍗 NON-VEG</button>
+            <button class="f-btn" onclick="filterItems('veg')">🥬 VEG</button>
         </div>
     </div>
 
-    <div class="section-banner">
-        <img src="https://images.unsplash.com/photo-1612927601601-6638404737ce?q=80&w=500" alt="Maggie">
-        <div class="overlay"><span>🍜 MAGGIE CORNER</span></div>
-    </div>
     <div class="menu-grid">
-        <div class="item-card maggie" data-name="rsk special maggie">
-            <div class="item-name">RSK Special Maggie</div>
-            <div class="price-box"><div class="price-line"><span>PRICE</span><span class="p-val">₹99</span></div></div>
-            <button class="order-btn" onclick="generateTokenAndOrder('RSK Special Maggie')">🛒 ORDER NOW</button>
+        <div class="item-card nonveg">
+            <div style="font-size:12px; font-weight:bold; color:#fff;">Tawa Chicken + Paratha</div>
+            <div class="price-tag">₹259</div>
+            <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">🛒 ADD TO CART</button>
         </div>
-    </div>
 
-    <div style="text-align:center; color:#444; font-size:10px; margin-top:40px; letter-spacing:1px;">
-        ROYAL STREET KITCHEN • INDORE • 2026
+        <div class="item-card veg">
+            <div style="font-size:12px; font-weight:bold; color:#fff;">Kastoori Paneer</div>
+            <div class="price-tag">₹179</div>
+            <button class="add-btn" onclick="addToCart('Kastoori Paneer', 179)">🛒 ADD TO CART</button>
+        </div>
+        
+        </div>
+
+    <div class="checkout-footer">
+        <button class="view-cart-btn" onclick="checkout()">
+            🚀 PLACE ORDER & GET TOKEN
+        </button>
     </div>
 </div>
-
-<script>
-    function filterItems(type, btn) {
-        let btns = document.querySelectorAll('.filter-btn');
-        btns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        let cards = document.querySelectorAll('.item-card');
-        cards.forEach(card => {
-            if (type === 'all') {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = card.classList.contains(type) ? 'flex' : 'none';
-            }
-        });
-    }
-</script>
