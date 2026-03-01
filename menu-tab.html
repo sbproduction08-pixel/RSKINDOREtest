@@ -1,66 +1,67 @@
 <style>
     .menu-header { color: var(--gold); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
-    .royal-banner { width: 100%; border-radius: 12px; border: 1px solid var(--gold); margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
     
-    /* Category Headers */
-    .cat-title { color: var(--gold); font-size: 16px; font-weight: bold; margin: 30px 0 15px; border-left: 4px solid var(--gold); padding-left: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    /* --- ROYAL COMBO: RIGHT SIDE IMAGE --- */
+    .royal-combo-box { 
+        display: flex; 
+        flex-direction: row; /* Image Right mein karne ke liye nichli line dekhein */
+        background: linear-gradient(to left, rgba(212, 175, 55, 0.2), rgba(0,0,0,0.4)); 
+        border: 1px solid var(--gold); border-radius: 12px; overflow: hidden;
+        margin-bottom: 25px; min-height: 140px;
+    }
+    .combo-details { width: 60%; padding: 15px; display: flex; flex-direction: column; justify-content: center; }
+    .combo-img-side { width: 40%; object-fit: cover; border-left: 1px solid var(--gold); }
     
-    /* The Grid */
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 30px; }
-    
-    /* Item Cards */
+    .combo-tag { color: var(--gold); font-size: 9px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 1px; }
+    .combo-title { font-size: 15px; font-weight: bold; color: #fff; margin-bottom: 8px; font-family: 'Marcellus', serif; line-height: 1.2; }
+
+    /* --- SECTION HEADERS WITH HIGHLIGHTS --- */
+    .section-header { 
+        display: flex; align-items: center; gap: 12px; 
+        margin: 35px 0 15px; padding-bottom: 8px;
+        border-bottom: 1px solid rgba(212,175,55,0.15);
+    }
+    .section-icon { width: 45px; height: 45px; border-radius: 50%; border: 1.5px solid var(--gold); object-fit: cover; box-shadow: 0 0 10px rgba(212,175,55,0.2); }
+    .cat-title { color: var(--gold); font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
+
+    /* --- GRID & CARDS --- */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 20px; }
     .item-card { 
-        background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); 
-        border-radius: 8px; padding: 12px; display: flex; flex-direction: column; 
-        justify-content: space-between; transition: 0.3s;
+        background: rgba(255,255,255,0.03); border-left: 3px solid var(--gold); 
+        border-radius: 6px; padding: 12px; display: flex; flex-direction: column; 
     }
-    .item-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
-    
-    .item-name { font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 5px; min-height: 32px; }
-    .price { color: var(--gold); font-size: 13px; font-weight: bold; margin-bottom: 10px; }
-    
-    /* Add Button */
-    .add-btn { 
-        background: #fff; color: #000; border: none; padding: 8px; 
-        border-radius: 4px; font-size: 10px; font-weight: bold; 
-        width: 100%; cursor: pointer; transition: 0.2s;
-    }
+    .item-name { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 6px; min-height: 30px; line-height: 1.3; }
+    .price { color: var(--gold); font-size: 13px; font-weight: 800; margin-bottom: 12px; }
+    .add-btn { background: #fff; color: #000; border: none; padding: 7px; border-radius: 4px; font-size: 10px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.3s; }
     .add-btn:active { background: var(--gold); transform: scale(0.95); }
 
-    /* Floating Checkout (Index logic se connect hai) */
+    /* Floating Order Button */
     .checkout-wrap { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 2000; }
-    .place-order-btn { background: var(--gold); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; box-shadow: 0 5px 20px #000; cursor: pointer; font-size: 14px; }
+    .place-order-btn { background: var(--gold); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; box-shadow: 0 5px 25px #000; cursor: pointer; font-size: 14px; letter-spacing: 1px; }
 </style>
 
 <div class="menu-tab">
     <h2 class="menu-header">ROYAL MENU</h2>
-    <img src="ROYAL COMBO.jpg" class="royal-banner">
 
-    <div class="cat-title">👑 Royal Combos</div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">Tawa Chicken + Paratha</div>
+    <div class="royal-combo-box">
+        <div class="combo-details">
+            <span class="combo-tag">👑 Most Loved</span>
+            <div class="combo-title">Royal Combo: Tawa Chicken + Paratha</div>
             <div class="price">₹259</div>
-            <button class="add-btn" onclick="window.addToCart('Tawa Chicken Combo', 259)">+ Add to Cart</button>
+            <button class="add-btn" onclick="window.addToCart('Tawa Chicken Combo', 259)">+ Add Combo</button>
         </div>
-        <div class="item-card">
-            <div class="item-name">Paneer Bhurji + Kulcha</div>
-            <div class="price">₹199</div>
-            <button class="add-btn" onclick="window.addToCart('Paneer Bhurji Combo', 199)">+ Add to Cart</button>
-        </div>
-        </div>
+        <img src="ROYAL COMBO.jpg" class="combo-img-side">
+    </div>
 
-    <div class="cat-title">🍗 Non-Veg Specials</div>
+    <div class="section-header">
+        <img src="nonveg-thumb.jpg" class="section-icon">
+        <span class="cat-title">Non-Veg Specials</span>
+    </div>
     <div class="menu-grid">
         <div class="item-card">
-            <div class="item-name">RSK Special Chicken (H)</div>
+            <div class="item-name">RSK Special Chicken (Half)</div>
             <div class="price">₹219</div>
             <button class="add-btn" onclick="window.addToCart('RSK Chicken (Half)', 219)">+ Add to Cart</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">RSK Special Chicken (F)</div>
-            <div class="price">₹399</div>
-            <button class="add-btn" onclick="window.addToCart('RSK Chicken (Full)', 399)">+ Add to Cart</button>
         </div>
         <div class="item-card">
             <div class="item-name">Chicken Keema Paratha</div>
@@ -69,37 +70,9 @@
         </div>
     </div>
 
-    <div class="cat-title">🌿 Pure Veg Delights</div>
+    <div class="section-header">
+        <img src="maggie-thumb.jpg" class="section-icon">
+        <span class="cat-title">Maggie Corner</span>
+    </div>
     <div class="menu-grid">
         <div class="item-card">
-            <div class="item-name">Royal Paneer Tawa</div>
-            <div class="price">₹179</div>
-            <button class="add-btn" onclick="window.addToCart('Royal Paneer Tawa', 179)">+ Add to Cart</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Mix Veg Masala</div>
-            <div class="price">₹149</div>
-            <button class="add-btn" onclick="window.addToCart('Mix Veg Masala', 149)">+ Add to Cart</button>
-        </div>
-    </div>
-
-    <div class="cat-title">🍜 Maggie & More</div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">RSK Special Maggie</div>
-            <div class="price">₹99</div>
-            <button class="add-btn" onclick="window.addToCart('RSK Special Maggie', 99)">+ Add to Cart</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Cheese Garlic Maggie</div>
-            <div class="price">₹129</div>
-            <button class="add-btn" onclick="window.addToCart('Cheese Maggie', 129)">+ Add to Cart</button>
-        </div>
-        </div>
-
-    <div style="height: 100px;"></div>
-
-    <div class="checkout-wrap" id="floatingCheckout">
-        <button class="place-order-btn" onclick="window.checkout()">🚀 PLACE ORDER (Get Token)</button>
-    </div>
-</div>
