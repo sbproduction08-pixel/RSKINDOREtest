@@ -1,88 +1,105 @@
 <style>
-    /* Full Width Image - Badi Image ke liye */
-    .full-banner {
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        height: 220px;
-        position: relative;
-        overflow: hidden;
-        border-bottom: 2px solid var(--gold);
-        margin-bottom: 20px;
-    }
-    .full-banner img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* Search & Filters */
-    .menu-controls { padding: 10px; position: sticky; top: 0; background: #000; z-index: 10; }
-    .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; }
-    .f-btn { 
-        background: transparent; border: 1px solid var(--gold); color: #fff; 
-        padding: 6px 15px; border-radius: 20px; font-size: 11px; cursor: pointer; white-space: nowrap;
-    }
-    .f-btn:active { background: var(--gold); color: #000; }
-
-    /* Menu Grid */
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px; padding-bottom: 100px; }
-    .item-card { 
-        background: rgba(255,255,255,0.05); border: 1px solid #222; border-radius: 12px; 
-        padding: 12px; transition: 0.3s; position: relative; display: flex; flex-direction: column;
-    }
-    .item-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-
-    .price-tag { color: var(--gold); font-weight: bold; font-size: 15px; margin: 8px 0; }
+    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
+    .royal-banner { width: 100%; border-radius: 12px; border: 1px solid var(--gold); margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
     
+    /* Category Headers */
+    .cat-title { color: var(--gold); font-size: 16px; font-weight: bold; margin: 30px 0 15px; border-left: 4px solid var(--gold); padding-left: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* The Grid */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 30px; }
+    
+    /* Item Cards */
+    .item-card { 
+        background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); 
+        border-radius: 8px; padding: 12px; display: flex; flex-direction: column; 
+        justify-content: space-between; transition: 0.3s;
+    }
+    .item-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+    
+    .item-name { font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 5px; min-height: 32px; }
+    .price { color: var(--gold); font-size: 13px; font-weight: bold; margin-bottom: 10px; }
+    
+    /* Add Button */
     .add-btn { 
-        background: var(--gold); color: #000; border: none; border-radius: 6px; 
-        padding: 10px; font-size: 11px; font-weight: bold; cursor: pointer; width: 100%; 
+        background: #fff; color: #000; border: none; padding: 8px; 
+        border-radius: 4px; font-size: 10px; font-weight: bold; 
+        width: 100%; cursor: pointer; transition: 0.2s;
     }
+    .add-btn:active { background: var(--gold); transform: scale(0.95); }
 
-    /* Floating Place Order Button */
-    .checkout-footer {
-        position: fixed; bottom: 85px; left: 0; width: 100%;
-        display: flex; justify-content: center; z-index: 100;
-    }
-    .view-cart-btn {
-        background: #fff; color: #000; padding: 15px 40px; border-radius: 50px;
-        font-weight: 900; border: none; box-shadow: 0 10px 30px rgba(212,175,55,0.4);
-        cursor: pointer; letter-spacing: 1px;
-    }
+    /* Floating Checkout (Index logic se connect hai) */
+    .checkout-wrap { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 2000; }
+    .place-order-btn { background: var(--gold); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; box-shadow: 0 5px 20px #000; cursor: pointer; font-size: 14px; }
 </style>
 
-<div class="menu-tab-content">
-    <div class="full-banner">
-        <img src="ROYAL COMBO.jpg" alt="Royal Combo">
-        <div style="position:absolute; bottom:0; left:0; width:100%; background:linear-gradient(transparent, #000); padding:20px;">
-            <span style="color:var(--gold); font-weight:bold; letter-spacing:2px;">👑 ROYAL SELECTION</span>
-        </div>
-    </div>
+<div class="menu-tab">
+    <h2 class="menu-header">ROYAL MENU</h2>
+    <img src="ROYAL COMBO.jpg" class="royal-banner">
 
-    <div class="menu-controls">
-        <input type="text" id="menuSearch" class="search-box" placeholder="Khao kya khaoge?..." onkeyup="filterMenu()" style="width:100%; padding:12px; border-radius:25px; border:1px solid var(--gold); background:#1a1a1a; color:#fff; outline:none; box-sizing:border-box;">
-        
-        <div class="filter-bar">
-            <button class="f-btn" onclick="filterItems('all')">SAB KUCH</button>
-            <button class="f-btn" onclick="filterItems('nonveg')">🍗 NON-VEG</button>
-            <button class="f-btn" onclick="filterItems('veg')">🥬 VEG</button>
-        </div>
-    </div>
-
+    <div class="cat-title">👑 Royal Combos</div>
     <div class="menu-grid">
-        <div class="item-card nonveg">
-            <div style="font-size:12px; font-weight:bold; color:#fff;">Tawa Chicken + Paratha</div>
-            <div class="price-tag">₹259</div>
-            <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">🛒 ADD TO CART</button>
+        <div class="item-card">
+            <div class="item-name">Tawa Chicken + Paratha</div>
+            <div class="price">₹259</div>
+            <button class="add-btn" onclick="window.addToCart('Tawa Chicken Combo', 259)">+ Add to Cart</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Paneer Bhurji + Kulcha</div>
+            <div class="price">₹199</div>
+            <button class="add-btn" onclick="window.addToCart('Paneer Bhurji Combo', 199)">+ Add to Cart</button>
+        </div>
         </div>
 
-        <div class="item-card veg">
-            <div style="font-size:12px; font-weight:bold; color:#fff;">Kastoori Paneer</div>
-            <div class="price-tag">₹179</div>
-            <button class="add-btn" onclick="addToCart('Kastoori Paneer', 179)">🛒 ADD TO CART</button>
+    <div class="cat-title">🍗 Non-Veg Specials</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">RSK Special Chicken (H)</div>
+            <div class="price">₹219</div>
+            <button class="add-btn" onclick="window.addToCart('RSK Chicken (Half)', 219)">+ Add to Cart</button>
         </div>
-        
+        <div class="item-card">
+            <div class="item-name">RSK Special Chicken (F)</div>
+            <div class="price">₹399</div>
+            <button class="add-btn" onclick="window.addToCart('RSK Chicken (Full)', 399)">+ Add to Cart</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Chicken Keema Paratha</div>
+            <div class="price">₹149</div>
+            <button class="add-btn" onclick="window.addToCart('Chicken Keema Paratha', 149)">+ Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="cat-title">🌿 Pure Veg Delights</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Royal Paneer Tawa</div>
+            <div class="price">₹179</div>
+            <button class="add-btn" onclick="window.addToCart('Royal Paneer Tawa', 179)">+ Add to Cart</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Mix Veg Masala</div>
+            <div class="price">₹149</div>
+            <button class="add-btn" onclick="window.addToCart('Mix Veg Masala', 149)">+ Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="cat-title">🍜 Maggie & More</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">RSK Special Maggie</div>
+            <div class="price">₹99</div>
+            <button class="add-btn" onclick="window.addToCart('RSK Special Maggie', 99)">+ Add to Cart</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Cheese Garlic Maggie</div>
+            <div class="price">₹129</div>
+            <button class="add-btn" onclick="window.addToCart('Cheese Maggie', 129)">+ Add to Cart</button>
+        </div>
         </div>
 
-    <div class="checkout-footer">
-        <button class="view-cart-btn" onclick="checkout()">
-            🚀 PLACE ORDER & GET TOKEN
-        </button>
+    <div style="height: 100px;"></div>
+
+    <div class="checkout-wrap" id="floatingCheckout">
+        <button class="place-order-btn" onclick="window.checkout()">🚀 PLACE ORDER (Get Token)</button>
     </div>
 </div>
