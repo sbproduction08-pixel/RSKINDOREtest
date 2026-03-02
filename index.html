@@ -87,28 +87,38 @@
 <script>
     window.cart = []; 
 
-    function showTab(tabId) {
-        var navItems = document.getElementsByClassName('nav-item');
-        for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
-        const activeBtn = document.getElementById('btn-' + tabId);
-        if(activeBtn) activeBtn.classList.add('active');
+   function showTab(tabId) {
+    var navItems = document.getElementsByClassName('nav-item');
+    for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
+    const activeBtn = document.getElementById('btn-' + tabId);
+    if(activeBtn) activeBtn.classList.add('active');
 
-        const contentArea = document.getElementById('content-area');
-        contentArea.innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading Royal Experience...</div>";
+    const contentArea = document.getElementById('content-area');
+    contentArea.innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading Royal Experience...</div>";
 
-        fetch('./' + tabId + '-tab.html?v=' + Date.now())
-            .then(res => res.text())
-            .then(data => {
-                contentArea.innerHTML = data;
-                updateUserUI(); 
-            })
-            .catch(err => {
-                contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Swagat Hai! Tab select karein.</div>";
+    fetch('./' + tabId + '-tab.html?v=' + Date.now())
+        .then(res => res.text())
+        .then(data => {
+            contentArea.innerHTML = data;
+            updateUserUI(); 
+            
+            // --- YEH NAYA CODE HAI ---
+            // Menu Tab ke andar ki script ko manually dhundh kar chalane ke liye
+            const scripts = contentArea.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
             });
+        })
+        .catch(err => {
+            contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Swagat Hai! Tab select karein.</div>";
+        });
 
-        localStorage.setItem('activeTab', tabId);
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
+    localStorage.setItem('activeTab', tabId);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
 
     function updateUserUI() {
         const userName = localStorage.getItem('userName');
