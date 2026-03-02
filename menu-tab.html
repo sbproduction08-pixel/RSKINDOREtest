@@ -4,13 +4,11 @@
 
     .cat-title { color: #D4AF37; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 25px 0 10px; display: block; border-left: 4px solid #D4AF37; padding-left: 10px; }
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .item-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .item-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
     .item-name { font-size: 12px; font-weight: bold; color: #fff; min-height: 30px; }
     .price-tag { color: #D4AF37; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
     
-    /* Strong Add Button */
-    .add-btn { background: #fff; color: #000; border: none; padding: 12px; border-radius: 5px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; display: block; }
-    .add-btn:active { background: #D4AF37; color: #fff; }
+    .add-btn { background: #D4AF37; color: #000; border: none; padding: 12px; border-radius: 5px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; }
 
     /* FLOATING CART BOX */
     #rskFloatingCart { 
@@ -23,18 +21,19 @@
     }
     .badge-count { position: absolute; top: -10px; left: -10px; background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 900; font-size: 12px; border: 1px solid #fff; }
 
-    /* CART INTERFACE OVERLAY */
+    /* CART OVERLAY - AB YE PAKKA KHULEGA */
     #cartOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
     .cart-modal { background: #111; border: 2px solid #D4AF37; border-radius: 20px; padding: 20px; flex: 1; display: flex; flex-direction: column; }
-    .cart-row { display: flex; justify-content: space-between; color: #fff; border-bottom: 1px solid #222; padding: 12px 0; font-size: 14px; }
+    .cart-row { display: flex; justify-content: space-between; align-items: center; color: #fff; border-bottom: 1px solid #222; padding: 12px 0; font-size: 14px; }
+    .remove-btn { color: #ff4444; font-weight: bold; cursor: pointer; border: 1px solid #ff4444; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+    
     .total-bill { font-size: 22px; color: #D4AF37; font-weight: 900; text-align: right; padding: 15px 0; border-top: 2px solid #D4AF37; margin-top: auto; }
     .action-btn { padding: 15px; border-radius: 10px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; }
 </style>
 
 <div class="menu-tab">
-    <h2 class="menu-header">ROYAL KITCHEN MENU</h2>
-    
-    <input type="text" id="menuSearch" class="search-box" placeholder="🔍 Search Dishes..." onkeyup="doSearch()">
+    <h2 class="menu-header">ROYAL RSK MENU</h2>
+    <input type="text" id="menuSearch" class="search-box" placeholder="🔍 Search Dish..." onkeyup="doSearch()">
 
     <div id="itemsContainer">
         <span class="cat-title">👑 Royal Combos</span>
@@ -43,20 +42,20 @@
                 <div class="item-card">
                     <div class="item-name">Tawa Chicken + Paratha</div>
                     <div class="price-tag">₹259</div>
-                    <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">+ ADD TO CART</button>
+                    <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">ADD TO CART</button>
                 </div>
             </div>
             <div class="dish-item" data-name="paneer bhurji combo">
                 <div class="item-card">
                     <div class="item-name">Paneer Bhurji Combo</div>
                     <div class="price-tag">₹209</div>
-                    <button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 209)">+ ADD TO CART</button>
+                    <button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 209)">ADD TO CART</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="rskFloatingCart" onclick="toggleCartView()">
+    <div id="rskFloatingCart" onclick="openCartView()">
         <span class="badge-count" id="cartCount">0</span>
         <span style="font-size: 22px;">🛒</span>
         <span style="font-size: 10px; font-weight: 900;" id="cartTotal">₹0</span>
@@ -64,34 +63,32 @@
 
     <div id="cartOverlay">
         <div class="cart-modal">
-            <h2 style="color:#D4AF37; margin-top:0;">Your Order</h2>
-            <div id="cartItemsList" style="overflow-y:auto; flex:1; margin:10px 0;"></div>
+            <h2 style="color:#D4AF37; margin-top:0; font-family:'Marcellus';">MY ROYAL ORDER</h2>
+            <div id="cartItemsList" style="overflow-y:auto; flex:1; margin:10px 0;">
+                </div>
             <div class="total-bill" id="billAmount">Total: ₹0</div>
             
-            <button class="action-btn" style="background:#D4AF37; color:#000;" onclick="sendOrder('Confirmed')">🚀 Confirm & Get Token</button>
-            <button class="action-btn" style="background:#ff4444; color:#fff;" onclick="sendOrder('Cancelled')">❌ Cancel</button>
-            <button class="action-btn" style="background:#333; color:#fff;" onclick="toggleCartView()">Back to Menu</button>
+            <button class="action-btn" style="background:#D4AF37; color:#000;" onclick="sendOrder('Confirmed')">🚀 SEND ORDER TO WHATSAPP</button>
+            <button class="action-btn" style="background:#ff4444; color:#fff;" onclick="clearCart()">🗑️ CLEAR ALL</button>
+            <button class="action-btn" style="background:#333; color:#fff;" onclick="closeCartView()">BACK TO MENU</button>
         </div>
     </div>
 </div>
 
 <script>
-    // LocalStorage se data load karna taaki refresh pe gayab na ho
     var cart = JSON.parse(localStorage.getItem('rsk_cart')) || [];
     var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBPKkzFJT5Pqmn-_88ziR1nwcnoJWeXbIPjZGD4P9TYgTr45pcTt2yPxrYwTHe4HFe/exec";
-    
-    // Login check
-    var userIn = false; 
 
-    // Page load hote hi cart update karo
+    // Start UI
     updateCartUI();
 
     function addToCart(name, price) {
-        event.preventDefault(); // Refresh rokne ke liye
         cart.push({name: name, price: price});
         localStorage.setItem('rsk_cart', JSON.stringify(cart));
         updateCartUI();
-        console.log("Added: " + name);
+        // Item add hote hi dabba thoda hilega (animation)
+        document.getElementById('rskFloatingCart').style.transform = "scale(1.2)";
+        setTimeout(() => { document.getElementById('rskFloatingCart').style.transform = "scale(1)"; }, 200);
     }
 
     function updateCartUI() {
@@ -101,32 +98,40 @@
         document.getElementById('cartTotal').innerText = "₹" + total;
     }
 
-    function toggleCartView() {
-        if(cart.length === 0) { alert("Cart khali hai!"); return; }
-        
-        if(!userIn) {
-            alert("👑 Royal Access! Please Login first.");
-            if(typeof showTab === 'function') showTab('safar');
-            return;
-        }
-
-        var overlay = document.getElementById('cartOverlay');
-        if(overlay.style.display === 'flex') {
-            overlay.style.display = 'none';
-        } else {
-            overlay.style.display = 'flex';
-            renderCartList();
-        }
+    function openCartView() {
+        if(cart.length === 0) { alert("Pehle kuch add kijiye!"); return; }
+        document.getElementById('cartOverlay').style.display = 'flex';
+        renderCartItems();
     }
 
-    function renderCartList() {
+    function closeCartView() { document.getElementById('cartOverlay').style.display = 'none'; }
+
+    function renderCartItems() {
         var html = ""; var total = 0;
         for(var i=0; i<cart.length; i++) {
-            html += `<div class="cart-row"><span>${cart[i].name}</span><span>₹${cart[i].price}</span></div>`;
+            html += `<div class="cart-row">
+                        <div><b>${cart[i].name}</b><br><small>₹${cart[i].price}</small></div>
+                        <span class="remove-btn" onclick="removeItem(${i})">REMOVE</span>
+                     </div>`;
             total += cart[i].price;
         }
         document.getElementById('cartItemsList').innerHTML = html;
         document.getElementById('billAmount').innerText = "Total: ₹" + total;
+    }
+
+    function removeItem(index) {
+        cart.splice(index, 1);
+        localStorage.setItem('rsk_cart', JSON.stringify(cart));
+        updateCartUI();
+        renderCartItems();
+        if(cart.length === 0) closeCartView();
+    }
+
+    function clearCart() {
+        cart = [];
+        localStorage.removeItem('rsk_cart');
+        updateCartUI();
+        closeCartView();
     }
 
     function sendOrder(status) {
@@ -144,11 +149,7 @@
         if(status === 'Confirmed') {
             window.open("https://wa.me/7489999890?text=*TOKEN: " + token + "*%0A*Order:* " + itemsStr + "%0A*Total:* ₹" + grandTotal, "_blank");
         }
-
-        cart = [];
-        localStorage.removeItem('rsk_cart');
-        updateCartUI();
-        document.getElementById('cartOverlay').style.display = 'none';
+        clearCart();
     }
 
     function doSearch() {
