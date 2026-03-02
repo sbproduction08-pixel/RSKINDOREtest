@@ -316,24 +316,31 @@
         updateCartUI();
     };
 
-    window.cancelOrder = function() {
-        const token = localStorage.getItem('lastTokenNo');
-        const name = localStorage.getItem('userName');
-        if(confirm("Kya aap sach mein order cancel karna chahte hain?")) {
+   window.cancelOrder = function() {
+    const token = localStorage.getItem('lastTokenNo');
+    const name = localStorage.getItem('userName');
+    if(confirm("Kya aap sach mein order cancel karna chahte hain?")) {
+        
+        fetch('https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: token,
+                name: name,
+                status: "Cancelled" // Sirf status update karne ke liye
+            })
+        });
 
-            // --- GOOGLE SHEET CANCELLATION ENTRY START ---
-            fetch('https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec', {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    token: token,
-                    name: name,
-                    items: "!! CANCELLED BY USER !!",
-                    total: 0,
-                    status: "Cancelled"
-                })
-            });
+        let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}%0A━━━━━━━━━━━━━━━%0A_Kripya mera order cancel kar dein._`;
+        window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
+        
+        clearInterval(cancelInterval);
+        document.getElementById('cancel-bar').style.display = 'none';
+        localStorage.removeItem('lastTokenNo');
+        alert("Order Status: CANCELLED update ho gaya hai.");
+    }
+};
             // --- GOOGLE SHEET CANCELLATION ENTRY END ---
 
             let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}%0A━━━━━━━━━━━━━━━%0A_Kripya mera order cancel kar dein._`;
