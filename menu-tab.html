@@ -1,84 +1,94 @@
 <style>
     .menu-tab-content { padding-bottom: 120px; color: #fff; font-family: sans-serif; }
-    .menu-header { color: #D4AF37; text-align: center; border-bottom: 1px solid #D4AF37; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
-    .royal-banner { width: 100%; border-radius: 12px; border: 1px solid #D4AF37; margin-bottom: 20px; }
-    .cat-title { color: #D4AF37; font-size: 16px; font-weight: bold; margin: 30px 0 15px; border-left: 4px solid #D4AF37; padding-left: 12px; }
+    .menu-header { color: #D4AF37; text-align: center; border-bottom: 1px solid #D4AF37; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+    .royal-banner { width: 100%; border-radius: 12px; border: 1px solid #D4AF37; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    .cat-title { color: #D4AF37; font-size: 16px; font-weight: bold; margin: 30px 0 15px; border-left: 4px solid #D4AF37; padding-left: 12px; text-transform: uppercase; }
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .item-card { background: rgba(255,255,255,0.05); border: 1px solid #222; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .price { color: #D4AF37; font-weight: bold; margin-bottom: 10px; }
-    .add-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+    .item-card { background: rgba(255,255,255,0.05); border: 1px solid #222; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
+    .item-card:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+    .price { color: #D4AF37; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+    .add-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; }
     
-    /* Footer */
+    /* WhatsApp Floating Button */
     .checkout-footer { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 999; }
-    .place-order-btn { background: #25D366; color: #fff; border: none; padding: 18px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.6); font-size: 14px; }
+    .place-order-btn { background: #25D366; color: #fff; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.6); font-size: 14px; display: flex; align-items: center; gap: 10px; }
 
     /* Token Popup */
-    #tokenModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid #D4AF37; padding: 25px; border-radius: 15px; text-align: center; z-index: 10000; display: none; width: 260px; box-shadow: 0 0 50px #000; }
-    .token-num { font-size: 60px; color: #D4AF37; font-weight: bold; display: block; margin: 10px 0; }
+    #tokenModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid #D4AF37; padding: 25px; border-radius: 15px; text-align: center; z-index: 10000; display: none; width: 260px; box-shadow: 0 0 100px #000; }
+    .token-num { font-size: 65px; color: #D4AF37; font-weight: 900; display: block; margin: 10px 0; font-family: monospace; }
 </style>
 
 <div class="menu-tab-content">
     <h2 class="menu-header">ROYAL MENU</h2>
     <img src="ROYAL COMBO.jpg" class="royal-banner" alt="Royal Combos">
 
-    <div class="cat-title">👑 ROYAL COMBOS</div>
+    <div class="cat-title">👑 RSK ROYAL COMBOS</div>
     <div class="menu-grid">
         <div class="item-card">
-            <div><b>Tawa Chicken Combo</b></div><div class="price">₹259</div>
-            <button class="add-btn" data-name="Tawa Chicken Combo" data-price="259">Add to Cart</button>
+            <div><b>Tawa Chicken + Paratha</b></div><div class="price">₹259</div>
+            <button class="add-btn" data-name="Tawa Chicken Combo" data-price="259">+ ADD TO CART</button>
         </div>
         <div class="item-card">
-            <div><b>Paneer Bhurji Combo</b></div><div class="price">₹199</div>
-            <button class="add-btn" data-name="Paneer Bhurji Combo" data-price="199">Add to Cart</button>
+            <div><b>Paneer Bhurji + Kulcha</b></div><div class="price">₹199</div>
+            <button class="add-btn" data-name="Paneer Bhurji Combo" data-price="199">+ ADD TO CART</button>
         </div>
     </div>
 
     <div class="cat-title">🍛 MAIN COURSE</div>
     <div class="menu-grid">
         <div class="item-card">
-            <div><b>Butter Chicken</b></div><div class="price">₹349</div>
-            <button class="add-btn" data-name="Butter Chicken" data-price="349">Add to Cart</button>
+            <div><b>Butter Chicken (Full)</b></div><div class="price">₹349</div>
+            <button class="add-btn" data-name="Butter Chicken" data-price="349">+ ADD</button>
         </div>
         <div class="item-card">
-            <div><b>Dal Makhani</b></div><div class="price">₹220</div>
-            <button class="add-btn" data-name="Dal Makhani" data-price="220">Add to Cart</button>
+            <div><b>Dal Makhani Royal</b></div><div class="price">₹220</div>
+            <button class="add-btn" data-name="Dal Makhani" data-price="220">+ ADD</button>
         </div>
     </div>
-
+    
     <div class="checkout-footer" id="floatingCheckout">
-        <button class="place-order-btn" id="finalOrderBtn">🚀 ORDER ON WHATSAPP</button>
+        <button class="place-order-btn" id="finalOrderBtn">
+            🟢 SEND ORDER ON WHATSAPP
+        </button>
     </div>
 
     <div id="tokenModal">
-        <b style="color:#D4AF37">ROYAL KITCHEN</b><br>
-        <small>Token Number Generated</small>
-        <span id="tokenNumDisplay" class="token-num">00</span>
-        <button id="closeTokenBtn" class="add-btn" style="background:#D4AF37; width:100%">OK, ORDER NOW</button>
+        <b style="color:#D4AF37; letter-spacing: 2px;">ROYAL KITCHEN</b><br>
+        <p style="color:#fff; font-size:12px; margin-top:10px;">Your Token Number Is:</p>
+        <span id="tokenNumDisplay" class="token-num">01</span>
+        <button id="closeAndSend" class="add-btn" style="background:#D4AF37; width:100%; padding:15px;">CONFIRM & SEND MESSAGE</button>
     </div>
 </div>
 
 <script>
 (function() {
     let myCart = [];
-    const WHATSAPP_NUM = "919999999999"; // <--- APNA NUMBER DALO (e.g., 919812345678)
+    const ADMIN_NUMBER = "917489999890"; // <-- Tera Number Set Kar Diya Hai
 
-    // Add to Cart Logic
-    document.querySelectorAll('.add-btn').forEach(button => {
-        button.addEventListener('click', function() {
+    // 1. Add to Cart Logic
+    document.querySelectorAll('.add-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
             const name = this.getAttribute('data-name');
             const price = this.getAttribute('data-price');
             myCart.push({ name, price });
             document.getElementById('floatingCheckout').style.display = 'flex';
+            
+            // Visual feedback
+            const originalText = this.innerText;
             this.innerText = "ADDED ✅";
-            setTimeout(() => { this.innerText = "Add to Cart"; }, 1000);
+            this.style.background = "#D4AF37";
+            setTimeout(() => { 
+                this.innerText = originalText; 
+                this.style.background = "#fff";
+            }, 800);
         });
     });
 
-    // Token & WhatsApp Logic
+    // 2. Token Generation & WhatsApp Message
     document.getElementById('finalOrderBtn').addEventListener('click', function() {
-        if (myCart.length === 0) return;
+        if (myCart.length === 0) return alert("Pehle kuch select toh karo!");
 
-        // Token Management
+        // Token Reset Logic (Daily)
         let today = new Date().toDateString();
         let lastDate = localStorage.getItem('rKitchen_date');
         let count = parseInt(localStorage.getItem('rKitchen_count')) || 0;
@@ -90,27 +100,33 @@
             count++;
         }
         localStorage.setItem('rKitchen_count', count);
-        let tkn = count.toString().padStart(2, '0');
+        let token = count.toString().padStart(2, '0');
 
-        // Show Token
-        document.getElementById('tokenNumDisplay').innerText = tkn;
+        // Show Token UI
+        document.getElementById('tokenNumDisplay').innerText = token;
         document.getElementById('tokenModal').style.display = 'block';
 
-        // Message Content
-        let msg = "🏷️ *TOKEN: " + tkn + "*\n";
-        msg += "---------------------------\n";
-        let total = 0;
-        myCart.forEach((item, i) => {
-            msg += (i + 1) + ". " + item.name + " (₹" + item.price + ")\n";
-            total += parseInt(item.price);
+        // 3. WHATSAPP MESSAGE FORMATTING (Parchi)
+        let message = "🏷️ *TOKEN NO: " + token + "*\n";
+        message += "━━━━━━━━━━━━━━━\n";
+        message += "🚩 *NEW ORDER - ROYAL KITCHEN*\n";
+        message += "━━━━━━━━━━━━━━━\n\n";
+        
+        let totalBill = 0;
+        myCart.forEach((item, index) => {
+            message += (index + 1) + ". " + item.name + " - ₹" + item.price + "\n";
+            totalBill += parseInt(item.price);
         });
-        msg += "---------------------------\n";
-        msg += "*TOTAL BILL: ₹" + total + "*";
 
-        // Click to close and go to WA
-        document.getElementById('closeTokenBtn').onclick = function() {
-            const finalUrl = "https://api.whatsapp.com/send?phone=" + WHATSAPP_NUM + "&text=" + encodeURIComponent(msg);
-            window.location.href = finalUrl;
+        message += "\n━━━━━━━━━━━━━━━\n";
+        message += "💰 *TOTAL BILL: ₹" + totalBill + "*\n";
+        message += "━━━━━━━━━━━━━━━\n";
+        message += "Please confirm the order ASAP! 🙏";
+
+        // 4. Send on Click
+        document.getElementById('closeAndSend').onclick = function() {
+            const waUrl = "https://api.whatsapp.com/send?phone=" + ADMIN_NUMBER + "&text=" + encodeURIComponent(message);
+            window.location.href = waUrl;
         };
     });
 })();
