@@ -2,8 +2,6 @@
 
 <script>
 (function() {
-    console.log("RSK Menu Script Loading...");
-    
     const menuData = [
         {
             sectionName: "👑 RSK ROYAL COMBOS",
@@ -75,28 +73,39 @@
         menuData.forEach(section => {
             html += `<div style="margin-bottom:30px;">
                 <img src="${section.sectionPhoto}" style="width:100%; border-radius:12px; margin-bottom:15px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" onerror="this.style.display='none'">
-                <div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">${section.sectionName}</div>
+                <div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase;">${section.sectionName}</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">`;
             
             section.items.forEach(item => {
                 html += `<div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
-                    <div style="color:#fff; font-size:13px; font-weight:500;">${item.name}</div>
-                    ${item.type === 'single' ? 
-                        `<div style="color:#D4AF37; font-weight:bold; margin:8px 0; font-size:14px;">₹${item.price}</div>
-                         <button onclick="window.addToCart('${item.name}', ${item.price})" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer; font-size:11px;">+ ADD</button>` :
-                        `<div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹${item.halfPrice} | F: ₹${item.fullPrice}</div>
-                         <div style="display:flex; flex-direction:column; gap:5px;">
-                            <button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" style="background:#f0f0f0; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer; font-size:10px;">HALF</button>
-                            <button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" style="background:#D4AF37; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer; font-size:10px;">FULL</button>
-                         </div>`
-                    }
-                </div>`;
+                    <div style="color:#fff; font-size:13px; font-weight:500;">${item.name}</div>`;
+                
+                if (item.type === 'single') {
+                    html += `
+                    <div style="color:#D4AF37; font-weight:bold; margin:8px 0; font-size:14px;">₹${item.price}</div>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <button onclick="window.removeFromCart('${item.name}')" style="background:#444; color:#fff; border:none; width:30px; height:30px; border-radius:6px; font-weight:bold; cursor:pointer;">-</button>
+                        <button onclick="window.addToCart('${item.name}', ${item.price})" style="background:#D4AF37; color:#000; border:none; flex:1; height:30px; border-radius:6px; font-weight:800; cursor:pointer; font-size:11px;">ADD +</button>
+                    </div>`;
+                } else {
+                    html += `
+                    <div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹${item.halfPrice} | F: ₹${item.fullPrice}</div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="window.removeFromCart('${item.name} (H)')" style="background:#444; color:#fff; border:none; width:25px; border-radius:4px;">-</button>
+                            <button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" style="background:#f0f0f0; border:none; flex:1; padding:6px; border-radius:4px; font-weight:700; font-size:10px;">HALF +</button>
+                        </div>
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="window.removeFromCart('${item.name} (F)')" style="background:#444; color:#fff; border:none; width:25px; border-radius:4px;">-</button>
+                            <button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" style="background:#D4AF37; border:none; flex:1; padding:6px; border-radius:4px; font-weight:700; font-size:10px;">FULL +</button>
+                        </div>
+                    </div>`;
+                }
+                html += `</div>`;
             });
             html += `</div></div>`;
         });
         container.innerHTML = html;
-    } else {
-        console.error("Container 'dynamic-menu-render' not found!");
     }
 })();
 </script>
