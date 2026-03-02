@@ -131,19 +131,62 @@
         }
     }
 
+   // --- 1. Updated Register/Verify Function ---
     window.registerUser = function() {
         let name = prompt("Aapka Naam?");
         let phone = prompt("Aapka WhatsApp Number?");
+
         if(name && phone && phone.length >= 10) {
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userPhone', phone);
-            updateUserUI();
-            alert("Login Safal!");
+            // Random 4-digit code generate karna verification ke liye
+            let vCode = Math.floor(1000 + Math.random() * 9000);
+            
+            // Temporary details save karna
+            localStorage.setItem('tempName', name);
+            localStorage.setItem('tempPhone', phone);
+            localStorage.setItem('vCode', vCode);
+
+            let verifyMsg = `*VERIFICATION REQUEST* 👑%0A━━━━━━━━━━━━━━━%0AHello RSK! I am *${name}*. %0APlease verify my number: ${phone}%0A━━━━━━━━━━━━━━━%0A*Verification Code: RSK-${vCode}*%0A━━━━━━━━━━━━━━━%0A_Note: Do not edit this code._`;
+
+            if(confirm("Verification ke liye aapko WhatsApp par ek message bhejna hoga. Proceed karein?")) {
+                // WhatsApp par message bhejna
+                window.open(`https://wa.me/917489999890?text=${verifyMsg}`, '_blank');
+                
+                // Details ko permanently save karna (Message bhejne ke baad user verified mana jayega)
+                localStorage.setItem('userName', name);
+                localStorage.setItem('userPhone', phone);
+                localStorage.setItem('isVerified', 'true');
+                
+                updateUserUI();
+                alert("Namaste ${name}! Verification message bhejne ke liye shukriya. Aapka account active hai.");
+            }
+        } else {
+            alert("Kripya sahi naam aur 10-digit number daalein.");
         }
     };
 
+    // --- 2. Updated AddToCart (Security Check) ---
+    window.addToCart = function(name, price) {
+        const isVerified = localStorage.getItem('isVerified');
+        
+        // Agar user login nahi hai ya verified nahi hai
+        if(!isVerified) {
+            alert("⚠️ Security Check: Pehle WhatsApp Verification poora karein!");
+            window.registerUser();
+            return;
+        }
+
+        const existingItem = window.cart.find(item => item.name === name);
+        if (existingItem) {
+            existingItem.qty += 1;
+        } else {
+            window.cart.push({ name: name, price: price, qty: 1 });
+        }
+        updateCartUI();
+    };
+
+    // --- 3. Updated Logout (Sab clear karne ke liye) ---
     window.logout = function() {
-        if(confirm("Logout karna chahte hain?")) {
+        if(confirm("Kya aap logout karna chahte hain? Sabhi details clear ho jayengi.")) {
             localStorage.clear();
             location.reload();
         }
