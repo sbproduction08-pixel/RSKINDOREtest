@@ -1,128 +1,219 @@
 <style>
-    /* Design Basics */
-    .menu-header { color: #D4AF37; font-family: 'Marcellus', serif; text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
-    .search-box { width:100%; padding:15px; border-radius:30px; border:1px solid #D4AF37; background:#1a1a1a; color:#fff; margin-bottom:20px; outline:none; box-sizing:border-box; font-size: 16px; }
-
-    /* Menu Grid */
-    .cat-title { color: #D4AF37; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 25px 0 10px; display: block; border-left: 4px solid #D4AF37; padding-left: 10px; }
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 100px; }
-    .item-card { background: rgba(255,255,255,0.07); border-radius: 10px; padding: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
-    .item-name { font-size: 13px; font-weight: bold; color: #fff; min-height: 35px; margin-bottom: 5px; }
-    .price-tag { color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+    :root { --gold: #D4AF37; --bg-dark: #0a0a0a; }
     
-    /* Add Button */
-    .add-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 5px; font-size: 12px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.2s; }
-    .add-btn:active { background: #D4AF37; transform: scale(0.95); }
+    /* Header & Banner */
+    .menu-header { color: var(--gold); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; }
+    
+    .royal-banner { 
+        width: 100%; border-radius: 12px; border: 1px solid var(--gold); 
+        margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
 
-    /* Bottom Checkout Bar */
-    #checkoutBar { 
-        position: fixed; bottom: 85px; left: 0; width: 100%; 
-        background: #D4AF37; color: #000; padding: 15px 20px; 
-        display: none; justify-content: space-between; align-items: center; 
-        font-weight: 900; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); z-index: 9999;
-        box-sizing: border-box; 
+    /* Category Titles */
+    .cat-title { 
+        color: var(--gold); font-size: 16px; font-weight: bold; 
+        margin: 30px 0 15px; border-left: 4px solid var(--gold); 
+        padding-left: 12px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    
+    /* Grid Design */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 20px; }
+    
+    /* Item Cards */
+    .item-card { 
+        background: rgba(255,255,255,0.05); border: 1px solid #222; 
+        border-radius: 10px; padding: 12px; transition: 0.3s; 
+        display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .item-card:hover { border-color: var(--gold); background: rgba(255,255,255,0.08); }
+    
+    .item-name { font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 5px; line-height: 1.2; }
+    .price { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 12px; }
+
+    /* Buttons */
+    .add-btn { 
+        background: #fff; color: #000; border: none; padding: 8px; 
+        border-radius: 5px; font-size: 10px; font-weight: bold; 
+        cursor: pointer; width: 100%;
+    }
+    .add-btn:active { transform: scale(0.95); background: var(--gold); }
+    
+    /* WhatsApp Login Modal */
+    #loginOverlay {
+        position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9);
+        display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;
+    }
+    .login-box { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 1px solid var(--gold); text-align: center; width: 80%; }
+    .login-box input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+
+    /* Fixed Checkout */
+    .checkout-footer { 
+        position: fixed; bottom: 20px; left: 0; width: 100%; 
+        display: none; justify-content: center; z-index: 1000; 
+    }
+    .place-order-btn { 
+        background: #25D366; color: #fff; border: none; 
+        padding: 15px 40px; border-radius: 50px; font-weight: 900; 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.6); cursor: pointer; font-size: 14px;
     }
 </style>
 
-<div class="menu-tab">
-    <h2 class="menu-header">ROYAL STREET KITCHEN</h2>
-    
-    <input type="text" id="rskSearch" class="search-box" placeholder="🔍 Dish dhundein..." onkeyup="filterDish()">
-
-    <div id="menuContainer">
-        <span class="cat-title">👑 Royal Combos</span>
-        <div class="menu-grid">
-            <div class="dish-unit" data-name="tawa chicken paratha combo">
-                <div class="item-card">
-                    <div class="item-name">Tawa Chicken + Paratha</div>
-                    <div class="price-tag">₹259</div>
-                    <button class="add-btn" onclick="addDish('Tawa Chicken Combo', 259)">+ ADD</button>
-                </div>
-            </div>
-            <div class="dish-unit" data-name="paneer bhurji combo">
-                <div class="item-card">
-                    <div class="item-name">Paneer Bhurji Combo</div>
-                    <div class="price-tag">₹209</div>
-                    <button class="add-btn" onclick="addDish('Paneer Bhurji Combo', 209)">+ ADD</button>
-                </div>
-            </div>
+<div id="loginOverlay">
+    <div class="login-box">
+        <h3 style="color:var(--gold)">WhatsApp Login</h3>
+        <input type="number" id="phoneNum" placeholder="WhatsApp Number">
+        <button class="add-btn" onclick="sendOTP()">SEND OTP VIA WHATSAPP</button>
+        <div id="otpSection" style="display:none">
+            <input type="text" id="otpInp" placeholder="Enter OTP">
+            <button class="add-btn" style="background:var(--gold)" onclick="verifyOTP()">VERIFY & LOGIN</button>
         </div>
+    </div>
+</div>
 
-        <span class="cat-title">🍚 Rice & Breads</span>
-        <div class="menu-grid">
-            <div class="dish-unit" data-name="chicken fried rice">
-                <div class="item-card">
-                    <div class="item-name">Chicken Fried Rice</div>
-                    <div class="price-tag">₹149</div>
-                    <button class="add-btn" onclick="addDish('Chicken Fried Rice', 149)">+ ADD</button>
-                </div>
-            </div>
+<div class="menu-tab-content">
+    <h2 class="menu-header">ROYAL KITCHEN</h2>
+
+    <img src="ROYAL COMBO.jpg" class="royal-banner" alt="Royal Combos">
+
+    <div class="cat-title">👑 RSK Royal Combos</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Tawa Chicken + Paratha</div>
+            <div class="price">₹259</div>
+            <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">+ ADD TO CART</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Paneer Bhurji + Kulcha</div>
+            <div class="price">₹199</div>
+            <button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 199)">+ ADD TO CART</button>
         </div>
     </div>
 
-    <div id="checkoutBar" onclick="goToWhatsApp()">
-        <div id="barInfo">0 Items | ₹0</div>
-        <div style="letter-spacing: 1px;">CHECKOUT ➔</div>
+    <div class="cat-title">🍢 Royal Starters</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Chicken Seekh Kebab</div>
+            <div class="price">₹179</div>
+            <button class="add-btn" onclick="addToCart('Seekh Kebab', 179)">+ ADD</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Crispy Corn</div>
+            <div class="price">₹129</div>
+            <button class="add-btn" onclick="addToCart('Crispy Corn', 129)">+ ADD</button>
+        </div>
+    </div>
+
+    <div class="cat-title">🍛 Main Course</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Butter Chicken</div>
+            <div class="price">₹349</div>
+            <button class="add-btn" onclick="addToCart('Butter Chicken', 349)">+ ADD</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Dal Makhani Royal</div>
+            <div class="price">₹229</div>
+            <button class="add-btn" onclick="addToCart('Dal Makhani', 229)">+ ADD</button>
+        </div>
+    </div>
+
+    <div class="cat-title">🥢 Indo-Chinese</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Chilly Chicken</div>
+            <div class="price">₹249</div>
+            <button class="add-btn" onclick="addToCart('Chilly Chicken', 249)">+ ADD</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Veg Hakka Noodles</div>
+            <div class="price">₹159</div>
+            <button class="add-btn" onclick="addToCart('Veg Noodles', 159)">+ ADD</button>
+        </div>
+    </div>
+
+    <div class="cat-title">🫓 Indian Breads</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Butter Naan</div>
+            <div class="price">₹40</div>
+            <button class="add-btn" onclick="addToCart('Butter Naan', 40)">+ ADD</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Lachha Paratha</div>
+            <div class="price">₹50</div>
+            <button class="add-btn" onclick="addToCart('Lachha Paratha', 50)">+ ADD</button>
+        </div>
+    </div>
+
+    <div class="cat-title">🥤 Drinks & Desserts</div>
+    <div class="menu-grid">
+        <div class="item-card">
+            <div class="item-name">Gulab Jamun (2pc)</div>
+            <div class="price">₹60</div>
+            <button class="add-btn" onclick="addToCart('Gulab Jamun', 60)">+ ADD</button>
+        </div>
+        <div class="item-card">
+            <div class="item-name">Cold Coffee</div>
+            <div class="price">₹99</div>
+            <button class="add-btn" onclick="addToCart('Cold Coffee', 99)">+ ADD</button>
+        </div>
+    </div>
+
+    <div class="checkout-footer" id="floatingCheckout">
+        <button class="place-order-btn" onclick="checkLoginAndOrder()">
+            💬 ORDER ON WHATSAPP
+        </button>
     </div>
 </div>
 
 <script>
-    // Cart in memory
-    var rskCart = [];
+let cart = [];
+let isLoggedIn = false;
 
-    function addDish(name, price) {
-        // Simple Add
-        rskCart.push({n: name, p: price});
-        
-        // Update Bar
-        var total = 0;
-        for(var i=0; i < rskCart.length; i++) { total += rskCart[i].p; }
-        
-        var bar = document.getElementById('checkoutBar');
-        bar.style.display = 'flex';
-        document.getElementById('barInfo').innerText = rskCart.length + " Items | ₹" + total;
-        
-        console.log("Added: " + name);
+function addToCart(name, price) {
+    cart.push({name, price});
+    document.getElementById('floatingCheckout').style.display = 'flex';
+    alert(name + " added to cart!");
+}
+
+function checkLoginAndOrder() {
+    if(!isLoggedIn) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+    } else {
+        sendToWhatsApp();
     }
+}
 
-    function filterDish() {
-        var input = document.getElementById('rskSearch').value.toLowerCase();
-        var items = document.getElementsByClassName('dish-unit');
-        
-        for (var i = 0; i < items.length; i++) {
-            var dishName = items[i].getAttribute('data-name');
-            if (dishName.includes(input)) {
-                items[i].style.display = "block";
-            } else {
-                items[i].style.display = "none";
-            }
-        }
-    }
+function sendOTP() {
+    let phone = document.getElementById('phoneNum').value;
+    if(phone.length < 10) return alert("Sahi number daal bhai!");
+    // Logic: Reality mein API lagti hai, yahan hum simulate kar rahe hain
+    alert("OTP sent to WhatsApp of " + phone);
+    document.getElementById('otpSection').style.display = 'block';
+}
 
-    function goToWhatsApp() {
-        if(rskCart.length === 0) return;
+function verifyOTP() {
+    isLoggedIn = true;
+    document.getElementById('loginOverlay').style.display = 'none';
+    sendToWhatsApp();
+}
 
-        var bill = 0;
-        var list = "";
-        for(var i=0; i < rskCart.length; i++) {
-            list += "- " + rskCart[i].n + " (₹" + rskCart[i].p + ")%0A";
-            bill += rskCart[i].p;
-        }
+function sendToWhatsApp() {
+    let phoneNumber = "919999999999"; // APNA NUMBER DALO YAHAN
+    let text = "--- *NEW ORDER ROYAL KITCHEN* ---\n\n";
+    let total = 0;
+    
+    cart.forEach((item, index) => {
+        text += (index+1) + ". " + item.name + " - ₹" + item.price + "\n";
+        total += item.price;
+    });
+    
+    text += "\n---------------------------\n";
+    text += "*TOTAL BILL: ₹" + total + "*\n";
+    text += "---------------------------\n";
+    text += "Please confirm my order!";
 
-        // Token Number
-        var token = "RSK-" + Math.floor(100 + Math.random() * 900);
-
-        // WhatsApp Format
-        var waText = "*--- ROYAL STREET KITCHEN ---*%0A";
-        waText += "*TOKEN: " + token + "*%0A%0A";
-        waText += "*ORDER:*%0A" + list;
-        waText += "%0A*TOTAL: ₹" + bill + "*%0A%0A";
-        waText += "Coming to pick it up!";
-
-        window.open("https://wa.me/7489999890?text=" + waText, "_blank");
-        
-        // Reset
-        rskCart = [];
-        document.getElementById('checkoutBar').style.display = 'none';
-    }
+    let url = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(text);
+    window.open(url, '_blank').focus();
+}
 </script>
