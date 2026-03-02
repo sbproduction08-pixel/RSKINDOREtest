@@ -10,7 +10,8 @@
         body { margin: 0; background: var(--black); background-image: radial-gradient(circle at center, var(--royal-red) 0%, var(--black) 100%); color: #fff; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
         header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(212,175,55,0.3); }
-        .main-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 20px var(--gold); }
+        /* Logo par cursor pointer lagaya hai taki click ka pata chale */
+        .main-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 20px var(--gold); cursor: pointer; }
         h1 { font-family: 'Marcellus', serif; color: var(--gold); margin: 15px 0 5px; letter-spacing: 2px; text-transform: uppercase; font-size: 22px; }
         .i-love-ind { width: 110px; margin-top: 5px; filter: drop-shadow(0 0 5px var(--gold)); }
 
@@ -62,7 +63,7 @@
 <body>
 
 <header>
-    <img src="MAIN_LOGO.jpeg" class="main-logo" alt="RSK Logo">
+    <img src="MAIN_LOGO.jpeg" class="main-logo" alt="RSK Logo" onclick="handleAdminAccess()">
     <h1>Royal Street Kitchen</h1>
     <img src="i_love_ind.png" class="i-love-ind" alt="I Love Indore">
     
@@ -119,9 +120,30 @@
     let cancelInterval;
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec';
 
+    // --- SECRET ADMIN ACCESS LOGIC ---
+    let logoClicks = 0;
+    let clickTimer;
+    window.handleAdminAccess = function() {
+        logoClicks++;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => { logoClicks = 0; }, 3000); // 3 sec mein reset
+
+        if (logoClicks === 3) {
+            logoClicks = 0;
+            let pass = prompt("🔐 Enter Royal Admin Key:");
+            if (pass === "RSK@2026") { // Yeh aapka password hai
+                showTab('admin');
+            } else if (pass !== null) {
+                alert("❌ Galat Password! Access Denied.");
+            }
+        }
+    };
+
     function showTab(tabId) {
         var navItems = document.getElementsByClassName('nav-item');
         for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
+        
+        // Navigation highlight tabhi hoga agar button exist karta hai
         const activeBtn = document.getElementById('btn-' + tabId);
         if(activeBtn) activeBtn.classList.add('active');
 
@@ -143,7 +165,7 @@
             })
             .catch(err => { contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Swagat Hai!</div>"; });
 
-        localStorage.setItem('activeTab', tabId);
+        if(tabId !== 'admin') localStorage.setItem('activeTab', tabId);
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
@@ -244,7 +266,6 @@
         } else { bar.style.display = 'none'; }
     }
 
-    // --- GOOGLE SHEET SEND DATA FUNCTION ---
     function sendDataToSheet(payload) {
         fetch(bridgeUrl, {
             method: 'POST',
@@ -254,7 +275,6 @@
         }).catch(err => console.log("Sheet Error:", err));
     }
 
-    // --- UPDATED CHECKOUT WITH CENTRAL TOKEN ---
     window.checkout = function() {
         let uName = localStorage.getItem('userName');
         let uPhone = localStorage.getItem('userPhone');
@@ -264,7 +284,6 @@
         checkoutBtn.disabled = true;
         checkoutBtn.innerText = "Processing... ⏳";
 
-        // 1. Sheet se aaj ka Count lo
         fetch(bridgeUrl) 
         .then(res => res.text())
         .then(currentCount => {
@@ -275,10 +294,8 @@
             let itemsForSheet = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
             let itemsForWA = window.cart.map((i, idx) => `*${idx+1}.* ${i.name} x ${i.qty} = ₹${i.price * i.qty}`).join('%0A');
 
-            // 2. Sheet mein bhej do
             sendDataToSheet({ token: nextToken, name: uName, items: itemsForSheet, total: total, status: "Pending" });
 
-            // 3. WhatsApp window
             let message = `*ROYAL STREET KITCHEN* 👑%0A━━━━━━━━━━━━━━━%0A*Token:* %23${nextToken}%0A*Cust:* ${uName}%0A*Mob:* ${uPhone}%0A━━━━━━━━━━━━━━━%0A*Order:*%0A${itemsForWA}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
             window.open(`https://wa.me/917489999890?text=${message}`, '_blank');
             
