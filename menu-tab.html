@@ -1,160 +1,157 @@
 <style>
-    .menu-header { color: #D4AF37; font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid #D4AF37; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
+    /* 1. Header & Search */
+    .menu-header { color: #D4AF37; font-family: 'Marcellus', serif; text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
     .search-box { width:100%; padding:15px; border-radius:30px; border:1px solid #D4AF37; background:#1a1a1a; color:#fff; margin-bottom:20px; outline:none; box-sizing:border-box; }
 
+    /* 2. Grid & Items */
     .cat-title { color: #D4AF37; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 25px 0 10px; display: block; border-left: 4px solid #D4AF37; padding-left: 10px; }
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .item-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
-    .item-name { font-size: 12px; font-weight: bold; color: #fff; min-height: 30px; }
+    .item-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .item-name { font-size: 12px; font-weight: bold; color: #fff; min-height: 30px; line-height: 1.2; }
     .price-tag { color: #D4AF37; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
     
-    .add-btn { background: #D4AF37; color: #000; border: none; padding: 12px; border-radius: 5px; font-size: 11px; font-weight: 800; cursor: pointer; width: 100%; }
+    /* Strong Add Button */
+    .add-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; width: 100%; }
+    .add-btn:active { background: #D4AF37; transform: scale(0.95); }
 
-    /* FLOATING CART BOX */
+    /* 3. FLOATING CART BUTTON (BOTTOM RIGHT) */
     #rskFloatingCart { 
         position: fixed; bottom: 100px; right: 20px; 
         background: #D4AF37; color: #000; width: 70px; height: 70px; 
         border-radius: 20px; display: flex; flex-direction: column; 
         align-items: center; justify-content: center; 
-        box-shadow: 0 8px 30px rgba(0,0,0,0.8); z-index: 9999; border: 2px solid #fff;
+        box-shadow: 0 8px 30px #000; z-index: 9999; border: 2.5px solid #fff;
         cursor: pointer;
     }
-    .badge-count { position: absolute; top: -10px; left: -10px; background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 900; font-size: 12px; border: 1px solid #fff; }
+    .badge { position: absolute; top: -12px; left: -12px; background: #ff4444; color: #fff; padding: 4px 10px; border-radius: 50%; font-weight: 900; font-size: 14px; border: 2px solid #fff; }
 
-    /* CART OVERLAY - AB YE PAKKA KHULEGA */
-    #cartOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
-    .cart-modal { background: #111; border: 2px solid #D4AF37; border-radius: 20px; padding: 20px; flex: 1; display: flex; flex-direction: column; }
-    .cart-row { display: flex; justify-content: space-between; align-items: center; color: #fff; border-bottom: 1px solid #222; padding: 12px 0; font-size: 14px; }
-    .remove-btn { color: #ff4444; font-weight: bold; cursor: pointer; border: 1px solid #ff4444; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
-    
-    .total-bill { font-size: 22px; color: #D4AF37; font-weight: 900; text-align: right; padding: 15px 0; border-top: 2px solid #D4AF37; margin-top: auto; }
-    .action-btn { padding: 15px; border-radius: 10px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; }
+    /* 4. CART INTERFACE (FULL SCREEN) */
+    #cartModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
+    .cart-header { color: #D4AF37; border-bottom: 1px solid #D4AF37; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .cart-list { flex: 1; overflow-y: auto; color: #fff; }
+    .cart-item { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 15px 0; }
+    .total-section { font-size: 24px; color: #D4AF37; font-weight: 900; text-align: right; padding: 20px 0; border-top: 2px solid #D4AF37; }
+    .cart-btn { padding: 18px; border-radius: 12px; border: none; font-weight: 900; font-size: 16px; width: 100%; margin-top: 10px; cursor: pointer; }
 </style>
 
 <div class="menu-tab">
-    <h2 class="menu-header">ROYAL RSK MENU</h2>
-    <input type="text" id="menuSearch" class="search-box" placeholder="🔍 Search Dish..." onkeyup="doSearch()">
+    <h2 class="menu-header">RSK ROYAL MENU</h2>
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search dish..." onkeyup="filterMenu()">
 
-    <div id="itemsContainer">
+    <div id="sections">
         <span class="cat-title">👑 Royal Combos</span>
         <div class="menu-grid">
-            <div class="dish-item" data-name="tawa chicken paratha combo">
-                <div class="item-card">
-                    <div class="item-name">Tawa Chicken + Paratha</div>
-                    <div class="price-tag">₹259</div>
-                    <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">ADD TO CART</button>
-                </div>
-            </div>
-            <div class="dish-item" data-name="paneer bhurji combo">
-                <div class="item-card">
-                    <div class="item-name">Paneer Bhurji Combo</div>
-                    <div class="price-tag">₹209</div>
-                    <button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 209)">ADD TO CART</button>
-                </div>
-            </div>
+            <div class="dish" data-name="tawa chicken paratha combo"><div class="item-card"><div class="item-name">Tawa Chicken + Paratha</div><div class="price-tag">₹259</div><button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">+ ADD TO CART</button></div></div>
+            <div class="dish" data-name="paneer bhurji combo"><div class="item-card"><div class="item-name">Paneer Bhurji Combo</div><div class="price-tag">₹209</div><button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 209)">+ ADD TO CART</button></div></div>
         </div>
+
+        <span class="cat-title">🍗 Non-Veg Specials</span>
+        <span class="cat-title">🌿 Veg Delights</span>
+        <span class="cat-title">🍜 Maggie Corner</span>
+        <span class="cat-title">🥚 Egg Station</span>
+        <span class="cat-title">🍚 Rice & Breads</span>
     </div>
 
-    <div id="rskFloatingCart" onclick="openCartView()">
-        <span class="badge-count" id="cartCount">0</span>
-        <span style="font-size: 22px;">🛒</span>
-        <span style="font-size: 10px; font-weight: 900;" id="cartTotal">₹0</span>
+    <div id="rskFloatingCart" onclick="openCart()">
+        <span class="badge" id="badgeCount">0</span>
+        <span style="font-size: 24px;">🛒</span>
+        <span style="font-size: 11px; font-weight: 900;" id="badgeTotal">₹0</span>
     </div>
 
-    <div id="cartOverlay">
-        <div class="cart-modal">
-            <h2 style="color:#D4AF37; margin-top:0; font-family:'Marcellus';">MY ROYAL ORDER</h2>
-            <div id="cartItemsList" style="overflow-y:auto; flex:1; margin:10px 0;">
-                </div>
-            <div class="total-bill" id="billAmount">Total: ₹0</div>
-            
-            <button class="action-btn" style="background:#D4AF37; color:#000;" onclick="sendOrder('Confirmed')">🚀 SEND ORDER TO WHATSAPP</button>
-            <button class="action-btn" style="background:#ff4444; color:#fff;" onclick="clearCart()">🗑️ CLEAR ALL</button>
-            <button class="action-btn" style="background:#333; color:#fff;" onclick="closeCartView()">BACK TO MENU</button>
+    <div id="cartModal">
+        <div class="cart-header">
+            <h2 style="margin:0;">YOUR CART</h2>
+            <button onclick="closeCart()" style="background:none; border:1px solid #D4AF37; color:#D4AF37; padding:5px 10px; border-radius:5px;">CLOSE</button>
         </div>
+        <div id="cartList" class="cart-list">
+            </div>
+        <div class="total-section" id="totalText">Total: ₹0</div>
+        
+        <button class="cart-btn" style="background:#D4AF37; color:#000;" onclick="handleCheckout('Confirmed')">🚀 ORDER VIA WHATSAPP</button>
+        <button class="cart-btn" style="background:#ff4444; color:#fff;" onclick="clearCart()">🗑️ EMPTY CART</button>
     </div>
 </div>
 
 <script>
-    var cart = JSON.parse(localStorage.getItem('rsk_cart')) || [];
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBPKkzFJT5Pqmn-_88ziR1nwcnoJWeXbIPjZGD4P9TYgTr45pcTt2yPxrYwTHe4HFe/exec";
+    var rsk_cart = JSON.parse(localStorage.getItem('rsk_cart_storage')) || [];
+    var webapp_link = "https://script.google.com/macros/s/AKfycbzBPKkzFJT5Pqmn-_88ziR1nwcnoJWeXbIPjZGD4P9TYgTr45pcTt2yPxrYwTHe4HFe/exec";
 
-    // Start UI
-    updateCartUI();
+    // Initialize
+    updateBadge();
 
     function addToCart(name, price) {
-        cart.push({name: name, price: price});
-        localStorage.setItem('rsk_cart', JSON.stringify(cart));
-        updateCartUI();
-        // Item add hote hi dabba thoda hilega (animation)
-        document.getElementById('rskFloatingCart').style.transform = "scale(1.2)";
-        setTimeout(() => { document.getElementById('rskFloatingCart').style.transform = "scale(1)"; }, 200);
+        rsk_cart.push({name: name, price: price});
+        localStorage.setItem('rsk_cart_storage', JSON.stringify(rsk_cart));
+        updateBadge();
+        alert(name + " added to Royal Cart!");
     }
 
-    function updateCartUI() {
-        var total = 0;
-        for(var i=0; i<cart.length; i++) { total += cart[i].price; }
-        document.getElementById('cartCount').innerText = cart.length;
-        document.getElementById('cartTotal').innerText = "₹" + total;
+    function updateBadge() {
+        var t = 0;
+        for(var i=0; i<rsk_cart.length; i++) { t += rsk_cart[i].price; }
+        document.getElementById('badgeCount').innerText = rsk_cart.length;
+        document.getElementById('badgeTotal').innerText = "₹" + t;
+        document.getElementById('rskFloatingCart').style.display = rsk_cart.length > 0 ? 'flex' : 'none';
     }
 
-    function openCartView() {
-        if(cart.length === 0) { alert("Pehle kuch add kijiye!"); return; }
-        document.getElementById('cartOverlay').style.display = 'flex';
-        renderCartItems();
+    function openCart() {
+        document.getElementById('cartModal').style.display = 'flex';
+        renderCart();
     }
 
-    function closeCartView() { document.getElementById('cartOverlay').style.display = 'none'; }
+    function closeCart() {
+        document.getElementById('cartModal').style.display = 'none';
+    }
 
-    function renderCartItems() {
+    function renderCart() {
         var html = ""; var total = 0;
-        for(var i=0; i<cart.length; i++) {
-            html += `<div class="cart-row">
-                        <div><b>${cart[i].name}</b><br><small>₹${cart[i].price}</small></div>
-                        <span class="remove-btn" onclick="removeItem(${i})">REMOVE</span>
+        for(var i=0; i<rsk_cart.length; i++) {
+            html += `<div class="cart-item">
+                        <span><b>${rsk_cart[i].name}</b><br><small>₹${rsk_cart[i].price}</small></span>
+                        <button onclick="removeItem(${i})" style="color:red; background:none; border:none;">Remove</button>
                      </div>`;
-            total += cart[i].price;
+            total += rsk_cart[i].price;
         }
-        document.getElementById('cartItemsList').innerHTML = html;
-        document.getElementById('billAmount').innerText = "Total: ₹" + total;
+        document.getElementById('cartList').innerHTML = html || "<p>Cart is empty</p>";
+        document.getElementById('totalText').innerText = "Total: ₹" + total;
     }
 
     function removeItem(index) {
-        cart.splice(index, 1);
-        localStorage.setItem('rsk_cart', JSON.stringify(cart));
-        updateCartUI();
-        renderCartItems();
-        if(cart.length === 0) closeCartView();
+        rsk_cart.splice(index, 1);
+        localStorage.setItem('rsk_cart_storage', JSON.stringify(rsk_cart));
+        updateBadge();
+        renderCart();
+        if(rsk_cart.length === 0) closeCart();
     }
 
     function clearCart() {
-        cart = [];
-        localStorage.removeItem('rsk_cart');
-        updateCartUI();
-        closeCartView();
+        rsk_cart = [];
+        localStorage.removeItem('rsk_cart_storage');
+        updateBadge();
+        closeCart();
     }
 
-    function sendOrder(status) {
-        var itemsStr = ""; var grandTotal = 0;
-        for(var i=0; i<cart.length; i++) { itemsStr += cart[i].name + ", "; grandTotal += cart[i].price; }
-        
+    function handleCheckout(status) {
+        var items = ""; var total = 0;
+        for(var i=0; i<rsk_cart.length; i++) { items += rsk_cart[i].name + ", "; total += rsk_cart[i].price; }
         var token = "RSK-" + Math.floor(100 + Math.random() * 900);
 
-        fetch(APPS_SCRIPT_URL, {
+        // Send to Sheet
+        fetch(webapp_link, {
             method: "POST",
             mode: "no-cors",
-            body: JSON.stringify({status: status, customer: "Urvashi", items: itemsStr, total: grandTotal, token: token})
+            body: JSON.stringify({status: status, customer: "Urvashi", items: items, total: total, token: token})
         });
 
         if(status === 'Confirmed') {
-            window.open("https://wa.me/7489999890?text=*TOKEN: " + token + "*%0A*Order:* " + itemsStr + "%0A*Total:* ₹" + grandTotal, "_blank");
+            window.open("https://wa.me/7489999890?text=*TOKEN: " + token + "*%0A*Order:* " + items + "%0A*Total:* ₹" + total, "_blank");
         }
         clearCart();
     }
 
-    function doSearch() {
-        var q = document.getElementById('menuSearch').value.toLowerCase();
-        var dishes = document.getElementsByClassName('dish-item');
+    function filterMenu() {
+        var q = document.getElementById('searchInput').value.toLowerCase();
+        var dishes = document.getElementsByClassName('dish');
         for(var i=0; i<dishes.length; i++) {
             var n = dishes[i].getAttribute('data-name').toLowerCase();
             dishes[i].style.display = n.includes(q) ? "block" : "none";
