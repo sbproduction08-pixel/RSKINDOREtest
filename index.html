@@ -35,6 +35,29 @@
         .fssai-main { width: 150px; margin-bottom: 20px; opacity: 0.9; }
         .sub-logos { display: flex; justify-content: center; align-items: center; gap: 25px; }
         .sub-logos img { height: 45px; filter: drop-shadow(0 0 5px var(--gold-glow)); }
+
+        /* Cancellation Bar Style */
+#cancel-bar {
+    display: none;
+    background: rgba(255, 68, 68, 0.15);
+    border: 1px solid #ff4444;
+    padding: 12px;
+    margin: 10px;
+    border-radius: 10px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+.cancel-btn-small {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+    font-size: 12px;
+}
     </style>
 </head>
 <body>
@@ -58,6 +81,14 @@
     <div class="nav-item" id="btn-reach" onclick="showTab('reach')">Reach</div>
 </div>
 
+<div id="cancel-bar">
+    <div style="font-size: 12px; color: #fff;">
+        🕒 <b>Active Order: Token #<span id="last-token">00</span></b><br>
+        Cancel karne ke liye <span id="timer-display" style="color: #ff4444; font-weight: bold;">05:00</span> bache hain.
+    </div>
+    <button onclick="window.cancelOrder()" class="cancel-btn-small">Urgent Cancel ❌</button>
+</div>
+    
 <div class="app-container" id="content-area"></div>
 
 <div id="floatingCheckout" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; box-sizing: border-box; box-shadow: 0 -5px 20px rgba(0,0,0,0.8);">
