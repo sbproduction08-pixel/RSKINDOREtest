@@ -1,11 +1,35 @@
 <script>
 
-function loadRSKMenu() {
-var container = document.getElementById('dynamic-menu-render');
+// Agar jagah nahi mili ya data nahi aaya, toh 100ms baad fir check karo
+    if (!container || !window.menuData) {
+        setTimeout(startMenu, 100);
+        return;
+    }
 
+    var out = "";
+    window.menuData.forEach(function(sec) {
+        out += '<div style="margin-bottom:30px;">';
+        out += '<img src="' + sec.sectionPhoto + '" style="width:100%; border-radius:12px; margin-bottom:15px;" onerror="this.style.display=\'none\'">';
+        out += '<div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px;">' + sec.sectionName + '</div>';
+        out += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">';
+        
+        sec.items.forEach(function(it) {
+            out += '<div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">';
+            out += '<div style="color:#fff; font-size:13px;">' + it.name + '</div>';
+            
+            if (it.type === "single") {
+                out += '<div style="color:#D4AF37; font-weight:bold; margin:8px 0;">₹' + it.price + '</div>';
+                out += '<button onclick="window.addToCart(\'' + it.name + '\',' + it.price + ')" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer;">+ ADD</button>';
+            } else {
+                out += '<div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹' + it.halfPrice + ' | F: ₹' + it.fullPrice + '</div>';
+                out += '<button onclick="window.addToCart(\'' + it.name + ' (H)\',' + it.halfPrice + ')" style="background:#f0f0f0; border:none; padding:8px; border-radius:6px; margin-bottom:5px; font-weight:700; cursor:pointer;">HALF</button>';
+                out += '<button onclick="window.addToCart(\'' + it.name + ' (F)\',' + it.fullPrice + ')" style="background:#D4AF37; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">FULL</button>';
+            }
+            out += '</div>';
+        });
+        out += '</div></div>';
+    });
+    container.innerHTML = out;
 }
-
-// Function chalu karein
-loadRSKMenu();
-  
+startMenu();
 </script>
