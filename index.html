@@ -65,9 +65,10 @@
 <div class="app-container" id="content-area"></div>
 
 <div id="floatingCheckout">
-    <div>
-        <div style="font-size: 10px; color: var(--gold);">Items in Cart</div>
-        <div style="font-size: 16px; font-weight: bold;">Total: ₹<span id="cart-total-display">0</span></div>
+    <div style="flex: 1; padding-right: 10px;">
+        <div id="cart-items-list" style="font-size: 11px; color: #fff; margin-bottom: 5px; max-height: 40px; overflow-y: auto; line-height: 1.2;"></div>
+        <div style="font-size: 10px; color: var(--gold); text-transform: uppercase;">Total Amount</div>
+        <div style="font-size: 16px; font-weight: bold;">₹<span id="cart-total-display">0</span></div>
     </div>
     <button onclick="window.checkout()" class="checkout-btn">Order on WhatsApp</button>
 </div>
@@ -88,7 +89,6 @@
 <script>
     window.cart = []; 
 
-    // --- Tab Switching Logic ---
     function showTab(tabId) {
         var navItems = document.getElementsByClassName('nav-item');
         for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
@@ -103,8 +103,6 @@
             .then(data => {
                 contentArea.innerHTML = data;
                 updateUserUI(); 
-                
-                // Execute scripts in the loaded tab
                 const scripts = contentArea.querySelectorAll('script');
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement('script');
@@ -121,13 +119,11 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    // --- User Auth UI ---
     function updateUserUI() {
         const userName = localStorage.getItem('userName');
         const welcomeDiv = document.getElementById('welcome-user');
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
-        
         if(userName) {
             welcomeDiv.innerHTML = "Namaste, " + userName + "! ✨";
             loginBtn.style.display = 'none';
@@ -156,7 +152,7 @@
         }
     };
 
-    // --- Cart Logic ---
+    // --- Cart Logic (ADD) ---
     window.addToCart = function(name, price) {
         const existingItem = window.cart.find(item => item.name === name);
         if (existingItem) {
@@ -167,14 +163,33 @@
         updateCartUI();
     };
 
+    // --- Cart Logic (REMOVE/MINUS) ---
+    window.removeFromCart = function(name) {
+        const itemIndex = window.cart.findIndex(item => item.name === name);
+        if (itemIndex > -1) {
+            if (window.cart[itemIndex].qty > 1) {
+                window.cart[itemIndex].qty -= 1;
+            } else {
+                window.cart.splice(itemIndex, 1);
+            }
+        }
+        updateCartUI();
+    };
+
     function updateCartUI() {
         const bar = document.getElementById('floatingCheckout');
         const totalDisp = document.getElementById('cart-total-display');
+        const itemsListDisp = document.getElementById('cart-items-list');
+        
         let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         
         if (window.cart.length > 0) {
             bar.style.display = 'flex';
             totalDisp.innerText = total;
+            
+            // Ye line items ke naam bar mein dikhayegi
+            let itemSummary = window.cart.map(i => `${i.name} (${i.qty})`).join(', ');
+            itemsListDisp.innerText = itemSummary;
         } else {
             bar.style.display = 'none';
         }
