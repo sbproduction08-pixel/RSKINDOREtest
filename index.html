@@ -246,7 +246,6 @@
 
     // --- GOOGLE SHEET SEND DATA FUNCTION ---
     function sendDataToSheet(payload) {
-        // We use text/plain to avoid CORS preflight issues in no-cors mode
         fetch(bridgeUrl, {
             method: 'POST',
             mode: 'no-cors',
@@ -255,48 +254,61 @@
         }).catch(err => console.log("Sheet Error:", err));
     }
 
+    // --- UPDATED CHECKOUT WITH CENTRAL TOKEN ---
     window.checkout = function() {
         let uName = localStorage.getItem('userName');
         let uPhone = localStorage.getItem('userPhone');
-        let today = new Date().toDateString();
-        let count = parseInt(localStorage.getItem('dailyCount')) || 0;
         
-        if (localStorage.getItem('tokenDate') !== today) { count = 1; localStorage.setItem('tokenDate', today); } 
-        else { count++; }
-        
-        localStorage.setItem('dailyCount', count);
-        let tokenNo = count.toString().padStart(2, '0');
-        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-        let itemsForSheet = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
-        let itemsForWA = window.cart.map((i, idx) => `*${idx+1}.* ${i.name} x ${i.qty} = ₹${i.price * i.qty}`).join('%0A');
+        const checkoutBtn = document.querySelector('#floatingCheckout button');
+        const originalText = checkoutBtn.innerText;
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerText = "Processing... ⏳";
 
-        // Send to Sheet
-        sendDataToSheet({ token: tokenNo, name: uName, items: itemsForSheet, total: total, status: "Pending" });
+        // 1. Sheet se aaj ka Count lo
+        fetch(bridgeUrl) 
+        .then(res => res.text())
+        .then(currentCount => {
+            let count = parseInt(currentCount) || 0;
+            let nextToken = (count + 1).toString().padStart(2, '0');
+            
+            let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let itemsForSheet = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+            let itemsForWA = window.cart.map((i, idx) => `*${idx+1}.* ${i.name} x ${i.qty} = ₹${i.price * i.qty}`).join('%0A');
 
-        let message = `*ROYAL STREET KITCHEN* 👑%0A━━━━━━━━━━━━━━━%0A*Token:* %23${tokenNo}%0A*Cust:* ${uName}%0A*Mob:* ${uPhone}%0A━━━━━━━━━━━━━━━%0A*Order:*%0A${itemsForWA}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
-        window.open(`https://wa.me/917489999890?text=${message}`, '_blank');
-        
-        localStorage.setItem('lastTokenNo', tokenNo);
-        document.getElementById('last-token').innerText = tokenNo;
-        startCancelTimer(300);
-        window.cart = [];
-        updateCartUI();
+            // 2. Sheet mein bhej do
+            sendDataToSheet({ token: nextToken, name: uName, items: itemsForSheet, total: total, status: "Pending" });
+
+            // 3. WhatsApp window
+            let message = `*ROYAL STREET KITCHEN* 👑%0A━━━━━━━━━━━━━━━%0A*Token:* %23${nextToken}%0A*Cust:* ${uName}%0A*Mob:* ${uPhone}%0A━━━━━━━━━━━━━━━%0A*Order:*%0A${itemsForWA}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
+            window.open(`https://wa.me/917489999890?text=${message}`, '_blank');
+            
+            localStorage.setItem('lastTokenNo', nextToken);
+            document.getElementById('last-token').innerText = nextToken;
+            startCancelTimer(300);
+            
+            window.cart = [];
+            updateCartUI();
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerText = originalText;
+        })
+        .catch(err => {
+            alert("Network issue! Please try again.");
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerText = originalText;
+        });
     };
 
     window.cancelOrder = function() {
         const token = localStorage.getItem('lastTokenNo');
         const name = localStorage.getItem('userName');
         if(confirm("Kya aap sach mein order cancel karna chahte hain?")) {
-            
-            // Send Cancel Status to Sheet
-            sendDataToSheet({ token: token, name: name, status: "Cancelled" });
-
+            sendDataToSheet({ token: token, name: name, items: "❌ CANCELLED BY CUSTOMER", total: 0, status: "Cancelled" });
             let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}%0A━━━━━━━━━━━━━━━%0A_Kripya mera order cancel kar dein._`;
             window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
             clearInterval(cancelInterval);
             document.getElementById('cancel-bar').style.display = 'none';
             localStorage.removeItem('lastTokenNo');
-            alert("Order Status: CANCELLED update ho gaya hai.");
+            alert("Order Status: CANCELLED entry bhej di gayi hai.");
         }
     };
 
