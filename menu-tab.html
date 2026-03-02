@@ -1,33 +1,11 @@
 <script>
-window.renderRSKMenu = function() {
-var container = document.getElementById('dynamic-menu-render');
-if (!container || !window.menuData) {
-setTimeout(window.renderRSKMenu, 100);
-return;
-}
-var html = "";
-window.menuData.forEach(function(section) {
-html += '<div style="margin-bottom:30px;">';
-html += '<img src="' + section.sectionPhoto + '" style="width:100%; border-radius:12px; margin-bottom:15px;" onerror="this.style.display=&#39;none&#39;">';
-html += '<div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase;">' + section.sectionName + '</div>';
-html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">';
-section.items.forEach(function(item) {
-html += '<div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">';
-html += '<div style="color:#fff; font-size:13px;">' + item.name + '</div>';
-if (item.type === "single") {
-html += '<div style="color:#D4AF37; font-weight:bold; margin:8px 0;">₹' + item.price + '</div>';
-html += '<button onclick="window.addToCart(&#39;' + item.name + '&#39;,' + item.price + ')" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer;">+ ADD</button>';
-} else {
-html += '<div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹' + item.halfPrice + ' | F: ₹' + item.fullPrice + '</div>';
-html += '<button onclick="window.addToCart(&#39;' + item.name + ' (H)&#39;,' + item.halfPrice + ')" style="background:#f0f0f0; border:none; padding:8px; border-radius:6px; margin-bottom:5px; font-weight:700; cursor:pointer;">HALF</button>';
-html += '<button onclick="window.addToCart(&#39;' + item.name + ' (F)&#39;,' + item.fullPrice + ')" style="background:#D4AF37; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">FULL</button>';
-}
-html += '</div>';
-});
-html += '</div></div>';
-});
-container.innerHTML = html;
-};
-window.renderRSKMenu();
 
+function loadRSKMenu() {
+var container = document.getElementById('dynamic-menu-render');
+
+}
+
+// Function chalu karein
+loadRSKMenu();
+  
 </script>
