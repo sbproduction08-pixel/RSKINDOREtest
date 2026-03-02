@@ -267,49 +267,83 @@
         }
     }
 
-    window.checkout = function() {
-        let uName = localStorage.getItem('userName');
-        let uPhone = localStorage.getItem('userPhone');
-        let today = new Date().toDateString();
-        let count = parseInt(localStorage.getItem('dailyCount')) || 0;
+   window.checkout = function() {
+        let uName = localStorage.getItem('userName');
+        let uPhone = localStorage.getItem('userPhone');
+        let today = new Date().toDateString();
+        let count = parseInt(localStorage.getItem('dailyCount')) || 0;
+        
+        if (localStorage.getItem('tokenDate') !== today) { 
+            count = 1; 
+            localStorage.setItem('tokenDate', today); 
+        } else { 
+            count++; 
+        }
+        
+        localStorage.setItem('dailyCount', count);
+        let tokenNo = count.toString().padStart(2, '0');
+        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
         
-        if (localStorage.getItem('tokenDate') !== today) { 
-            count = 1; 
-            localStorage.setItem('tokenDate', today); 
-        } else { 
-            count++; 
-        }
-        
-        localStorage.setItem('dailyCount', count);
-        let tokenNo = count.toString().padStart(2, '0');
-        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-        let items = window.cart.map((i, idx) => `*${idx+1}.* ${i.name} x ${i.qty} = ₹${i.price * i.qty}`).join('%0A');
+        // Google Sheet ke liye items ki list (Sahi format mein)
+        let itemsForSheet = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+        let items = window.cart.map((i, idx) => `*${idx+1}.* ${i.name} x ${i.qty} = ₹${i.price * i.qty}`).join('%0A');
 
-        let message = `*ROYAL STREET KITCHEN* 👑%0A━━━━━━━━━━━━━━━%0A*Token:* %23${tokenNo}%0A*Cust:* ${uName}%0A*Mob:* ${uPhone}%0A━━━━━━━━━━━━━━━%0A*Order:*%0A${items}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
+        // --- GOOGLE SHEET SILENT ENTRY START ---
+        fetch('https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: tokenNo,
+                name: uName,
+                items: itemsForSheet,
+                total: total,
+                status: "Pending"
+            })
+        });
+        // --- GOOGLE SHEET SILENT ENTRY END ---
 
-        window.open(`https://wa.me/917489999890?text=${message}`, '_blank');
-        
-        // --- Timer Trigger ---
-        localStorage.setItem('lastTokenNo', tokenNo);
-        document.getElementById('last-token').innerText = tokenNo;
-        startCancelTimer(300); // 5 Minutes
-        
-        window.cart = [];
-        updateCartUI();
-    };
+        let message = `*ROYAL STREET KITCHEN* 👑%0A━━━━━━━━━━━━━━━%0A*Token:* %23${tokenNo}%0A*Cust:* ${uName}%0A*Mob:* ${uPhone}%0A━━━━━━━━━━━━━━━%0A*Order:*%0A${items}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
+
+        window.open(`https://wa.me/917489999890?text=${message}`, '_blank');
+        
+        localStorage.setItem('lastTokenNo', tokenNo);
+        document.getElementById('last-token').innerText = tokenNo;
+        startCancelTimer(300); 
+        
+        window.cart = [];
+        updateCartUI();
+    };
 
     window.cancelOrder = function() {
-        const token = localStorage.getItem('lastTokenNo');
-        const name = localStorage.getItem('userName');
-        if(confirm("Kya aap sach mein order cancel karna chahte hain?")) {
-            let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}%0A━━━━━━━━━━━━━━━%0A_Kripya mera order cancel kar dein._`;
-            window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
-            clearInterval(cancelInterval);
-            document.getElementById('cancel-bar').style.display = 'none';
-            localStorage.removeItem('lastTokenNo');
-            alert("Cancellation request bhej di gayi hai.");
-        }
-    };
+        const token = localStorage.getItem('lastTokenNo');
+        const name = localStorage.getItem('userName');
+        if(confirm("Kya aap sach mein order cancel karna chahte hain?")) {
+
+            // --- GOOGLE SHEET CANCELLATION ENTRY START ---
+            fetch('https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: token,
+                    name: name,
+                    items: "!! CANCELLED BY USER !!",
+                    total: 0,
+                    status: "Cancelled"
+                })
+            });
+            // --- GOOGLE SHEET CANCELLATION ENTRY END ---
+
+            let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}%0A━━━━━━━━━━━━━━━%0A_Kripya mera order cancel kar dein._`;
+            window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
+            clearInterval(cancelInterval);
+            document.getElementById('cancel-bar').style.display = 'none';
+            localStorage.removeItem('lastTokenNo');
+            alert("Cancellation request Sheet mein update ho gayi hai.");
+        }
+    };
 
     window.onload = () => { 
         showTab(localStorage.getItem('activeTab') || 'home');
