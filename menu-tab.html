@@ -1,166 +1,117 @@
 <style>
-    .menu-tab-content { padding-bottom: 120px; color: #fff; }
-    .menu-header { color: var(--gold, #D4AF37); font-family: 'Marcellus', serif; text-align: center; border-bottom: 1px solid var(--gold, #D4AF37); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; }
-    .royal-banner { width: 100%; border-radius: 12px; border: 1px solid var(--gold, #D4AF37); margin-bottom: 20px; }
-    .cat-title { color: var(--gold, #D4AF37); font-size: 16px; font-weight: bold; margin: 30px 0 15px; border-left: 4px solid var(--gold, #D4AF37); padding-left: 12px; text-transform: uppercase; }
+    .menu-tab-content { padding-bottom: 120px; color: #fff; font-family: sans-serif; }
+    .menu-header { color: #D4AF37; text-align: center; border-bottom: 1px solid #D4AF37; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
+    .royal-banner { width: 100%; border-radius: 12px; border: 1px solid #D4AF37; margin-bottom: 20px; }
+    .cat-title { color: #D4AF37; font-size: 16px; font-weight: bold; margin: 30px 0 15px; border-left: 4px solid #D4AF37; padding-left: 12px; }
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .item-card { background: rgba(255,255,255,0.05); border: 1px solid #222; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .item-name { font-size: 13px; font-weight: bold; }
-    .price { color: var(--gold, #D4AF37); font-size: 14px; margin-bottom: 10px; }
-    .add-btn { background: #fff; color: #000; border: none; padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
+    .price { color: #D4AF37; font-weight: bold; margin-bottom: 10px; }
+    .add-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     
-    /* Fixed Footer */
-    .checkout-footer { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 1000; }
-    .place-order-btn { background: #25D366; color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    /* Footer */
+    .checkout-footer { position: fixed; bottom: 85px; left: 0; width: 100%; display: none; justify-content: center; z-index: 999; }
+    .place-order-btn { background: #25D366; color: #fff; border: none; padding: 18px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.6); font-size: 14px; }
 
-    /* Token Central Popup */
-    #tokenModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--gold, #D4AF37); padding: 25px; border-radius: 15px; text-align: center; z-index: 9999; display: none; width: 250px; }
-    .token-num { font-size: 50px; color: var(--gold, #D4AF37); font-weight: bold; display: block; margin: 10px 0; }
+    /* Token Popup */
+    #tokenModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid #D4AF37; padding: 25px; border-radius: 15px; text-align: center; z-index: 10000; display: none; width: 260px; box-shadow: 0 0 50px #000; }
+    .token-num { font-size: 60px; color: #D4AF37; font-weight: bold; display: block; margin: 10px 0; }
 </style>
 
 <div class="menu-tab-content">
     <h2 class="menu-header">ROYAL MENU</h2>
     <img src="ROYAL COMBO.jpg" class="royal-banner" alt="Royal Combos">
 
-    <div class="cat-title">👑 RSK Royal Combos</div>
+    <div class="cat-title">👑 ROYAL COMBOS</div>
     <div class="menu-grid">
         <div class="item-card">
-            <div class="item-name">Tawa Chicken + Paratha</div><div class="price">₹259</div>
-            <button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">+ ADD</button>
+            <div><b>Tawa Chicken Combo</b></div><div class="price">₹259</div>
+            <button class="add-btn" data-name="Tawa Chicken Combo" data-price="259">Add to Cart</button>
         </div>
         <div class="item-card">
-            <div class="item-name">Paneer Bhurji + Kulcha</div><div class="price">₹199</div>
-            <button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 199)">+ ADD</button>
+            <div><b>Paneer Bhurji Combo</b></div><div class="price">₹199</div>
+            <button class="add-btn" data-name="Paneer Bhurji Combo" data-price="199">Add to Cart</button>
         </div>
     </div>
 
-    <div class="cat-title">🍢 Starters</div>
+    <div class="cat-title">🍛 MAIN COURSE</div>
     <div class="menu-grid">
         <div class="item-card">
-            <div class="item-name">Chicken Seekh Kebab</div><div class="price">₹179</div>
-            <button class="add-btn" onclick="addToCart('Seekh Kebab', 179)">+ ADD</button>
+            <div><b>Butter Chicken</b></div><div class="price">₹349</div>
+            <button class="add-btn" data-name="Butter Chicken" data-price="349">Add to Cart</button>
         </div>
         <div class="item-card">
-            <div class="item-name">Veg Spring Roll</div><div class="price">₹120</div>
-            <button class="add-btn" onclick="addToCart('Veg Spring Roll', 120)">+ ADD</button>
-        </div>
-    </div>
-
-    <div class="cat-title">🍛 Main Course</div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">Butter Chicken</div><div class="price">₹349</div>
-            <button class="add-btn" onclick="addToCart('Butter Chicken', 349)">+ ADD</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Dal Makhani</div><div class="price">₹220</div>
-            <button class="add-btn" onclick="addToCart('Dal Makhani', 220)">+ ADD</button>
-        </div>
-    </div>
-
-    <div class="cat-title">🍜 Maggie & Snacks</div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">RSK Special Maggie</div><div class="price">₹99</div>
-            <button class="add-btn" onclick="addToCart('RSK Maggie', 99)">+ ADD</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Egg Maggie</div><div class="price">₹119</div>
-            <button class="add-btn" onclick="addToCart('Egg Maggie', 119)">+ ADD</button>
-        </div>
-    </div>
-
-    <div class="cat-title">🫓 Breads</div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">Butter Naan</div><div class="price">₹40</div>
-            <button class="add-btn" onclick="addToCart('Butter Naan', 40)">+ ADD</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Rumali Roti</div><div class="price">₹15</div>
-            <button class="add-btn" onclick="addToCart('Rumali Roti', 15)">+ ADD</button>
-        </div>
-    </div>
-
-    <div class="cat-title">🥤 Drinks</div>
-    <div class="menu-grid">
-        <div class="item-card">
-            <div class="item-name">Cold Coffee</div><div class="price">₹99</div>
-            <button class="add-btn" onclick="addToCart('Cold Coffee', 99)">+ ADD</button>
-        </div>
-        <div class="item-card">
-            <div class="item-name">Masala Tea</div><div class="price">₹30</div>
-            <button class="add-btn" onclick="addToCart('Masala Tea', 30)">+ ADD</button>
+            <div><b>Dal Makhani</b></div><div class="price">₹220</div>
+            <button class="add-btn" data-name="Dal Makhani" data-price="220">Add to Cart</button>
         </div>
     </div>
 
     <div class="checkout-footer" id="floatingCheckout">
-        <button class="place-order-btn" onclick="triggerOrder()">
-            💬 ORDER ON WHATSAPP
-        </button>
+        <button class="place-order-btn" id="finalOrderBtn">🚀 ORDER ON WHATSAPP</button>
     </div>
 
     <div id="tokenModal">
-        <div style="color:#fff; font-size:14px; font-weight:bold;">ROYAL KITCHEN</div>
-        <p style="color:#888; font-size:11px;">Token Generated Successfully!</p>
-        <span id="tokenNumDisplay" class="token-num">01</span>
-        <button class="add-btn" style="background:var(--gold, #D4AF37); width:100%" onclick="closeOrder()">CLOSE</button>
+        <b style="color:#D4AF37">ROYAL KITCHEN</b><br>
+        <small>Token Number Generated</small>
+        <span id="tokenNumDisplay" class="token-num">00</span>
+        <button id="closeTokenBtn" class="add-btn" style="background:#D4AF37; width:100%">OK, ORDER NOW</button>
     </div>
 </div>
 
 <script>
-    // Global variable to avoid conflict
-    window.royalCart = [];
+(function() {
+    let myCart = [];
+    const WHATSAPP_NUM = "919999999999"; // <--- APNA NUMBER DALO (e.g., 919812345678)
 
-    window.addToCart = function(name, price) {
-        window.royalCart.push({n: name, p: price});
-        document.getElementById('floatingCheckout').style.display = 'flex';
-    };
+    // Add to Cart Logic
+    document.querySelectorAll('.add-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const name = this.getAttribute('data-name');
+            const price = this.getAttribute('data-price');
+            myCart.push({ name, price });
+            document.getElementById('floatingCheckout').style.display = 'flex';
+            this.innerText = "ADDED ✅";
+            setTimeout(() => { this.innerText = "Add to Cart"; }, 1000);
+        });
+    });
 
-    window.triggerOrder = function() {
-        if (window.royalCart.length === 0) return;
+    // Token & WhatsApp Logic
+    document.getElementById('finalOrderBtn').addEventListener('click', function() {
+        if (myCart.length === 0) return;
 
-        // 1. Token Logic (Daily Reset)
+        // Token Management
         let today = new Date().toDateString();
-        let lastDate = localStorage.getItem('orderDate');
-        let count = parseInt(localStorage.getItem('orderCount')) || 0;
+        let lastDate = localStorage.getItem('rKitchen_date');
+        let count = parseInt(localStorage.getItem('rKitchen_count')) || 0;
 
         if (lastDate !== today) {
             count = 1;
-            localStorage.setItem('orderDate', today);
+            localStorage.setItem('rKitchen_date', today);
         } else {
             count++;
         }
-        localStorage.setItem('orderCount', count);
-        let tokenStr = count.toString().padStart(2, '0');
+        localStorage.setItem('rKitchen_count', count);
+        let tkn = count.toString().padStart(2, '0');
 
-        // 2. Show Token on screen
-        document.getElementById('tokenNumDisplay').innerText = tokenStr;
+        // Show Token
+        document.getElementById('tokenNumDisplay').innerText = tkn;
         document.getElementById('tokenModal').style.display = 'block';
 
-        // 3. Build WhatsApp URL
-        let myNum = "919999999999"; // <--- CHANGE THIS TO YOUR NUMBER
-        let message = "🏷️ *TOKEN: " + tokenStr + "*\n\n";
-        let grandTotal = 0;
-        
-        window.royalCart.forEach((item, index) => {
-            message += (index + 1) + ". " + item.n + " - ₹" + item.p + "\n";
-            grandTotal += item.p;
+        // Message Content
+        let msg = "🏷️ *TOKEN: " + tkn + "*\n";
+        msg += "---------------------------\n";
+        let total = 0;
+        myCart.forEach((item, i) => {
+            msg += (i + 1) + ". " + item.name + " (₹" + item.price + ")\n";
+            total += parseInt(item.price);
         });
-        message += "\n*TOTAL BILL: ₹" + grandTotal + "*";
+        msg += "---------------------------\n";
+        msg += "*TOTAL BILL: ₹" + total + "*";
 
-        // Direct link generation
-        let finalUrl = "https://wa.me/" + myNum + "?text=" + encodeURIComponent(message);
-        
-        // Use a small delay for better mobile experience
-        setTimeout(() => {
+        // Click to close and go to WA
+        document.getElementById('closeTokenBtn').onclick = function() {
+            const finalUrl = "https://api.whatsapp.com/send?phone=" + WHATSAPP_NUM + "&text=" + encodeURIComponent(msg);
             window.location.href = finalUrl;
-        }, 800);
-    };
-
-    window.closeOrder = function() {
-        document.getElementById('tokenModal').style.display = 'none';
-        window.royalCart = [];
-        document.getElementById('floatingCheckout').style.display = 'none';
-    };
+        };
+    });
+})();
 </script>
