@@ -1,35 +1,175 @@
-<script>
+<div id="dynamic-menu-render" style="background: #000; padding: 15px; font-family: 'Segoe UI', sans-serif;"></div>
 
-// Agar jagah nahi mili ya data nahi aaya, toh 100ms baad fir check karo
+<div id="cart-footer" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; z-index: 1000;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 600px; margin: 0 auto;">
+        <div style="color: #fff;">
+            <div id="cart-count" style="font-size: 12px; color: #D4AF37;">0 Items Selected</div>
+            <div style="font-size: 18px; font-weight: bold;">Total: ₹<span id="cart-total">0</span></div>
+        </div>
+        <button onclick="sendToWhatsApp()" style="background: #25D366; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            Order on WhatsApp
+        </button>
+    </div>
+</div>
+
+<script>
+// 1. Your Menu Data
+const menuData = [
+    {
+        sectionName: "👑 RSK ROYAL COMBOS",
+        sectionPhoto: "ROYAL COMBO.jpg",
+        items: [
+            { name: "Tawa Chicken + Paratha", price: 259, type: "single" },
+            { name: "Paneer Bhurji + Kulcha", price: 199, type: "single" }
+        ]
+    },
+    {
+        sectionName: "🍢 ROYAL STARTERS",
+        sectionPhoto: "STARTERS_BANNER.jpg",
+        items: [
+            { name: "Chicken Seekh Kebab", price: 179, type: "single" },
+            { name: "Veg Spring Roll", price: 120, type: "single" },
+            { name: "Crispy Corn", price: 130, type: "single" }
+        ]
+    },
+    {
+        sectionName: "🍗 NON-VEG SPECIALS",
+        sectionPhoto: "NON_VEG_BANNER.jpg",
+        items: [
+            { name: "RSK Special Chicken", halfPrice: 219, fullPrice: 399, type: "dual" },
+            { name: "Chicken Masala", halfPrice: 180, fullPrice: 320, type: "dual" },
+            { name: "Chicken Keema Paratha", price: 149, type: "single" }
+        ]
+    },
+    {
+        sectionName: "🍛 MAIN COURSE (VEG)",
+        sectionPhoto: "VEG_MAIN_BANNER.jpg",
+        items: [
+            { name: "Paneer Butter Masala", price: 240, type: "single" },
+            { name: "Dal Makhani Royal", price: 220, type: "single" },
+            { name: "Mix Veg", price: 180, type: "single" }
+        ]
+    },
+    {
+        sectionName: "🍜 MAGGIE & SNACKS",
+        sectionPhoto: "MAGGIE_BANNER.jpg",
+        items: [
+            { name: "RSK Special Maggie", price: 99, type: "single" },
+            { name: "Egg Maggie", price: 119, type: "single" },
+            { name: "Veg Cheese Maggie", price: 110, type: "single" }
+        ]
+    },
+    {
+        sectionName: "🫓 ROYAL BREADS",
+        sectionPhoto: "BREADS_BANNER.jpg",
+        items: [
+            { name: "Butter Naan", price: 40, type: "single" },
+            { name: "Lachha Paratha", price: 50, type: "single" },
+            { name: "Rumali Roti", price: 15, type: "single" }
+        ]
+    },
+    {
+        sectionName: "🥤 DRINKS & DESSERTS",
+        sectionPhoto: "DRINKS_BANNER.jpg",
+        items: [
+            { name: "Cold Coffee", price: 99, type: "single" },
+            { name: "Masala Tea", price: 30, type: "single" },
+            { name: "Gulab Jamun (2pc)", price: 60, type: "single" }
+        ]
+    }
+];
+
+window.menuData = menuData;
+
+// 2. Global Cart State
+let cart = [];
+
+// 3. Render Menu Function
+window.renderRSKMenu = function() {
+    var container = document.getElementById('dynamic-menu-render');
     if (!container || !window.menuData) {
-        setTimeout(startMenu, 100);
+        setTimeout(window.renderRSKMenu, 100);
         return;
     }
-
-    var out = "";
-    window.menuData.forEach(function(sec) {
-        out += '<div style="margin-bottom:30px;">';
-        out += '<img src="' + sec.sectionPhoto + '" style="width:100%; border-radius:12px; margin-bottom:15px;" onerror="this.style.display=\'none\'">';
-        out += '<div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px;">' + sec.sectionName + '</div>';
-        out += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">';
+    var html = "";
+    window.menuData.forEach(function(section) {
+        html += '<div style="margin-bottom:30px;">';
+        html += '<img src="' + section.sectionPhoto + '" style="width:100%; border-radius:12px; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" onerror="this.style.display=\'none\'">';
+        html += '<div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">' + section.sectionName + '</div>';
+        html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">';
         
-        sec.items.forEach(function(it) {
-            out += '<div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">';
-            out += '<div style="color:#fff; font-size:13px;">' + it.name + '</div>';
+        section.items.forEach(function(item) {
+            html += '<div style="background:rgba(255,255,255,0.07); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">';
+            html += '<div style="color:#fff; font-size:14px; font-weight:500; margin-bottom:8px;">' + item.name + '</div>';
             
-            if (it.type === "single") {
-                out += '<div style="color:#D4AF37; font-weight:bold; margin:8px 0;">₹' + it.price + '</div>';
-                out += '<button onclick="window.addToCart(\'' + it.name + '\',' + it.price + ')" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer;">+ ADD</button>';
+            if (item.type === "single") {
+                html += '<div style="color:#D4AF37; font-weight:bold; margin-bottom:10px;">₹' + item.price + '</div>';
+                html += '<button onclick="addToCart(\'' + item.name + '\',' + item.price + ')" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer; transition:0.3s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">+ ADD</button>';
             } else {
-                out += '<div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹' + it.halfPrice + ' | F: ₹' + it.fullPrice + '</div>';
-                out += '<button onclick="window.addToCart(\'' + it.name + ' (H)\',' + it.halfPrice + ')" style="background:#f0f0f0; border:none; padding:8px; border-radius:6px; margin-bottom:5px; font-weight:700; cursor:pointer;">HALF</button>';
-                out += '<button onclick="window.addToCart(\'' + it.name + ' (F)\',' + it.fullPrice + ')" style="background:#D4AF37; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">FULL</button>';
+                html += '<div style="color:#aaa; font-size:11px; margin-bottom:10px;">H: ₹' + item.halfPrice + ' | F: ₹' + item.fullPrice + '</div>';
+                html += '<div style="display:flex; gap:5px;">';
+                html += '<button onclick="addToCart(\'' + item.name + ' (H)\',' + item.halfPrice + ')" style="background:#f0f0f0; flex:1; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">HALF</button>';
+                html += '<button onclick="addToCart(\'' + item.name + ' (F)\',' + item.fullPrice + ')" style="background:#D4AF37; flex:1; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">FULL</button>';
+                html += '</div>';
             }
-            out += '</div>';
+            html += '</div>';
         });
-        out += '</div></div>';
+        html += '</div></div>';
     });
-    container.innerHTML = out;
+    container.innerHTML = html;
+};
+
+// 4. Add to Cart Logic
+window.addToCart = function(name, price) {
+    const existingItem = cart.find(item => item.name === name);
+    if (existingItem) {
+        existingItem.qty += 1;
+    } else {
+        cart.push({ name: name, price: price, qty: 1 });
+    }
+    updateCartUI();
+};
+
+// 5. Update UI
+function updateCartUI() {
+    const cartFooter = document.getElementById('cart-footer');
+    const cartTotal = document.getElementById('cart-total');
+    const cartCount = document.getElementById('cart-count');
+    
+    let total = 0;
+    let itemsCount = 0;
+    
+    cart.forEach(item => {
+        total += (item.price * item.qty);
+        itemsCount += item.qty;
+    });
+
+    if (itemsCount > 0) {
+        cartFooter.style.display = 'block';
+        cartTotal.innerText = total;
+        cartCount.innerText = itemsCount + " Items in Cart";
+    } else {
+        cartFooter.style.display = 'none';
+    }
 }
-startMenu();
+
+// 6. WhatsApp Integration
+window.sendToWhatsApp = function() {
+    const phoneNumber = "91XXXXXXXXXX"; // APNA NUMBER YAHAN DALO
+    let message = "*New Order from RSK Royal Kitchen*%0A---------------------------%0A";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        message += (index + 1) + ". " + item.name + " x " + item.qty + " = ₹" + (item.price * item.qty) + "%0A";
+        total += (item.price * item.qty);
+    });
+
+    message += "---------------------------%0A";
+    message += "*Grand Total: ₹" + total + "*%0A%0A_Please confirm my order!_";
+
+    window.open("https://wa.me/" + phoneNumber + "?text=" + message, '_blank');
+};
+
+// Initialize
+window.renderRSKMenu();
 </script>
