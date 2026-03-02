@@ -7,144 +7,133 @@
     .item-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
     .item-name { font-size: 12px; font-weight: bold; color: #fff; min-height: 30px; }
     .price-tag { color: #D4AF37; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
-    .add-btn { background: #fff; color: #000; border: none; padding: 8px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; }
+    .add-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 5px; font-size: 10px; font-weight: 800; cursor: pointer; width: 100%; }
 
-    /* CART BOX TRIGGER */
+    /* CART BUTTON (BOTTOM RIGHT) */
     .cart-box-trigger { 
         position: fixed; bottom: 90px; right: 20px; 
-        background: #D4AF37; color: #000; width: 60px; height: 60px; 
+        background: #D4AF37; color: #000; width: 65px; height: 65px; 
         border-radius: 15px; display: flex; flex-direction: column; 
         align-items: center; justify-content: center; 
-        box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 999; border: 2px solid #fff;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.8); z-index: 999; border: 2px solid #fff;
     }
-    .cart-count-badge { position: absolute; top: -10px; left: -10px; background: #fff; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: 900; font-size: 12px; border: 1px solid #000; }
+    .badge { position: absolute; top: -10px; left: -10px; background: #fff; color: #000; padding: 2px 8px; border-radius: 50%; font-weight: 900; border: 1px solid #000; }
 
-    /* CART MODAL (OVERLAY) */
+    /* CART OVERLAY INTERFACE */
     .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
-    .cart-content { background: #1a1a1a; border: 2px solid #D4AF37; border-radius: 20px; padding: 20px; flex: 1; display: flex; flex-direction: column; }
-    .cart-row { display: flex; justify-content: space-between; color: #fff; border-bottom: 1px solid #333; padding: 10px 0; font-size: 14px; }
-    .cart-total { font-size: 20px; color: #D4AF37; font-weight: 900; text-align: right; padding: 15px 0; border-top: 2px solid #D4AF37; }
-
+    .cart-modal { background: #1a1a1a; border: 2px solid #D4AF37; border-radius: 20px; padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .item-row { display: flex; justify-content: space-between; color: #fff; border-bottom: 1px solid #333; padding: 10px 0; }
+    
     .action-btn { padding: 15px; border-radius: 10px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; }
-    .btn-confirm { background: #D4AF37; color: #000; }
-    .btn-cancel { background: #ff4444; color: #fff; }
+    .confirm { background: #D4AF37; color: #000; }
+    .cancel { background: #ff4444; color: #fff; }
 </style>
 
 <div class="menu-tab">
-    <h2 class="menu-header">RSK MENU</h2>
+    <h2 class="menu-header">ROYAL MENU</h2>
     <input type="text" id="menuSearch" class="search-box" placeholder="Search dish..." onkeyup="doSearch()">
 
-    <div id="menu-items">
+    <div id="full-list">
         <span class="cat-title">👑 Royal Combos</span>
         <div class="menu-grid">
-            <div class="item dish" data-n="tawa chicken paratha combo"><div class="item-card"><div class="item-name">Tawa Chicken + Paratha</div><div class="price-tag">₹259</div><button class="add-btn" onclick="addItem('Tawa Chicken Combo', 259)">+ Add</button></div></div>
-            </div>
+            <div class="dish-item" data-name="tawa chicken combo"><div class="item-card"><div class="item-name">Tawa Chicken Combo</div><div class="price-tag">₹259</div><button class="add-btn" onclick="addToCart('Tawa Chicken Combo', 259)">+ Add</button></div></div>
+            <div class="dish-item" data-name="paneer bhurji combo"><div class="item-card"><div class="item-name">Paneer Bhurji Combo</div><div class="price-tag">₹209</div><button class="add-btn" onclick="addToCart('Paneer Bhurji Combo', 209)">+ Add</button></div></div>
+        </div>
+        
+        <span class="cat-title">🍚 Rice & Breads</span>
+        <div class="menu-grid">
+            <div class="dish-item" data-name="chicken fried rice"><div class="item-card"><div class="item-name">Chicken Fried Rice</div><div class="price-tag">₹149</div><button class="add-btn" onclick="addToCart('Chicken Fried Rice', 149)">+ Add</button></div></div>
+        </div>
     </div>
 
-    <div class="cart-box-trigger" id="cartBox" onclick="tryOpeningCart()">
-        <span class="cart-count-badge" id="badgeQty">0</span>
-        <span style="font-size: 20px;">🛒</span>
-        <span style="font-size: 10px; font-weight: bold;" id="boxTotal">₹0</span>
+    <div class="cart-box-trigger" id="cartBtn" onclick="openCart()">
+        <span class="badge" id="cartQty">0</span>
+        <span>🛒</span>
+        <span style="font-size: 10px; font-weight: bold;" id="cartTotal">₹0</span>
     </div>
 
     <div class="cart-overlay" id="cartOverlay">
-        <div class="cart-content">
-            <h2 style="color:#D4AF37;">Review Your Order</h2>
-            <div id="cartItemsList" class="cart-items-list" style="flex:1; overflow-y:auto;"></div>
-            <div class="cart-total" id="grandTotal">Total: ₹0</div>
+        <div class="cart-modal">
+            <h2 style="color:#D4AF37; margin-top:0;">Your Order</h2>
+            <div id="cartList" style="flex:1; overflow-y:auto; margin:15px 0;"></div>
+            <div id="finalBill" style="color:#D4AF37; font-size:20px; font-weight:900; text-align:right; border-top:1px solid #D4AF37; padding-top:10px;">Total: ₹0</div>
             
-            <button class="action-btn btn-confirm" onclick="finishOrder('Confirmed')">🚀 GET TOKEN & ORDER</button>
-            <button class="action-btn btn-cancel" onclick="finishOrder('Cancelled')">❌ CANCEL ORDER</button>
-            <button class="action-btn" style="background:#444; color:#fff;" onclick="closeCart()">CLOSE</button>
+            <button class="action-btn confirm" onclick="finishOrder('Confirmed')">🚀 ORDER (GET TOKEN)</button>
+            <button class="action-btn cancel" onclick="finishOrder('Cancelled')">❌ CANCEL ORDER</button>
+            <button class="action-btn" style="background:#444; color:#fff;" onclick="document.getElementById('cartOverlay').style.display='none'">BACK</button>
         </div>
     </div>
 </div>
 
 <script>
-    var rskCart = [];
-    var sheetURL = "https://script.google.com/macros/s/AKfycbzBPKkzFJT5Pqmn-_88ziR1nwcnoJWeXbIPjZGD4P9TYgTr45pcTt2yPxrYwTHe4HFe/exec";
+    var cartItems = [];
+    var webAppURL = "https://script.google.com/macros/s/AKfycbzBPKkzFJT5Pqmn-_88ziR1nwcnoJWeXbIPjZGD4P9TYgTr45pcTt2yPxrYwTHe4HFe/exec";
     
-    // Check if User is Logged In (Aapka login logic yahan check hoga)
-    // Abhi ke liye dummy logic:
-    var isLoggedIn = false; 
+    // Login check variable
+    var isUserLoggedIn = false; 
 
-    function addItem(name, price) {
-        rskCart.push({n: name, p: price});
-        updateCartBox();
+    function addToCart(name, price) {
+        cartItems.push({name: name, price: price});
+        updateCartBtn();
     }
 
-    function updateCartBox() {
+    function updateCartBtn() {
         var total = 0;
-        for(var i=0; i<rskCart.length; i++) { total += rskCart[i].p; }
-        document.getElementById('badgeQty').innerText = rskCart.length;
-        document.getElementById('boxTotal').innerText = "₹" + total;
-    }
-
-    function tryOpeningCart() {
-        if(rskCart.length === 0) {
-            alert("Pehle kuch khana toh chuno!");
-            return;
-        }
-        
-        // Login Check
-        if(!isLoggedIn) {
-            alert("👑 Royal Access Required! Please Login/Register first.");
-            // Agar website main file hai toh Safar tab activate karo
-            if(window.showTab) window.showTab('safar'); 
-            return;
-        }
-        
-        openCart();
+        for(var i=0; i<cartItems.length; i++) { total += cartItems[i].price; }
+        document.getElementById('cartQty').innerText = cartItems.length;
+        document.getElementById('cartTotal').innerText = "₹" + total;
     }
 
     function openCart() {
+        if(cartItems.length === 0) { alert("Pehle items add kijiye!"); return; }
+        
+        // Login condition
+        if(!isUserLoggedIn) {
+            alert("Please login/register to view cart.");
+            if(window.showTab) window.showTab('safar');
+            return;
+        }
+
         document.getElementById('cartOverlay').style.display = 'flex';
         var listHTML = ""; var total = 0;
-        for(var i=0; i<rskCart.length; i++) {
-            listHTML += `<div class="cart-row"><span>${rskCart[i].n}</span><span>₹${rskCart[i].p}</span></div>`;
-            total += rskCart[i].p;
+        for(var i=0; i<cartItems.length; i++) {
+            listHTML += `<div class="item-row"><span>${cartItems[i].name}</span><span>₹${cartItems[i].price}</span></div>`;
+            total += cartItems[i].price;
         }
-        document.getElementById('cartItemsList').innerHTML = listHTML;
-        document.getElementById('grandTotal').innerText = "Total Bill: ₹" + total;
+        document.getElementById('cartList').innerHTML = listHTML;
+        document.getElementById('finalBill').innerText = "Total Bill: ₹" + total;
     }
 
-    function closeCart() { document.getElementById('cartOverlay').style.display = 'none'; }
-
     function finishOrder(status) {
-        var itemsStr = ""; var total = 0;
-        for(var i=0; i<rskCart.length; i++) { itemsStr += rskCart[i].n + ", "; total += rskCart[i].p; }
+        var items = ""; var total = 0;
+        for(var i=0; i<cartItems.length; i++) { items += cartItems[i].name + ", "; total += cartItems[i].price; }
+        
+        var token = "RSK-" + Math.floor(100 + Math.random() * 900);
 
-        // TOKEN GENERATION
-        var tokenNo = "RSK-" + Math.floor(1000 + Math.random() * 9000);
-
-        // Send to Google Sheet
-        fetch(sheetURL, {
+        // Google Sheet Posting
+        fetch(webAppURL, {
             method: "POST",
             mode: "no-cors",
-            body: JSON.stringify({
-                status: status, 
-                customer: "Urvashi Khatri", // Login data se utha lena baad mein
-                items: itemsStr, 
-                total: total,
-                token: tokenNo // Google Sheet mein token column zaroor rakhna
-            })
+            body: JSON.stringify({status: status, customer: "Urvashi", items: items, total: total, token: token})
         });
 
         if(status === 'Confirmed') {
-            var msg = `*TOKEN: ${tokenNo}*%0A*Order:* ${itemsStr}%0A*Total:* ₹${total}`;
+            var msg = `*TOKEN: ${token}*%0A*Order:* ${items}%0A*Total:* ₹${total}`;
             window.open("https://wa.me/7489999890?text=" + msg, "_blank");
         } else {
-            window.open("https://wa.me/7489999890?text=Order Cancelled by Customer", "_blank");
+            window.open("https://wa.me/7489999890?text=Order Cancelled", "_blank");
         }
 
-        rskCart = []; updateCartBox(); closeCart();
+        cartItems = []; updateCartBtn(); 
+        document.getElementById('cartOverlay').style.display = 'none';
     }
 
     function doSearch() {
         var q = document.getElementById('menuSearch').value.toLowerCase();
-        var d = document.getElementsByClassName('dish');
-        for(var i=0; i<d.length; i++) {
-            d[i].style.display = d[i].getAttribute('data-n').includes(q) ? "block" : "none";
+        var items = document.getElementsByClassName('dish-item');
+        for(var i=0; i<items.length; i++) {
+            var n = items[i].getAttribute('data-name').toLowerCase();
+            items[i].style.display = n.includes(q) ? "block" : "none";
         }
     }
 </script>
