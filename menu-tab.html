@@ -2,8 +2,11 @@
     </div>
 
 <script>
+<div id="dynamic-menu-render"></div>
+
+<script>
 (function() {
-    // 1. Menu Data Configuration
+    console.log("Menu Script Loading..."); // Check karne ke liye
     const menuData = [
         {
             sectionName: "👑 RSK ROYAL COMBOS",
@@ -13,96 +16,33 @@
                 { name: "Paneer Bhurji + Kulcha", price: 199, type: "single" }
             ]
         },
-        {
-            sectionName: "🍢 ROYAL STARTERS",
-            sectionPhoto: "STARTERS_BANNER.jpg",
-            items: [
-                { name: "Chicken Seekh Kebab", price: 179, type: "single" },
-                { name: "Veg Spring Roll", price: 120, type: "single" },
-                { name: "Crispy Corn", price: 130, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🍗 NON-VEG SPECIALS",
-            sectionPhoto: "NON_VEG_BANNER.jpg",
-            items: [
-                { name: "RSK Special Chicken", halfPrice: 219, fullPrice: 399, type: "dual" },
-                { name: "Chicken Masala", halfPrice: 180, fullPrice: 320, type: "dual" },
-                { name: "Chicken Keema Paratha", price: 149, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🍛 MAIN COURSE (VEG)",
-            sectionPhoto: "VEG_MAIN_BANNER.jpg",
-            items: [
-                { name: "Paneer Butter Masala", price: 240, type: "single" },
-                { name: "Dal Makhani Royal", price: 220, type: "single" },
-                { name: "Mix Veg", price: 180, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🍜 MAGGIE & SNACKS",
-            sectionPhoto: "MAGGIE_BANNER.jpg",
-            items: [
-                { name: "RSK Special Maggie", price: 99, type: "single" },
-                { name: "Egg Maggie", price: 119, type: "single" },
-                { name: "Veg Cheese Maggie", price: 110, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🫓 ROYAL BREADS",
-            sectionPhoto: "BREADS_BANNER.jpg",
-            items: [
-                { name: "Butter Naan", price: 40, type: "single" },
-                { name: "Lachha Paratha", price: 50, type: "single" },
-                { name: "Rumali Roti", price: 15, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🥤 DRINKS & DESSERTS",
-            sectionPhoto: "DRINKS_BANNER.jpg",
-            items: [
-                { name: "Cold Coffee", price: 99, type: "single" },
-                { name: "Masala Tea", price: 30, type: "single" },
-                { name: "Gulab Jamun (2pc)", price: 60, type: "single" }
-            ]
-        }
+        // ... baaki saare items yahan daalein ...
     ];
 
-    // 2. Render Function
-    window.renderRSKMenu = function() {
-        var container = document.getElementById('dynamic-menu-render');
-        if (!container) return;
-
-        var html = "";
-        menuData.forEach(function(section) {
-            html += '<div style="margin-bottom:30px;">';
-            html += '<img src="' + section.sectionPhoto + '" style="width:100%; border-radius:12px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" onerror="this.style.display=\'none\'">';
-            html += '<div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase; font-size:14px; letter-spacing:1px;">' + section.sectionName + '</div>';
-            html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">';
+    const container = document.getElementById('dynamic-menu-render');
+    if (container) {
+        let html = "";
+        menuData.forEach(section => {
+            html += `<div style="margin-bottom:30px;">
+                <img src="${section.sectionPhoto}" style="width:100%; border-radius:12px; margin-bottom:15px;" onerror="this.style.display='none'">
+                <div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase;">${section.sectionName}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">`;
             
-            section.items.forEach(function(item) {
-                html += '<div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 2px 2px 10px rgba(0,0,0,0.2);">';
-                html += '<div style="color:#fff; font-size:13px; font-weight:600; margin-bottom:8px; line-height:1.4;">' + item.name + '</div>';
-                
-                if (item.type === "single") {
-                    html += '<div style="color:#D4AF37; font-weight:bold; margin-bottom:10px; font-size:15px;">₹' + item.price + '</div>';
-                    html += '<button onclick="window.addToCart(\'' + item.name + '\',' + item.price + ')" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer; font-size:11px;">+ ADD</button>';
-                } else {
-                    html += '<div style="color:#D4AF37; font-size:10px; margin-bottom:10px;">H: ₹' + item.halfPrice + ' | F: ₹' + item.fullPrice + '</div>';
-                    html += '<div style="display:flex; gap:4px;">';
-                    html += '<button onclick="window.addToCart(\'' + item.name + ' (H)\',' + item.halfPrice + ')" style="background:#f0f0f0; border:none; padding:8px 2px; border-radius:6px; font-weight:700; cursor:pointer; flex:1; font-size:10px;">HALF</button>';
-                    html += '<button onclick="window.addToCart(\'' + item.name + ' (F)\',' + item.fullPrice + ')" style="background:#D4AF37; border:none; padding:8px 2px; border-radius:6px; font-weight:700; cursor:pointer; flex:1; font-size:10px;">FULL</button>';
-                    html += '</div>';
-                }
-                html += '</div>';
+            section.items.forEach(item => {
+                html += `<div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div style="color:#fff; font-size:13px;">${item.name}</div>
+                    ${item.type === 'single' ? 
+                        `<div style="color:#D4AF37; font-weight:bold; margin:8px 0;">₹${item.price}</div>
+                         <button onclick="window.addToCart('${item.name}', ${item.price})" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer;">+ ADD</button>` :
+                        `<div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹${item.halfPrice} | F: ₹${item.fullPrice}</div>
+                         <button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" style="background:#f0f0f0; border:none; padding:8px; border-radius:6px; margin-bottom:5px; font-weight:700;">HALF</button>
+                         <button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" style="background:#D4AF37; border:none; padding:8px; border-radius:6px; font-weight:700;">FULL</button>`
+                    }
+                </div>`;
             });
-            html += '</div></div>';
+            html += `</div></div>`;
         });
         container.innerHTML = html;
-    };
-
-    // Initialize rendering
-    window.renderRSKMenu();
+    }
 })();
 </script>
