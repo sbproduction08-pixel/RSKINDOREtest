@@ -62,6 +62,7 @@ const menuData = [
             { name: "Gulab Jamun (2pc)", price: 60, type: "single" }
         ]
     }
+    window.menuData = menuData;
 ];
 
 // Ye line sabse zaroori hai taaki data tabs ko mil sake
