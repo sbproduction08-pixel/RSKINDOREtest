@@ -1,54 +1,30 @@
 <script>
+Aap pareshan mat hoiye, main samajh gaya ki code block shayad copy karne mein dikat de raha hai. Ye raha ekdam simple code bina kisi extra line ya box ke.
+
+Aap is poore hisse ko copy karke apne menu-tab.html file mein <script> tag ke andar daal dijiye:
+
 (function() {
-    const renderArea = document.getElementById('dynamic-menu-render');
-    
-    function renderMenu() {
-        // Agar data nahi mila, toh 50ms baad fir check karo (Loop tab tak chalega jab tak data na mile)
-        if (!window.menuData) {
-            setTimeout(renderMenu, 50);
-            return;
-        }
-
-        let fullHTML = "";
-        window.menuData.forEach(section => {
-            // Section Start
-            let sectionHTML = `
-                <div class="cat-section" style="margin-bottom:30px;">
-                    <img src="${section.sectionPhoto}" style="width:100%; border-radius:12px; border:1px solid #D4AF37; margin-bottom:15px;" onerror="this.style.display='none'">
-                    <div style="color:#D4AF37; font-size:16px; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase;">${section.sectionName}</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            `;
-
-            section.items.forEach(item => {
-                if (item.type === "single") {
-                    sectionHTML += `
-                        <div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
-                            <div style="font-size:13px; font-weight:600;">${item.name}</div>
-                            <div style="color:#D4AF37; font-size:13px; font-weight:bold; margin:8px 0;">₹${item.price}</div>
-                            <button onclick="window.addToCart('${item.name}', ${item.price})" style="background:#fff; color:#000; border:none; padding:10px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; text-transform:uppercase;">+ ADD</button>
-                        </div>`;
-                } else {
-                    sectionHTML += `
-                        <div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
-                            <div style="font-size:13px; font-weight:600;">${item.name}</div>
-                            <div style="color:#D4AF37; font-size:13px; font-weight:bold; margin:8px 0;">H: ₹${item.halfPrice} | F: ₹${item.fullPrice}</div>
-                            <button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" style="background:#f0f0f0; color:#000; border:none; padding:10px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; text-transform:uppercase; margin-bottom:5px;">ADD HALF</button>
-                            <button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" style="background:#fff; color:#000; border:none; padding:10px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; text-transform:uppercase;">ADD FULL</button>
-                        </div>`;
-                }
-            });
-
-            sectionHTML += `</div></div>`; // Corrected: Yeh dono divs loop ke bahar band honge
-            fullHTML += sectionHTML;
-        });
-        
-        renderArea.innerHTML = fullHTML;
-        
-        if (window.cart && window.cart.length > 0) {
-            document.getElementById('floatingCheckout').style.display = 'flex';
-        }
-    }
-
-    renderMenu();
+function renderMenu() {
+const renderArea = document.getElementById('dynamic-menu-render');
+if (!renderArea || !window.menuData) {
+setTimeout(renderMenu, 100);
+return;
+}
+let fullHTML = "";
+window.menuData.forEach(section => {
+let sectionHTML = <div style="margin-bottom:30px;"> <img src="${section.sectionPhoto}" style="width:100%; border-radius:12px; margin-bottom:15px;" onerror="this.style.display='none'"> <div style="color:#D4AF37; font-weight:bold; border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:15px; text-transform:uppercase;">${section.sectionName}</div> <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">;
+section.items.forEach(item => {
+if (item.type === "single") {
+sectionHTML += <div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;"> <div style="color:#fff; font-size:13px;">${item.name}</div> <div style="color:#D4AF37; font-weight:bold; margin:8px 0;">₹${item.price}</div> <button onclick="window.addToCart('${item.name}', ${item.price})" style="background:#D4AF37; color:#000; border:none; padding:10px; border-radius:6px; font-weight:800; cursor:pointer;">+ ADD</button> </div>;
+} else {
+sectionHTML += <div style="background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;"> <div style="color:#fff; font-size:13px;">${item.name}</div> <div style="color:#D4AF37; font-size:11px; margin:8px 0;">H: ₹${item.halfPrice} | F: ₹${item.fullPrice}</div> <button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" style="background:#f0f0f0; border:none; padding:8px; border-radius:6px; margin-bottom:5px; font-weight:700; cursor:pointer;">HALF</button> <button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" style="background:#D4AF37; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">FULL</button> </div>;
+}
+});
+sectionHTML += </div></div>;
+fullHTML += sectionHTML;
+});
+renderArea.innerHTML = fullHTML;
+}
+renderMenu();
 })();
 </script>
