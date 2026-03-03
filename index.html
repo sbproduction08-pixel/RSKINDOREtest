@@ -6,7 +6,6 @@
     <title>Royal Street Kitchen | RSK Indore</title>
     <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* --- Root & Base Styles --- */
         :root { 
             --gold: #D4AF37; 
             --black: #0a0a0a; 
@@ -24,22 +23,34 @@
             overflow-x: hidden; 
         }
 
-        /* --- Upgraded Royal Header Section --- */
+        /* --- ROYAL HEADER SECTION --- */
         header { 
             padding: 50px 20px 30px; 
             text-align: center; 
             border-bottom: 2px solid rgba(212,175,55,0.3); 
-            position: relative; 
-            background: rgba(0, 0, 0, 0.4);
+            position: relative;
+            background: rgba(0,0,0,0.5);
+            display: flex; /* Aligns content to center */
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Spacing between main logo and title group */
         }
-        
-        /* 1. Logo with Animated Fire Ring */
-        .logo-container {
+
+        /* Grouping Main Logo and Title for perfect center align as one unit */
+        .brand-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 1. Main Logo with Fire Motion */
+        .logo-box {
             position: relative;
             display: inline-block;
-            width: 130px;
-            height: 130px;
-            margin-bottom: 15px;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px; /* Separator from Title Group */
         }
         .main-logo { 
             position: relative;
@@ -49,40 +60,38 @@
             box-shadow: 0 0 25px var(--gold); 
             cursor: pointer; 
             z-index: 10;
-            background: var(--black);
-            transition: transform 0.3s;
+            background: #000;
         }
-        .main-logo:active { transform: scale(0.9); }
-
-        .fire-ring {
+        .fire-motion {
             position: absolute;
             top: 0; left: 0;
-            width: 130px; height: 130px;
+            width: 120px; height: 120px;
             border-radius: 50%;
             border: 4px solid var(--fire);
+            filter: blur(2px);
             box-shadow: 0 0 20px var(--fire), inset 0 0 15px var(--fire);
-            animation: rotateFire 3s linear infinite;
+            animation: burn 3s linear infinite;
             z-index: 5;
-            filter: blur(1px);
         }
-        @keyframes rotateFire {
-            from { transform: rotate(0deg) scale(1); opacity: 0.8; }
+        @keyframes burn {
+            0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
             50% { transform: rotate(180deg) scale(1.1); opacity: 0.5; }
-            to { transform: rotate(360deg) scale(1); opacity: 0.8; }
+            100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
         }
 
-        /* 2. Royal Text Image with Pulsating Crown & Shine */
+        /* 2. Royal Text Image (Pulsating Crown is part of this image) */
         .title-wrapper {
             position: relative;
             display: inline-block;
-            overflow: hidden; 
+            overflow: hidden; /* Shine streak */
             padding: 10px;
+            z-index: 10;
         }
         .royal-title-img {
-            width: 280px; /* Adjust according to your image size */
+            width: 280px; /* Adjust as needed */
             display: block;
-            filter: drop-shadow(0 0 10px var(--gold-glow));
-            animation: titleGlow 2s infinite alternate;
+            filter: drop-shadow(0 0 10px var(--gold));
+            animation: titlePulse 2s infinite ease-in-out; /* Crown and glow animation */
         }
         /* Shine Streak Effect on Hover */
         .title-wrapper::after {
@@ -95,54 +104,45 @@
         }
         .title-wrapper:hover::after { left: 150%; }
 
-        @keyframes titleGlow {
-            from { filter: drop-shadow(0 0 5px var(--gold)) brightness(1); }
-            to { filter: drop-shadow(0 0 20px var(--fire)) brightness(1.2); }
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--gold)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--fire)); }
         }
 
-        /* 3. I Love Indore Heartbeat Bounce */
-        .i-love-ind { 
-            width: 130px; 
+        /* 3. I Love Indore Vector (Dhak-Dhak Bounce) */
+        .indore-vector { 
+            width: 140px; 
             display: block;
-            margin: 15px auto; 
+            margin: 20px auto; 
             filter: drop-shadow(0 0 10px var(--gold)); 
-            animation: heartbeat 1.4s infinite ease-in-out;
+            animation: bounceBeat 1.4s infinite ease-in-out;
         }
-        @keyframes heartbeat {
+        @keyframes bounceBeat {
             0%, 100% { transform: scale(1); }
             15% { transform: scale(1.1) translateY(-5px); }
             30% { transform: scale(1.05); }
             45% { transform: scale(1.2) translateY(-8px); }
         }
 
-        /* --- User Panel & Auth Buttons --- */
-        .user-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 20px; min-height: 40px; }
-        #welcome-user { color: var(--gold); font-weight: bold; font-size: 16px; font-family: 'Marcellus', serif; letter-spacing: 1px; }
-        .auth-btn { padding: 10px 25px; border-radius: 30px; font-size: 12px; cursor: pointer; text-transform: uppercase; font-weight: 800; transition: 0.4s; border: 1px solid var(--gold); outline: none; }
+        /* --- UI Panels (Login, Welcome, Logout) --- */
+        .user-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 25px; min-height: 40px; z-index: 10; }
+        #welcome-user { color: var(--gold); font-weight: bold; font-size: 16px; font-family: 'Marcellus', serif; }
+        .auth-btn { padding: 10px 25px; border-radius: 30px; font-size: 12px; cursor: pointer; text-transform: uppercase; font-weight: 800; transition: 0.4s; border: 1px solid var(--gold); }
         #loginBtn { background: linear-gradient(45deg, #af8d19, #f1d36d); color: #000; box-shadow: 0 0 15px var(--gold-glow); }
         #logoutBtn { background: transparent; color: #ff4444; border: 1px solid #ff4444; display: none; padding: 5px 15px; font-size: 10px; }
 
-        /* --- Navigation --- */
+        /* --- Navigation & Containers --- */
         .bottom-nav { position: sticky; top: 0; z-index: 2000; width: 100%; background: rgba(10, 10, 10, 0.95); border-bottom: 2px solid var(--gold); display: flex; justify-content: space-around; padding: 15px 0; backdrop-filter: blur(10px); }
         .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
 
         .app-container { max-width: 500px; margin: 0 auto; min-height: 60vh; padding: 15px; padding-bottom: 120px; }
         
-        /* --- Order Status Bar --- */
-        #cancel-bar {
-            display: none;
-            background: rgba(255, 68, 68, 0.15);
-            border: 1px solid #ff4444;
-            padding: 12px;
-            margin: 10px;
-            border-radius: 10px;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
+        /* Order Status Bar */
+        #cancel-bar { display: none; background: rgba(255, 68, 68, 0.15); border: 1px solid #ff4444; padding: 12px; margin: 10px; border-radius: 10px; text-align: center; animation: fadeIn 0.5s ease; }
         .cancel-btn-small { background: #ff4444; color: white; border: none; padding: 6px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; font-size: 12px; }
 
-        /* --- Floating Elements --- */
+        /* Floating Elements */
         .insta-jumpu { position: fixed; bottom: 110px; right: 20px; z-index: 2100; width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; animation: jump 3s infinite; box-shadow: 0 0 15px var(--gold); text-decoration: none; }
         @keyframes jump { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
 
@@ -150,7 +150,7 @@
 
         /* --- Footer Section --- */
         .footer-section { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(212,175,55,0.2); background: rgba(0,0,0,0.8); margin-top: 30px; }
-        .fssai-main { width: 140px; margin-bottom: 20px; }
+        .fssai-main { width: 140px; margin-bottom: 20px; opacity: 0.9; }
         .sub-logos { display: flex; justify-content: center; align-items: center; gap: 25px; }
         .sub-logos img { height: 40px; filter: drop-shadow(0 0 5px var(--gold-glow)); }
 
@@ -160,16 +160,18 @@
 <body>
 
 <header>
-    <div class="logo-container">
-        <div class="fire-ring"></div>
-        <img src="MAIN_LOGO.jpeg" class="main-logo" alt="RSK Logo" onclick="handleAdminAccess()">
+    <div class="brand-unit">
+        <div class="logo-box">
+            <div class="fire-motion"></div>
+            <img src="MAIN_LOGO.jpeg" class="main-logo" alt="RSK Logo" onclick="handleAdminAccess()">
+        </div>
+
+        <div class="title-wrapper">
+            <img src="royalstreetkitchen.png" class="royal-title-img" alt="Royal Street Kitchen Title">
+        </div>
     </div>
 
-    <div class="title-wrapper">
-        <img src="royalstreetkitchen.jpg" class="royal-title-img" alt="Royal Street Kitchen">
-    </div>
-
-    <img src="vectoriloveindore.jpg" class="i-love-ind" alt="I Love Indore">
+    <img src="vectoriloveindore.png" class="indore-vector" alt="I Love Indore">
     
     <div class="user-panel">
         <span id="welcome-user"></span>
@@ -220,11 +222,7 @@
 </div>
 
 <script>
-    window.cart = []; 
-    let cancelInterval;
-    const bridgeUrl = 'https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec';
-
-    // --- SECRET ADMIN ACCESS LOGIC ---
+    // --- Secret Admin Access Logic ---
     let logoClicks = 0;
     let clickTimer;
     window.handleAdminAccess = function() {
@@ -238,13 +236,16 @@
         }
     };
 
+    // --- Dynamic Tab Switching ---
     function showTab(tabId) {
         var navItems = document.getElementsByClassName('nav-item');
         for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
         const activeBtn = document.getElementById('btn-' + tabId);
         if(activeBtn) activeBtn.classList.add('active');
+
         const contentArea = document.getElementById('content-area');
         contentArea.innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading...</div>";
+
         fetch('./' + tabId + '-tab.html?v=' + Date.now())
             .then(res => res.text())
             .then(data => {
@@ -263,6 +264,7 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
+    // --- User Auth & Welcome Bar Logic ---
     function updateUserUI() {
         const userName = localStorage.getItem('userName');
         const welcomeDiv = document.getElementById('welcome-user');
@@ -279,16 +281,18 @@
         }
     }
 
+    // --- Order Timer Logic ---
+    let cancelInterval;
     function startCancelTimer(duration) {
         clearInterval(cancelInterval);
-        let timer = duration, minutes, seconds;
+        let timer = duration, min, sec;
         const display = document.getElementById('timer-display');
         const bar = document.getElementById('cancel-bar');
         bar.style.display = 'block';
         cancelInterval = setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
-            display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+            min = parseInt(timer / 60, 10);
+            sec = parseInt(timer % 60, 10);
+            display.textContent = (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
             if (--timer < 0) {
                 clearInterval(cancelInterval);
                 bar.style.display = 'none';
@@ -297,6 +301,7 @@
         }, 1000);
     }
 
+    // --- User Registration (Login/Register) ---
     window.registerUser = function() {
         let name = prompt("Aapka Naam?");
         let phone = prompt("Aapka WhatsApp Number?");
@@ -308,13 +313,14 @@
         }
     };
 
+    // --- Cart Functions ---
+    window.cart = []; 
     window.addToCart = function(name, price) {
         if(!localStorage.getItem('userName')) { window.registerUser(); return; }
         const existing = window.cart.find(item => item.name === name);
         if (existing) { existing.qty += 1; } else { window.cart.push({ name: name, price: price, qty: 1 }); }
         updateCartUI();
     };
-
     window.removeFromCart = function(name) {
         const idx = window.cart.findIndex(item => item.name === name);
         if (idx > -1) {
@@ -322,7 +328,6 @@
         }
         updateCartUI();
     };
-
     function updateCartUI() {
         const bar = document.getElementById('floatingCheckout');
         const totalDisp = document.getElementById('cart-total-display');
@@ -331,15 +336,12 @@
         if (window.cart.length > 0) {
             bar.style.display = 'flex';
             totalDisp.innerText = total;
-            listDisp.innerHTML = window.cart.map(item => `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:rgba(255,255,255,0.08); padding:6px 10px; border-radius:6px; border:1px solid rgba(212,175,55,0.2);">
-                    <span style="font-size:12px; color:#fff;">${item.name} <b style="color:#D4AF37;">x${item.qty}</b></span>
-                    <button onclick="window.removeFromCart('${item.name}')" style="background:#ff4444; color:white; border:none; border-radius:4px; width:22px; height:22px; font-size:16px; font-weight:bold; cursor:pointer;">-</button>
-                </div>
-            `).join('');
+            listDisp.innerHTML = window.cart.map(item => `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:rgba(255,255,255,0.08); padding:6px 10px; border-radius:6px; border:1px solid rgba(212,175,55,0.2);"><span style="font-size:12px; color:#fff;">${item.name} <b style="color:#D4AF37;">x${item.qty}</b></span><button onclick="window.removeFromCart('${item.name}')" style="background:#ff4444; color:white; border:none; border-radius:4px; width:22px; height:22px; font-size:16px; font-weight:bold; cursor:pointer;">-</button></div>`).join('');
         } else { bar.style.display = 'none'; }
     }
 
+    // --- Checkout Logic (Post to Sheet & WhatsApp) ---
+    const bridgeUrl = 'https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec';
     window.checkout = function() {
         let uName = localStorage.getItem('userName');
         fetch(bridgeUrl).then(res => res.text()).then(currentCount => {
@@ -349,7 +351,7 @@
             
             fetch(bridgeUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ token: nextToken, name: uName, items: itemsStr, total: total, status: "Pending" }) });
 
-            let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Cust:* ${uName}%0A*Total: ₹${total}*`;
+            let waMsg = `*ROYAL STREET KITCHEN*%0A━━━━━━━━━━━━━━━%0A*Token:* %23${nextToken}%0A*Cust:* ${uName}%0A━━━━━━━━━━━━━━━%0A*Order: ${itemsStr}*%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
             window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
             
             localStorage.setItem('lastTokenNo', nextToken);
@@ -359,8 +361,9 @@
         });
     };
 
+    // --- Order Cancellation ---
     window.cancelOrder = function() {
-        if(confirm("Cancel order?")) {
+        if(confirm("Ky cancel order proceed karein?")) {
             let token = localStorage.getItem('lastTokenNo');
             fetch(bridgeUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ token: token, name: localStorage.getItem('userName'), items: "CANCELLED", total: 0, status: "Cancelled" }) });
             clearInterval(cancelInterval);
@@ -369,8 +372,10 @@
         }
     };
 
-    window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
+    // --- Logout Logic ---
+    window.logout = function() { if(confirm("Logout proceeds?")) { localStorage.clear(); location.reload(); } };
 
+    // --- Final Page Setup (OnLoad) ---
     window.onload = () => { 
         showTab(localStorage.getItem('activeTab') || 'home');
         if(localStorage.getItem('lastTokenNo')) {
