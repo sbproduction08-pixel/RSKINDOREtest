@@ -6,44 +6,175 @@
     <title>Royal Street Kitchen | RSK Indore</title>
     <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --black: #0a0a0a; --royal-red: #3a0d0d; --gold-glow: rgba(212, 175, 55, 0.6); --fire: #ff4500; }
-        body { margin: 0; background: var(--black); background-image: radial-gradient(circle at center, var(--royal-red) 0%, var(--black) 100%); color: #fff; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+        :root { 
+            --gold: #D4AF37; 
+            --black: #0a0a0a; 
+            --royal-red: #3a0d0d; 
+            --gold-glow: rgba(212, 175, 55, 0.6); 
+            --fire: #ff4500;
+        }
 
-        /* --- HORIZONTAL ROYAL HEADER --- */
-        header { padding: 30px 10px; border-bottom: 2px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.5); display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: 10px; flex-wrap: nowrap; }
-        .logo-box { position: relative; flex-shrink: 0; width: 85px; height: 85px; }
-        .main-logo { position: relative; width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold); cursor: pointer; z-index: 10; background: #000; }
-        .fire-motion { position: absolute; top: -5px; left: -5px; width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--fire); filter: blur(1px); box-shadow: 0 0 15px var(--fire), inset 0 0 10px var(--fire); animation: burn 3s linear infinite; z-index: 5; }
-        @keyframes burn { 0% { transform: rotate(0deg) scale(1); opacity: 0.8; } 50% { transform: rotate(180deg) scale(1.1); opacity: 0.5; } 100% { transform: rotate(360deg) scale(1); opacity: 0.8; } }
-        .title-wrapper { position: relative; flex-grow: 1; max-width: 500px; display: flex; justify-content: center; }
-        .royal-title-img { width: 100%; max-width: 500px; filter: drop-shadow(0 0 10px var(--gold)); animation: titlePulse 3s infinite ease-in-out; }
-        @keyframes titlePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        body { 
+            margin: 0; 
+            background: var(--black); 
+            background-image: radial-gradient(circle at center, var(--royal-red) 0%, var(--black) 100%); 
+            color: #fff; 
+            font-family: 'Poppins', sans-serif; 
+            overflow-x: hidden; 
+        }
 
-        /* --- CANCEL BAR (FIXED ID) --- */
-        #cancel-bar { display: none; background: rgba(255, 68, 68, 0.15); border: 1px solid #ff4444; padding: 12px; margin: 10px; border-radius: 10px; text-align: center; animation: fadeIn 0.5s ease; }
+        /* --- HORIZONTAL ROYAL HEADER SECTION --- */
+        header { 
+            padding: 25px 5px; 
+            text-align: center; 
+            border-bottom: 2px solid rgba(212,175,55,0.3); 
+            position: relative;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: row; 
+            justify-content: space-between; 
+            align-items: center;
+            gap: 5px;
+            flex-wrap: nowrap; 
+        }
 
+        /* 1. Main Logo with Fire Motion */
+        .logo-box {
+            position: relative;
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+        }
+        .main-logo { 
+            position: relative;
+            width: 70px; height: 70px; 
+            border-radius: 50%; 
+            border: 2px solid var(--gold); 
+            box-shadow: 0 0 15px var(--gold); 
+            cursor: pointer; 
+            z-index: 10;
+            background: #000;
+        }
+        .fire-motion {
+            position: absolute;
+            top: -2px; left: -2px;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--fire);
+            filter: blur(1px);
+            box-shadow: 0 0 15px var(--fire), inset 0 0 10px var(--fire);
+            animation: burn 3s linear infinite;
+            z-index: 5;
+        }
+        @keyframes burn {
+            0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
+            50% { transform: rotate(180deg) scale(1.1); opacity: 0.5; }
+            100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
+        }
+
+        /* 2. Royal Text Image (Center) */
+        .title-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-width: 150px;
+            max-width: 450px; /* Isse title katega nahi */
+            overflow: visible;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+        }
+        .royal-title-img {
+            width: 100%;
+            max-width: 450px;
+            display: block;
+            filter: drop-shadow(0 0 10px var(--gold));
+            animation: titlePulse 3s infinite ease-in-out;
+            transform-origin: center;
+        }
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 3. Indore Vector (Right) */
+        .vector-container {
+            flex-shrink: 0;
+            width: 90px;
+        }
+        .indore-vector { 
+            width: 100%; 
+            display: block;
+            filter: drop-shadow(0 0 8px var(--gold)); 
+            animation: heartBeat 1.2s infinite ease-in-out;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* --- User Panel & Royal Buttons --- */
         .user-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px; min-height: 40px; }
-        #welcome-user { color: var(--gold); font-weight: bold; font-size: 17px; font-family: 'Marcellus', serif; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
-        #loginBtn { background: linear-gradient(45deg, #8a6d3b, #D4AF37, #f1d36d, #8a6d3b); color: #000; border: 1px solid #5c4013; box-shadow: 0 0 15px var(--gold-glow); padding: 10px 30px; border-radius: 30px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.5s; }
-        #logoutBtn { background: rgba(20, 20, 20, 0.8); color: #ff4444; border: 1px solid #ff4444; display: none; padding: 8px 20px; border-radius: 30px; font-size: 10px; cursor: pointer; }
+        #welcome-user { color: var(--gold); font-weight: bold; font-size: 17px; font-family: 'Marcellus', serif; letter-spacing: 1.5px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); margin-bottom: 5px; }
+        
+        #loginBtn { 
+            background: linear-gradient(45deg, #8a6d3b, #D4AF37, #f1d36d, #8a6d3b);
+            background-size: 200% auto;
+            color: #000; 
+            border: 1px solid #5c4013;
+            box-shadow: 0 0 15px var(--gold-glow), inset 0 0 5px rgba(255,255,255,0.5);
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.5s;
+            font-family: 'Marcellus', serif;
+            font-weight: 800;
+        }
+        #loginBtn:hover { background-position: right center; transform: scale(1.05); }
 
+        #logoutBtn { 
+            background: rgba(20, 20, 20, 0.8); 
+            color: #ff4444; 
+            border: 1px solid #ff4444; 
+            display: none; 
+            padding: 6px 18px; 
+            border-radius: 30px;
+            font-size: 10px; 
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        /* --- Navigation & UI --- */
         .bottom-nav { position: sticky; top: 0; z-index: 2000; width: 100%; background: rgba(15, 12, 5, 0.95); border-bottom: 2px solid var(--gold); display: flex; justify-content: space-around; padding: 15px 0; backdrop-filter: blur(10px); }
-        .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; }
-        .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
 
         .app-container { max-width: 500px; margin: 0 auto; min-height: 65vh; padding: 15px; padding-bottom: 120px; }
-        #floatingCheckout { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; box-sizing: border-box; }
+        
+        #cancel-bar { display: none; background: rgba(255, 68, 68, 0.15); border: 1px solid #ff4444; padding: 12px; margin: 10px; border-radius: 10px; text-align: center; animation: fadeIn 0.5s ease; }
+
+        /* --- FOOTER --- */
         .footer-section { text-align: center; padding: 50px 20px; background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); border-top: 3px solid var(--gold); margin-top: 30px; }
+        .sub-logos { display: flex; justify-content: center; align-items: center; gap: 30px; }
         .swachh-logo { height: 90px !important; filter: drop-shadow(0 0 10px var(--gold-glow)); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #floatingCheckout { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-box"><div class="fire-motion"></div><img src="MAIN_LOGO.jpeg" class="main-logo" onclick="handleAdminAccess()"></div>
-    <div class="title-wrapper"><img src="royalstreetkitchen.png" class="royal-title-img"></div>
-    <div class="vector-container"><img src="vectoriloveindore.png" style="width:160%; filter: drop-shadow(0 0 8px var(--gold)); animation: heartBeat 1.2s infinite ease-in-out;"></div>
+    <div class="logo-box">
+        <div class="fire-motion"></div>
+        <img src="MAIN_LOGO.jpeg" class="main-logo" alt="RSK Logo" onclick="handleAdminAccess()">
+    </div>
+    <div class="title-wrapper">
+        <img src="royalstreetkitchen.png" class="royal-title-img" alt="Royal Street Kitchen Title">
+    </div>
+    <div class="vector-container">
+        <img src="vectoriloveindore.png" class="indore-vector" alt="I Love Indore">
+    </div>
 </header>
 
 <div class="user-panel">
@@ -68,7 +199,7 @@
 
 <div id="floatingCheckout">
     <div style="flex: 1; padding-right: 10px;">
-        <div id="cart-items-list" style="font-size: 11px; color: #fff; margin-bottom: 8px; max-height: 80px; overflow-y: auto;"></div>
+        <div id="cart-items-list" style="font-size: 11px; color: #fff; margin-bottom: 8px;"></div>
         <div style="font-size: 10px; color: #D4AF37;">Total Amount</div>
         <div style="font-size: 20px; font-weight: bold; color: #D4AF37;">₹<span id="cart-total-display">0</span></div>
     </div>
@@ -76,12 +207,12 @@
 </div>
 
 <div class="footer-section">
-    <img src="FSSAI_Logo.png" style="width: 220px; margin-bottom: 40px;">
+    <img src="FSSAI_Logo.png" style="width: 200px; margin-bottom: 30px;">
     <div class="sub-logos">
-        <img src="msme_logo.avif" style="height: 50px; margin-right:40px;">
+        <img src="msme_logo.avif" style="height: 50px; margin-right: 20px;">
         <img src="Swachh_Bharat_Mission_Logo.png.png" class="swachh-logo">
     </div>
-    <p style="color:var(--gold); font-size:10px; margin-top:40px;">© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
+    <p style="color:#555; font-size:10px; margin-top:30px;">© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
 </div>
 
 <script>
@@ -94,13 +225,6 @@
         document.getElementById('content-area').innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading...</div>";
         fetch('./' + tabId + '-tab.html?v=' + Date.now()).then(res => res.text()).then(data => {
             document.getElementById('content-area').innerHTML = data; updateUserUI();
-            const scripts = document.getElementById('content-area').querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
         });
     }
 
@@ -160,21 +284,8 @@
     }
 
     window.registerUser = function() {
-        let n = prompt("Naam?"); let p = prompt("Number?");
+        let n = prompt("Naam?"); let p = prompt("WhatsApp?");
         if(n && p) { localStorage.setItem('userName', n); localStorage.setItem('userPhone', p); updateUserUI(); }
-    };
-
-    window.addToCart = function(n, p) {
-        if(!localStorage.getItem('userName')) return window.registerUser();
-        const ex = window.cart.find(i => i.name === n);
-        if (ex) ex.qty++; else window.cart.push({ name: n, price: p, qty: 1 });
-        updateCartUI();
-    };
-
-    window.removeFromCart = function(n) {
-        const idx = window.cart.findIndex(i => i.name === n);
-        if (idx > -1) { if (window.cart[idx].qty > 1) window.cart[idx].qty--; else window.cart.splice(idx, 1); }
-        updateCartUI();
     };
 
     function updateCartUI() {
@@ -182,16 +293,9 @@
         const total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
         if (window.cart.length > 0) {
             bar.style.display = 'flex'; document.getElementById('cart-total-display').innerText = total;
-            document.getElementById('cart-items-list').innerHTML = window.cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.name} x${i.qty}</span><button onclick="window.removeFromCart('${i.name}')" style="background:red; color:white; border:none; padding:2px 5px; border-radius:3px;">-</button></div>`).join('');
+            document.getElementById('cart-items-list').innerHTML = window.cart.map(i => `<div>${i.name} x${i.qty}</div>`).join('');
         } else bar.style.display = 'none';
     }
-
-    window.handleAdminAccess = function() {
-        let logoClicks = 0; let clickTimer;
-        logoClicks++; clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => { logoClicks = 0; }, 3000);
-        if (logoClicks === 3) { let pass = prompt("🔐 Enter Royal Admin Key:"); if (pass === "RSK@2026") showTab('admin'); }
-    };
 
     window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
     window.onload = () => { 
