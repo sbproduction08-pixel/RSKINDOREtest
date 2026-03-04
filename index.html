@@ -25,16 +25,16 @@
 
         /* --- HORIZONTAL ROYAL HEADER SECTION --- */
         header { 
-            padding: 25px 5px; 
+            padding: 30px 10px; 
             text-align: center; 
             border-bottom: 2px solid rgba(212,175,55,0.3); 
             position: relative;
             background: rgba(0,0,0,0.5);
             display: flex;
             flex-direction: row; 
-            justify-content: space-between; 
+            justify-content: space-around; 
             align-items: center;
-            gap: 5px;
+            gap: 10px;
             flex-wrap: nowrap; 
         }
 
@@ -42,12 +42,12 @@
         .logo-box {
             position: relative;
             flex-shrink: 0;
-            width: 80px;
-            height: 80px;
+            width: 85px;
+            height: 85px;
         }
         .main-logo { 
             position: relative;
-            width: 70px; height: 70px; 
+            width: 75px; height: 75px; 
             border-radius: 50%; 
             border: 2px solid var(--gold); 
             box-shadow: 0 0 15px var(--gold); 
@@ -57,8 +57,8 @@
         }
         .fire-motion {
             position: absolute;
-            top: -2px; left: -2px;
-            width: 80px; height: 80px;
+            top: -5px; left: -5px;
+            width: 85px; height: 85px;
             border-radius: 50%;
             border: 3px solid var(--fire);
             filter: blur(1px);
@@ -72,12 +72,11 @@
             100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
         }
 
-        /* 2. Royal Text Image (Center) */
+        /* 2. Royal Text Image (Center - BIG & CLEAR) */
         .title-wrapper {
             position: relative;
             flex-grow: 1;
-            min-width: 150px;
-            max-width: 450px; /* Isse title katega nahi */
+            max-width: 500px;
             overflow: visible;
             z-index: 10;
             display: flex;
@@ -85,12 +84,22 @@
         }
         .royal-title-img {
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             display: block;
             filter: drop-shadow(0 0 10px var(--gold));
             animation: titlePulse 3s infinite ease-in-out;
             transform-origin: center;
         }
+        .title-wrapper::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.7s;
+        }
+        .title-wrapper:hover::after { left: 150%; }
+
         @keyframes titlePulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -99,10 +108,10 @@
         /* 3. Indore Vector (Right) */
         .vector-container {
             flex-shrink: 0;
-            width: 90px;
+            width: 100px;
         }
         .indore-vector { 
-            width: 100%; 
+            width: 160%; 
             display: block;
             filter: drop-shadow(0 0 8px var(--gold)); 
             animation: heartBeat 1.2s infinite ease-in-out;
@@ -131,35 +140,46 @@
             font-family: 'Marcellus', serif;
             font-weight: 800;
         }
-        #loginBtn:hover { background-position: right center; transform: scale(1.05); }
+        #loginBtn:hover { background-position: right center; transform: scale(1.08) translateY(-2px); box-shadow: 0 0 25px var(--gold); }
 
         #logoutBtn { 
             background: rgba(20, 20, 20, 0.8); 
             color: #ff4444; 
             border: 1px solid #ff4444; 
             display: none; 
-            padding: 6px 18px; 
+            padding: 8px 20px; 
             border-radius: 30px;
             font-size: 10px; 
             cursor: pointer;
             transition: 0.3s;
+            backdrop-filter: blur(5px);
         }
+        #logoutBtn:hover { background: #ff4444; color: #fff; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6); }
 
-        /* --- Navigation & UI --- */
+        /* --- UI & Navigation --- */
         .bottom-nav { position: sticky; top: 0; z-index: 2000; width: 100%; background: rgba(15, 12, 5, 0.95); border-bottom: 2px solid var(--gold); display: flex; justify-content: space-around; padding: 15px 0; backdrop-filter: blur(10px); }
         .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
 
         .app-container { max-width: 500px; margin: 0 auto; min-height: 65vh; padding: 15px; padding-bottom: 120px; }
+        #el-bar { display: none; background: rgba(255, 68, 68, 0.15); border: 1px solid #ff4444; padding: 12px; margin: 10px; border-radius: 10px; text-align: center; animation: fadeIn 0.5s ease; }
         
-        #cancel-bar { display: none; background: rgba(255, 68, 68, 0.15); border: 1px solid #ff4444; padding: 12px; margin: 10px; border-radius: 10px; text-align: center; animation: fadeIn 0.5s ease; }
+        #floatingCheckout { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; box-sizing: border-box; box-shadow: 0 -5px 20px rgba(0,0,0,0.8); }
 
-        /* --- FOOTER --- */
-        .footer-section { text-align: center; padding: 50px 20px; background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); border-top: 3px solid var(--gold); margin-top: 30px; }
-        .sub-logos { display: flex; justify-content: center; align-items: center; gap: 30px; }
-        .swachh-logo { height: 90px !important; filter: drop-shadow(0 0 10px var(--gold-glow)); }
+        /* --- ROYAL FOOTER --- */
+        .footer-section { 
+            text-align: center; 
+            padding: 50px 20px; 
+            background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); 
+            border-top: 3px solid var(--gold); 
+            box-shadow: 0 -10px 30px rgba(212, 175, 55, 0.2);
+            margin-top: 30px; 
+        }
+        .sub-logos { display: flex; justify-content: center; align-items: center; gap: 40px; margin-top: 25px; }
+        .swachh-logo { height: 90px !important; filter: drop-shadow(0 0 10px var(--gold-glow)) brightness(1.2); }
+        .footer-section p { color: var(--gold); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; margin-top: 40px; }
 
-        #floatingCheckout { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; box-sizing: border-box; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -179,8 +199,8 @@
 
 <div class="user-panel">
     <span id="welcome-user"></span>
-    <button onclick="window.registerUser()" id="loginBtn">👑 Login / Register 👑</button>
-    <button onclick="window.logout()" id="logoutBtn">Logout Account</button>
+    <button onclick="window.registerUser()" id="loginBtn" class="auth-btn">👑 Login / Register 👑</button>
+    <button onclick="window.logout()" id="logoutBtn" class="auth-btn">Logout Account</button>
 </div>
 
 <div class="bottom-nav">
@@ -191,7 +211,10 @@
 </div>
 
 <div id="cancel-bar">
-    <div style="font-size: 12px; color: #fff;">🕒 <b>Active Order: Token #<span id="last-token">00</span></b><br>Cancel karne ke liye <span id="timer-display" style="color: #ff4444; font-weight: bold;">05:00</span> bache hain.</div>
+    <div style="font-size: 12px; color: #fff;">
+        🕒 <b>Active Order: Token #<span id="last-token">00</span></b><br>
+        Cancel karne ke liye <span id="timer-display" style="color: #ff4444; font-weight: bold;">05:00</span> bache hain.
+    </div>
     <button onclick="window.cancelOrder()" style="background:#ff4444; color:white; border:none; padding:5px 15px; border-radius:5px; margin-top:8px; cursor:pointer;">Urgent Cancel ❌</button>
 </div>
 
@@ -199,110 +222,186 @@
 
 <div id="floatingCheckout">
     <div style="flex: 1; padding-right: 10px;">
-        <div id="cart-items-list" style="font-size: 11px; color: #fff; margin-bottom: 8px;"></div>
-        <div style="font-size: 10px; color: #D4AF37;">Total Amount</div>
+        <div id="cart-items-list" style="font-size: 11px; color: #fff; margin-bottom: 8px; max-height: 80px; overflow-y: auto;"></div>
+        <div style="font-size: 10px; color: #D4AF37; text-transform: uppercase; letter-spacing: 1px;">Total Amount</div>
         <div style="font-size: 20px; font-weight: bold; color: #D4AF37;">₹<span id="cart-total-display">0</span></div>
     </div>
-    <button onclick="window.checkout()" id="orderNowBtn" style="background: #25D366; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Order Now</button>
+    <button onclick="window.checkout()" id="orderNowBtn" style="background: #25D366; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        Order Now
+    </button>
 </div>
 
+<a href="https://www.instagram.com/rsk.indore/" style="position: fixed; bottom: 110px; right: 20px; z-index: 2100; width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; animation: jump 3s infinite; box-shadow: 0 0 15px var(--gold); text-decoration: none;" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="25">
+</a>
+
 <div class="footer-section">
-    <img src="FSSAI_Logo.png" style="width: 200px; margin-bottom: 30px;">
+    <img src="FSSAI_Logo.png" class="fssai-main" style="width: 220px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); margin-bottom: 40px;">
     <div class="sub-logos">
-        <img src="msme_logo.avif" style="height: 50px; margin-right: 20px;">
-        <img src="Swachh_Bharat_Mission_Logo.png.png" class="swachh-logo">
+        <img src="msme_logo.avif" alt="MSME" style="height: 50px;">
+        <img src="Swachh_Bharat_Mission_Logo.png.png" alt="Swachh Bharat" class="swachh-logo">
     </div>
-    <p style="color:#555; font-size:10px; margin-top:30px;">© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
+    <p>© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
 </div>
 
 <script>
-    window.cart = []; let cancelInterval;
+    window.cart = []; 
+    let cancelInterval;
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
 
-    function showTab(tabId) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        const btn = document.getElementById('btn-' + tabId); if(btn) btn.classList.add('active');
-        document.getElementById('content-area').innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading...</div>";
-        fetch('./' + tabId + '-tab.html?v=' + Date.now()).then(res => res.text()).then(data => {
-            document.getElementById('content-area').innerHTML = data; updateUserUI();
-        });
-    }
-
-    function updateUserUI() {
-        const name = localStorage.getItem('userName');
-        document.getElementById('welcome-user').innerHTML = name ? "Namaste, " + name + "! ✨" : "";
-        document.getElementById('loginBtn').style.display = name ? 'none' : 'inline-block';
-        document.getElementById('logoutBtn').style.display = name ? 'inline-block' : 'none';
-    }
-
-    window.checkout = function() {
-        let uName = localStorage.getItem('userName');
-        const btn = document.getElementById('orderNowBtn');
-        btn.innerText = "Wait... ⏳"; btn.disabled = true;
-
-        fetch(bridgeUrl).then(res => res.text()).then(currentCount => {
-            let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
-            let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
-            
-            const params = new URLSearchParams();
-            params.append('token', nextToken);
-            params.append('name', uName);
-            params.append('items', itemsStr);
-            params.append('total', total);
-
-            fetch(bridgeUrl, { method: 'POST', mode: 'no-cors', body: params });
-            window.open(`https://wa.me/917489999890?text=*TOKEN: %23${nextToken}*%0AOrder: ${itemsStr}%0ATotal: ₹${total}`, '_blank');
-            
-            localStorage.setItem('lastTokenNo', nextToken);
-            document.getElementById('last-token').innerText = nextToken;
-            startCancelTimer(300);
-            window.cart = []; updateCartUI();
-            btn.innerText = "Order Now"; btn.disabled = false;
-        });
-    };
-
-    window.cancelOrder = function() {
-        const t = localStorage.getItem('lastTokenNo'); const n = localStorage.getItem('userName');
-        if(confirm("Order cancel karein?")) {
-            const params = new URLSearchParams(); params.append('token', t); params.append('name', n); params.append('status', 'Cancelled');
-            fetch(bridgeUrl, { method: 'POST', mode: 'no-cors', body: params });
-            clearInterval(cancelInterval); document.getElementById('cancel-bar').style.display = 'none';
-            localStorage.removeItem('lastTokenNo'); alert("Cancellation Request Sent!");
+    // --- SECRET ADMIN ACCESS ---
+    let logoClicks = 0; let clickTimer;
+    window.handleAdminAccess = function() {
+        logoClicks++; clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => { logoClicks = 0; }, 3000);
+        if (logoClicks === 3) {
+            logoClicks = 0;
+            let pass = prompt("🔐 Enter Royal Admin Key:");
+            if (pass === "RSK@2026") { showTab('admin'); }
         }
     };
 
+    function showTab(tabId) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        const activeBtn = document.getElementById('btn-' + tabId);
+        if(activeBtn) activeBtn.classList.add('active');
+        const contentArea = document.getElementById('content-area');
+        contentArea.innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading...</div>";
+        fetch('./' + tabId + '-tab.html?v=' + Date.now()).then(res => res.text()).then(data => {
+            contentArea.innerHTML = data; updateUserUI();
+            const scripts = contentArea.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }).catch(err => { contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Welcome!</div>"; });
+        if(tabId !== 'admin') localStorage.setItem('activeTab', tabId);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function updateUserUI() {
+        const userName = localStorage.getItem('userName');
+        document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
+        document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
+        document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
+    }
+
     function startCancelTimer(duration) {
         clearInterval(cancelInterval);
-        const bar = document.getElementById('cancel-bar'); bar.style.display = 'block';
         let timer = duration;
-        cancelInterval = setInterval(() => {
-            let m = parseInt(timer / 60, 10); let s = parseInt(timer % 60, 10);
-            document.getElementById('timer-display').textContent = (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
-            if (--timer < 0) { clearInterval(cancelInterval); bar.style.display = 'none'; localStorage.removeItem('lastTokenNo'); }
+        const display = document.getElementById('timer-display');
+        const bar = document.getElementById('cancel-bar');
+        bar.style.display = 'block';
+        cancelInterval = setInterval(function () {
+            let minutes = parseInt(timer / 60, 10);
+            let seconds = parseInt(timer % 60, 10);
+            display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+            if (--timer < 0) {
+                clearInterval(cancelInterval); bar.style.display = 'none';
+                localStorage.removeItem('lastTokenNo');
+            }
         }, 1000);
     }
 
     window.registerUser = function() {
-        let n = prompt("Naam?"); let p = prompt("WhatsApp?");
-        if(n && p) { localStorage.setItem('userName', n); localStorage.setItem('userPhone', p); updateUserUI(); }
+        let name = prompt("Aapka Naam?"); let phone = prompt("WhatsApp Number?");
+        if(name && phone && phone.length >= 10) {
+            localStorage.setItem('userName', name); localStorage.setItem('userPhone', phone);
+            updateUserUI(); alert(`Namaste ${name}!`);
+        }
+    };
+
+    window.addToCart = function(name, price) {
+        if(!localStorage.getItem('userName')) { alert("Pehle Login karein!"); window.registerUser(); return; }
+        const existing = window.cart.find(item => item.name === name);
+        if (existing) { existing.qty += 1; } else { window.cart.push({ name: name, price: price, qty: 1 }); }
+        updateCartUI();
+    };
+
+    window.removeFromCart = function(name) {
+        const idx = window.cart.findIndex(item => item.name === name);
+        if (idx > -1) { if (window.cart[idx].qty > 1) { window.cart[idx].qty -= 1; } else { window.cart.splice(idx, 1); } }
+        updateCartUI();
     };
 
     function updateCartUI() {
         const bar = document.getElementById('floatingCheckout');
-        const total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+        const listDisp = document.getElementById('cart-items-list');
+        const totalDisp = document.getElementById('cart-total-display');
+        let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         if (window.cart.length > 0) {
-            bar.style.display = 'flex'; document.getElementById('cart-total-display').innerText = total;
-            document.getElementById('cart-items-list').innerHTML = window.cart.map(i => `<div>${i.name} x${i.qty}</div>`).join('');
-        } else bar.style.display = 'none';
+            bar.style.display = 'flex'; totalDisp.innerText = total;
+            listDisp.innerHTML = window.cart.map(item => `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:rgba(255,255,255,0.08); padding:6px 10px; border-radius:6px; border:1px solid rgba(212,175,55,0.2);"><span style="font-size:12px; color:#fff;">${item.name} <b style="color:#D4AF37;">x${item.qty}</b></span><button onclick="window.removeFromCart('${item.name}')" style="background:#ff4444; color:white; border:none; border-radius:4px; width:22px; height:22px; cursor:pointer;">-</button></div>`).join('');
+        } else { bar.style.display = 'none'; }
     }
 
-    window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
+    // --- FIX FOR ORDER NOW ---
+   window.checkout = function() {
+    let uName = localStorage.getItem('userName');
+    const btn = document.getElementById('orderNowBtn');
+    btn.innerText = "Wait... ⏳"; btn.disabled = true;
+
+    fetch(bridgeUrl)
+    .then(res => res.text())
+    .then(currentCount => {
+        let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
+        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+        let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+        
+        // Data Sheet mein bhejna
+        fetch(bridgeUrl, {
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ token: nextToken, name: uName, items: itemsStr, total: total }) 
+        });
+
+        // WhatsApp turant kholna
+        let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
+        window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
+        
+        localStorage.setItem('lastTokenNo', nextToken);
+        document.getElementById('last-token').innerText = nextToken;
+        startCancelTimer(300);
+        window.cart = []; updateCartUI();
+        btn.innerText = "Order Now"; btn.disabled = false;
+    })
+    .catch(() => { alert("Check Connection!"); btn.innerText = "Order Now"; btn.disabled = false; });
+};
+
+window.cancelOrder = function() {
+    const token = localStorage.getItem('lastTokenNo');
+    const name = localStorage.getItem('userName');
+    
+    if(!token || !name) return alert("No active order found!");
+
+    if(confirm("Order cancel karein? Entry update ho jayegi.")) {
+        // CORS-safe tarika: Data ko URL parameters ki tarah bhejna
+        const params = new URLSearchParams();
+        params.append('token', token);
+        params.append('name', name);
+        params.append('status', 'Cancelled');
+
+        fetch(bridgeUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: params // Params bhej rahe hain JSON nahi
+        });
+
+        // WhatsApp turant
+        let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}`;
+        window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
+        
+        clearInterval(cancelInterval);
+        document.getElementById('cancel-bar').style.display = 'none';
+        localStorage.removeItem('lastTokenNo');
+        alert("Cancellation Request Sent! Check Sheet in a few seconds.");
+    }
+};    window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
     window.onload = () => { 
         showTab(localStorage.getItem('activeTab') || 'home');
-        const t = localStorage.getItem('lastTokenNo');
-        if(t) { document.getElementById('last-token').innerText = t; startCancelTimer(300); }
-        else { document.getElementById('cancel-bar').style.display = 'none'; }
+        if(localStorage.getItem('lastTokenNo')) startCancelTimer(300);
     };
 </script>
 </body>
