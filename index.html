@@ -38,7 +38,7 @@
             flex-wrap: nowrap; 
         }
 
-        /* 1. Main Logo with Fire Motion (Left) */
+        /* 1. Main Logo with Fire Motion */
         .logo-box {
             position: relative;
             flex-shrink: 0;
@@ -72,13 +72,15 @@
             100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
         }
 
-        /* 2. Royal Text Image (Center) */
+        /* 2. Royal Text Image (Center - BIG & CLEAR) */
         .title-wrapper {
             position: relative;
             flex-grow: 1;
             max-width: 500px;
-            overflow: hidden;
+            overflow: visible;
             z-index: 10;
+            display: flex;
+            justify-content: center;
         }
         .royal-title-img {
             width: 100%;
@@ -119,88 +121,63 @@
             50% { transform: scale(1.1); }
         }
 
-        /* --- User Panel --- */
+        /* --- User Panel & Royal Buttons --- */
         .user-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px; min-height: 40px; }
+        #welcome-user { color: var(--gold); font-weight: bold; font-size: 17px; font-family: 'Marcellus', serif; letter-spacing: 1.5px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); margin-bottom: 5px; }
         
-       /* --- Namaste Text Styling --- */
-#welcome-user { 
-    color: var(--gold); 
-    font-weight: bold; 
-    font-size: 17px; 
-    font-family: 'Marcellus', serif; 
-    letter-spacing: 1.5px;
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
-    margin-bottom: 5px;
-}
-        .auth-btn { padding: 8px 20px; border-radius: 30px; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 800; transition: 0.4s; border: 1px solid var(--gold); }
-       /* --- Royal Login/Register Button --- */
-#loginBtn { 
-    background: linear-gradient(45deg, #8a6d3b, #D4AF37, #f1d36d, #8a6d3b);
-    background-size: 200% auto;
-    color: #000; 
-    border: 1px solid #5c4013;
-    box-shadow: 0 0 15px var(--gold-glow), inset 0 0 5px rgba(255,255,255,0.5);
-    padding: 10px 30px;
-    font-size: 13px;
-    letter-spacing: 1.5px;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
-    transition: 0.5s;
-    font-family: 'Marcellus', serif;
-}
+        #loginBtn { 
+            background: linear-gradient(45deg, #8a6d3b, #D4AF37, #f1d36d, #8a6d3b);
+            background-size: 200% auto;
+            color: #000; 
+            border: 1px solid #5c4013;
+            box-shadow: 0 0 15px var(--gold-glow), inset 0 0 5px rgba(255,255,255,0.5);
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.5s;
+            font-family: 'Marcellus', serif;
+            font-weight: 800;
+        }
+        #loginBtn:hover { background-position: right center; transform: scale(1.08) translateY(-2px); box-shadow: 0 0 25px var(--gold); }
 
-#loginBtn:hover { 
-    background-position: right center; /* Metallic shine move hogi */
-    transform: scale(1.08) translateY(-2px);
-    box-shadow: 0 0 25px var(--gold), inset 0 0 10px rgba(255,255,255,0.6);
-}
+        #logoutBtn { 
+            background: rgba(20, 20, 20, 0.8); 
+            color: #ff4444; 
+            border: 1px solid #ff4444; 
+            display: none; 
+            padding: 8px 20px; 
+            border-radius: 30px;
+            font-size: 10px; 
+            cursor: pointer;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        #logoutBtn:hover { background: #ff4444; color: #fff; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6); }
 
-/* --- Royal Logout Button --- */
-#logoutBtn { 
-    background: rgba(20, 20, 20, 0.8); 
-    color: #ff4444; 
-    border: 1px solid #ff4444; 
-    display: none; 
-    padding: 6px 18px; 
-    font-size: 10px; 
-    letter-spacing: 1px;
-    box-shadow: 0 0 5px rgba(255, 68, 68, 0.2);
-    transition: 0.3s;
-    backdrop-filter: blur(5px);
-}
-
-#logoutBtn:hover { 
-    background: #ff4444;
-    color: #fff;
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
-    transform: scale(1.05);
-}
-
+        /* --- UI & Navigation --- */
         .bottom-nav { position: sticky; top: 0; z-index: 2000; width: 100%; background: rgba(15, 12, 5, 0.95); border-bottom: 2px solid var(--gold); display: flex; justify-content: space-around; padding: 15px 0; backdrop-filter: blur(10px); }
         .nav-item { color: #888; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; text-shadow: 0 0 10px var(--gold); }
 
         .app-container { max-width: 500px; margin: 0 auto; min-height: 65vh; padding: 15px; padding-bottom: 120px; }
-        
         #cancel-bar { display: none; background: rgba(255, 68, 68, 0.15); border: 1px solid #ff4444; padding: 12px; margin: 10px; border-radius: 10px; text-align: center; animation: fadeIn 0.5s ease; }
-        .cancel-btn-small { background: #ff4444; color: white; border: none; padding: 6px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; font-size: 12px; }
-
-        .insta-jumpu { position: fixed; bottom: 110px; right: 20px; z-index: 2100; width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; animation: jump 3s infinite; box-shadow: 0 0 15px var(--gold); text-decoration: none; }
-        @keyframes jump { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
-
+        
         #floatingCheckout { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; box-sizing: border-box; box-shadow: 0 -5px 20px rgba(0,0,0,0.8); }
 
-       .footer-section { 
-    text-align: center; 
-    padding: 50px 20px; 
-    /* Ek bright aur royal black-to-red gradient */
-    background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); 
-    /* Chamakti hui golden patti upar */
-    border-top: 3px solid var(--gold); 
-    box-shadow: 0 -10px 30px rgba(212, 175, 55, 0.2);
-    margin-top: 30px; 
-}
-        .sub-logos { display: flex; justify-content: center; align-items: center; gap: 25px; }
-        .sub-logos img { height: 90px; filter: drop-shadow(0 0 5px var(--gold-glow)); }
+        /* --- ROYAL FOOTER --- */
+        .footer-section { 
+            text-align: center; 
+            padding: 50px 20px; 
+            background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); 
+            border-top: 3px solid var(--gold); 
+            box-shadow: 0 -10px 30px rgba(212, 175, 55, 0.2);
+            margin-top: 30px; 
+        }
+        .sub-logos { display: flex; justify-content: center; align-items: center; gap: 40px; margin-top: 25px; }
+        .swachh-logo { height: 90px !important; filter: drop-shadow(0 0 10px var(--gold-glow)) brightness(1.2); }
+        .footer-section p { color: var(--gold); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; margin-top: 40px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -222,12 +199,8 @@
 
 <div class="user-panel">
     <span id="welcome-user"></span>
-    <button onclick="window.registerUser()" id="loginBtn" class="auth-btn">
-        👑 Login / Register 👑
-    </button>
-    <button onclick="window.logout()" id="logoutBtn" class="auth-btn">
-        Logout Account
-    </button>
+    <button onclick="window.registerUser()" id="loginBtn" class="auth-btn">👑 Login / Register 👑</button>
+    <button onclick="window.logout()" id="logoutBtn" class="auth-btn">Logout Account</button>
 </div>
 
 <div class="bottom-nav">
@@ -242,7 +215,7 @@
         🕒 <b>Active Order: Token #<span id="last-token">00</span></b><br>
         Cancel karne ke liye <span id="timer-display" style="color: #ff4444; font-weight: bold;">05:00</span> bache hain.
     </div>
-    <button onclick="window.cancelOrder()" class="cancel-btn-small">Urgent Cancel ❌</button>
+    <button onclick="window.cancelOrder()" style="background:#ff4444; color:white; border:none; padding:5px 15px; border-radius:5px; margin-top:8px; cursor:pointer;">Urgent Cancel ❌</button>
 </div>
 
 <div class="app-container" id="content-area"></div>
@@ -253,25 +226,22 @@
         <div style="font-size: 10px; color: #D4AF37; text-transform: uppercase; letter-spacing: 1px;">Total Amount</div>
         <div style="font-size: 20px; font-weight: bold; color: #D4AF37;">₹<span id="cart-total-display">0</span></div>
     </div>
-    <button onclick="window.checkout()" style="background: #25D366; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+    <button onclick="window.checkout()" id="orderNowBtn" style="background: #25D366; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
         Order Now
     </button>
 </div>
 
-<a href="https://www.instagram.com/rsk.indore/" class="insta-jumpu" target="_blank">
+<a href="https://www.instagram.com/rsk.indore/" style="position: fixed; bottom: 110px; right: 20px; z-index: 2100; width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; animation: jump 3s infinite; box-shadow: 0 0 15px var(--gold); text-decoration: none;" target="_blank">
     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="25">
 </a>
 
 <div class="footer-section">
-    <img src="FSSAI_Logo.png" class="fssai-main" style="width: 250px; margin-bottom: 90px;">
-    
+    <img src="FSSAI_Logo.png" class="fssai-main" style="width: 220px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); margin-bottom: 40px;">
     <div class="sub-logos">
-        <img src="msme_logo.avif" alt="MSME">
-        
-        <img src="Swachh_Bharat_Mission_Logo.png.png" alt="Swachh Bharat">
+        <img src="msme_logo.avif" alt="MSME" style="height: 50px;">
+        <img src="Swachh_Bharat_Mission_Logo.png.png" alt="Swachh Bharat" class="swachh-logo">
     </div>
-</div>
-    <p style="font-size: 10px; color: #555; margin-top: 25px;">© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
+    <p>© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
 </div>
 
 <script>
@@ -279,95 +249,67 @@
     let cancelInterval;
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec';
 
-    // --- SECRET ADMIN ACCESS LOGIC ---
-    let logoClicks = 0;
-    let clickTimer;
+    // --- SECRET ADMIN ACCESS ---
+    let logoClicks = 0; let clickTimer;
     window.handleAdminAccess = function() {
-        logoClicks++;
-        clearTimeout(clickTimer);
+        logoClicks++; clearTimeout(clickTimer);
         clickTimer = setTimeout(() => { logoClicks = 0; }, 3000);
         if (logoClicks === 3) {
             logoClicks = 0;
             let pass = prompt("🔐 Enter Royal Admin Key:");
             if (pass === "RSK@2026") { showTab('admin'); }
-            else if (pass !== null) { alert("❌ Galat Password!"); }
         }
     };
 
     function showTab(tabId) {
-        var navItems = document.getElementsByClassName('nav-item');
-        for (var i = 0; i < navItems.length; i++) { navItems[i].classList.remove('active'); }
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         const activeBtn = document.getElementById('btn-' + tabId);
         if(activeBtn) activeBtn.classList.add('active');
-
         const contentArea = document.getElementById('content-area');
         contentArea.innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading...</div>";
-
-        fetch('./' + tabId + '-tab.html?v=' + Date.now())
-            .then(res => res.text())
-            .then(data => {
-                contentArea.innerHTML = data;
-                updateUserUI(); 
-                const scripts = contentArea.querySelectorAll('script');
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
-            })
-            .catch(err => { contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Welcome!</div>"; });
-
+        fetch('./' + tabId + '-tab.html?v=' + Date.now()).then(res => res.text()).then(data => {
+            contentArea.innerHTML = data; updateUserUI();
+            const scripts = contentArea.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }).catch(err => { contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Welcome!</div>"; });
         if(tabId !== 'admin') localStorage.setItem('activeTab', tabId);
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function updateUserUI() {
         const userName = localStorage.getItem('userName');
-        const welcomeDiv = document.getElementById('welcome-user');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        if(userName) {
-            welcomeDiv.innerHTML = "Namaste, " + userName + "! ✨";
-            loginBtn.style.display = 'none';
-            logoutBtn.style.display = 'inline-block';
-        } else {
-            welcomeDiv.innerHTML = "";
-            loginBtn.style.display = 'inline-block';
-            logoutBtn.style.display = 'none';
-        }
+        document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
+        document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
+        document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
     }
 
     function startCancelTimer(duration) {
         clearInterval(cancelInterval);
-        let timer = duration, minutes, seconds;
+        let timer = duration;
         const display = document.getElementById('timer-display');
         const bar = document.getElementById('cancel-bar');
         bar.style.display = 'block';
         cancelInterval = setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
+            let minutes = parseInt(timer / 60, 10);
+            let seconds = parseInt(timer % 60, 10);
             display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
             if (--timer < 0) {
-                clearInterval(cancelInterval);
-                bar.style.display = 'none';
+                clearInterval(cancelInterval); bar.style.display = 'none';
                 localStorage.removeItem('lastTokenNo');
             }
         }, 1000);
     }
 
     window.registerUser = function() {
-        let name = prompt("Aapka Naam?");
-        let phone = prompt("Aapka WhatsApp Number?");
+        let name = prompt("Aapka Naam?"); let phone = prompt("WhatsApp Number?");
         if(name && phone && phone.length >= 10) {
-            let vCode = Math.floor(1000 + Math.random() * 9000);
-            let verifyMsg = `*VERIFICATION REQUEST* 👑%0A━━━━━━━━━━━━━━━%0AHello RSK! I am *${name}*. Verification Code: RSK-${vCode}`;
-            if(confirm("WhatsApp par message bhejein?")) {
-                window.open(`https://wa.me/917489999890?text=${verifyMsg}`, '_blank');
-                localStorage.setItem('userName', name);
-                localStorage.setItem('userPhone', phone);
-                updateUserUI();
-            }
+            localStorage.setItem('userName', name); localStorage.setItem('userPhone', phone);
+            updateUserUI(); alert(`Namaste ${name}!`);
         }
     };
 
@@ -380,90 +322,73 @@
 
     window.removeFromCart = function(name) {
         const idx = window.cart.findIndex(item => item.name === name);
-        if (idx > -1) {
-            if (window.cart[idx].qty > 1) { window.cart[idx].qty -= 1; } else { window.cart.splice(idx, 1); }
-        }
+        if (idx > -1) { if (window.cart[idx].qty > 1) { window.cart[idx].qty -= 1; } else { window.cart.splice(idx, 1); } }
         updateCartUI();
     };
 
     function updateCartUI() {
         const bar = document.getElementById('floatingCheckout');
-        const totalDisp = document.getElementById('cart-total-display');
         const listDisp = document.getElementById('cart-items-list');
+        const totalDisp = document.getElementById('cart-total-display');
         let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         if (window.cart.length > 0) {
-            bar.style.display = 'flex';
-            totalDisp.innerText = total;
-            listDisp.innerHTML = window.cart.map(item => `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:rgba(255,255,255,0.08); padding:6px 10px; border-radius:6px; border:1px solid rgba(212,175,55,0.2);">
-                    <span style="font-size:12px; color:#fff;">${item.name} <b style="color:#D4AF37;">x${item.qty}</b></span>
-                    <button onclick="window.removeFromCart('${item.name}')" style="background:#ff4444; color:white; border:none; border-radius:4px; width:22px; height:22px; font-size:16px; font-weight:bold; cursor:pointer;">-</button>
-                </div>
-            `).join('');
+            bar.style.display = 'flex'; totalDisp.innerText = total;
+            listDisp.innerHTML = window.cart.map(item => `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:rgba(255,255,255,0.08); padding:6px 10px; border-radius:6px; border:1px solid rgba(212,175,55,0.2);"><span style="font-size:12px; color:#fff;">${item.name} <b style="color:#D4AF37;">x${item.qty}</b></span><button onclick="window.removeFromCart('${item.name}')" style="background:#ff4444; color:white; border:none; border-radius:4px; width:22px; height:22px; cursor:pointer;">-</button></div>`).join('');
         } else { bar.style.display = 'none'; }
     }
 
+    // --- FIX FOR ORDER NOW ---
     window.checkout = function() {
         let uName = localStorage.getItem('userName');
         let uPhone = localStorage.getItem('userPhone');
+        const btn = document.getElementById('orderNowBtn');
+        btn.innerText = "Processing... ⏳"; btn.disabled = true;
+
         fetch(bridgeUrl).then(res => res.text()).then(currentCount => {
             let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
             let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
             let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
             
-            fetch(bridgeUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ token: nextToken, name: uName, items: itemsStr, total: total, status: "Pending" }) });
+            // Logic 2 of Apps Script (Append Row)
+            fetch(bridgeUrl, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ token: nextToken, name: uName, items: itemsStr, total: total, status: "Pending" }) 
+            });
 
-            let waMsg = `*ROYAL STREET KITCHEN*%0AToken: %23${nextToken}%0AOrder: ${itemsStr}%0ATotal: ₹${total}`;
+            let waMsg = `*ROYAL STREET KITCHEN*%0A━━━━━━━━━━━━━━━%0A*Token:* %23${nextToken}%0A*Cust:* ${uName}%0A━━━━━━━━━━━━━━━%0A*Order:* ${itemsStr}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
             window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
             
             localStorage.setItem('lastTokenNo', nextToken);
             document.getElementById('last-token').innerText = nextToken;
             startCancelTimer(300);
             window.cart = []; updateCartUI();
-        });
+            btn.innerText = "Order Now"; btn.disabled = false;
+        }).catch(err => { alert("Error! Please try again."); btn.innerText = "Order Now"; btn.disabled = false; });
     };
 
+    // --- FIX FOR CANCEL ORDER ---
     window.cancelOrder = function() {
-    const token = localStorage.getItem('lastTokenNo');
-    const name = localStorage.getItem('userName'); // Name dhoondhne ke liye zaroori hai
-
-    if(!token) {
-        alert("Koi active order nahi mila!");
-        return;
-    }
-
-    if(confirm("Kya aap sach mein order cancel karna chahte hain?")) {
-        // Sheet ko update karne ke liye request
-        fetch(bridgeUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ 
-                token: token, 
-                name: name, 
-                status: "Cancelled" // Ye status Apps Script ke Logic 1 ko trigger karega
-            })
-        }).then(() => {
-            // WhatsApp message for manual info (optional)
-            let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}%0A━━━━━━━━━━━━━━━%0A_Kripya mera order cancel kar dein._`;
+        const token = localStorage.getItem('lastTokenNo');
+        const name = localStorage.getItem('userName');
+        if(confirm("Kya aap order cancel karna chahte hain?")) {
+            fetch(bridgeUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ token: token, name: name, status: "Cancelled" })
+            });
+            let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}`;
             window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
-            
-            // Timer aur UI saaf karein
-            clearInterval(cancelInterval);
-            document.getElementById('cancel-bar').style.display = 'none';
-            localStorage.removeItem('lastTokenNo');
-            alert("Order Status: CANCELLED update bhej diya gaya hai.");
-        }).catch(err => console.log("Cancel Error:", err));
-    }
-};
-    window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
+            clearInterval(cancelInterval); document.getElementById('cancel-bar').style.display = 'none';
+            localStorage.removeItem('lastTokenNo'); alert("Order Status: CANCELLED update bhej diya gaya hai.");
+        }
+    };
 
+    window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
     window.onload = () => { 
         showTab(localStorage.getItem('activeTab') || 'home');
-        if(localStorage.getItem('lastTokenNo')) {
-            document.getElementById('last-token').innerText = localStorage.getItem('lastTokenNo');
-            startCancelTimer(300);
-        }
+        if(localStorage.getItem('lastTokenNo')) startCancelTimer(300);
     };
 </script>
 </body>
