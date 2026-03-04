@@ -338,53 +338,53 @@
     }
 
     // --- FIX FOR ORDER NOW ---
-    window.checkout = function() {
-        let uName = localStorage.getItem('userName');
-        let uPhone = localStorage.getItem('userPhone');
-        const btn = document.getElementById('orderNowBtn');
-        btn.innerText = "Processing... ⏳"; btn.disabled = true;
+   window.checkout = function() {
+    let uName = localStorage.getItem('userName');
+    const btn = document.getElementById('orderNowBtn');
+    btn.innerText = "Wait... ⏳"; btn.disabled = true;
 
-        fetch(bridgeUrl).then(res => res.text()).then(currentCount => {
-            let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
-            let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
-            
-            // Logic 2 of Apps Script (Append Row)
-            fetch(bridgeUrl, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ token: nextToken, name: uName, items: itemsStr, total: total, status: "Pending" }) 
-            });
+    fetch(bridgeUrl)
+    .then(res => res.text())
+    .then(currentCount => {
+        let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
+        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+        let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+        
+        // Data Sheet mein bhejna
+        fetch(bridgeUrl, {
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ token: nextToken, name: uName, items: itemsStr, total: total }) 
+        });
 
-            let waMsg = `*ROYAL STREET KITCHEN*%0A━━━━━━━━━━━━━━━%0A*Token:* %23${nextToken}%0A*Cust:* ${uName}%0A━━━━━━━━━━━━━━━%0A*Order:* ${itemsStr}%0A━━━━━━━━━━━━━━━%0A*Total: ₹${total}*`;
-            window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
-            
-            localStorage.setItem('lastTokenNo', nextToken);
-            document.getElementById('last-token').innerText = nextToken;
-            startCancelTimer(300);
-            window.cart = []; updateCartUI();
-            btn.innerText = "Order Now"; btn.disabled = false;
-        }).catch(err => { alert("Error! Please try again."); btn.innerText = "Order Now"; btn.disabled = false; });
-    };
+        // WhatsApp turant kholna
+        let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
+        window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
+        
+        localStorage.setItem('lastTokenNo', nextToken);
+        document.getElementById('last-token').innerText = nextToken;
+        startCancelTimer(300);
+        window.cart = []; updateCartUI();
+        btn.innerText = "Order Now"; btn.disabled = false;
+    })
+    .catch(() => { alert("Check Connection!"); btn.innerText = "Order Now"; btn.disabled = false; });
+};
 
-    // --- FIX FOR CANCEL ORDER ---
-    window.cancelOrder = function() {
-        const token = localStorage.getItem('lastTokenNo');
-        const name = localStorage.getItem('userName');
-        if(confirm("Kya aap order cancel karna chahte hain?")) {
-            fetch(bridgeUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({ token: token, name: name, status: "Cancelled" })
-            });
-            let cancelMsg = `*URGENT CANCELLATION* ❌%0A━━━━━━━━━━━━━━━%0A*Token:* %23${token}%0A*Customer:* ${name}`;
-            window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
-            clearInterval(cancelInterval); document.getElementById('cancel-bar').style.display = 'none';
-            localStorage.removeItem('lastTokenNo'); alert("Order Status: CANCELLED update bhej diya gaya hai.");
-        }
-    };
-
+window.cancelOrder = function() {
+    const token = localStorage.getItem('lastTokenNo');
+    const name = localStorage.getItem('userName');
+    if(confirm("Order cancel karein?")) {
+        fetch(bridgeUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ token: token, name: name, status: "Cancelled" })
+        });
+        clearInterval(cancelInterval);
+        document.getElementById('cancel-bar').style.display = 'none';
+        localStorage.removeItem('lastTokenNo');
+        alert("Cancellation Request Sent!");
+    }
+};
     window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
     window.onload = () => { 
         showTab(localStorage.getItem('activeTab') || 'home');
