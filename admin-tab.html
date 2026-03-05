@@ -49,30 +49,32 @@
     
     .cust-info { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; display: block; }
     .order-items { font-size: 12px; color: #bbb; line-height: 1.4; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; margin: 8px 0; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
-    // 1.bridgeUrl wahi rakhein jo index.html mein hai
+    // 1. Apne Apps Script ka naya URL yahan dalein
     const adminBridge = 'https://script.google.com/macros/s/AKfycbyfJH5iauZsXjdewfHAgQ4Sbljm6Gj2vWR96WdDhK8GJLmntz6ixY9QD6xSUt9mN1MB/exec';
-    let lastKnownToken = localStorage.getItem('lastProcessedToken') || 0;
+    let lastKnownToken = parseInt(localStorage.getItem('lastProcessedToken')) || 0;
     const bell = document.getElementById('kitchenBell');
 
-   function refreshAdminData() {
-    // 1. Ek unique callback function banayein
-    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    
-    // 2. Window object par ye function register karein
-    window[callbackName] = function(data) {
-        renderOrders(data); // Data milte hi render karein
-        delete window[callbackName]; // Kaam hone ke baad saaf karein
-        document.body.removeChild(script); // Script tag hata dein
-    };
+    function refreshAdminData() {
+        // JSONP Technique to bypass CORS
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        const script = document.createElement('script');
+        script.id = 'jsonp-temp-script';
 
-    // 3. Dynamic Script tag banayein (Ye CORS bypass kar lega)
-    const script = document.createElement('script');
-    script.src = adminBridge + "?action=readAdmin&callback=" + callbackName;
-    document.body.appendChild(script);
-}
+        window[callbackName] = function(data) {
+            renderOrders(data);
+            delete window[callbackName];
+            const oldScript = document.getElementById('jsonp-temp-script');
+            if(oldScript) oldScript.remove();
+        };
+
+        script.src = adminBridge + "?action=readAdmin&callback=" + callbackName;
+        document.body.appendChild(script);
+    }
+
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
         const totalOrdersDisp = document.getElementById('admin-total-orders');
@@ -81,17 +83,20 @@
         let html = "";
         let totalSale = 0;
         let todayCount = 0;
-        let maxToken = 0;
+        let currentMaxToken = 0;
         const todayStr = new Date().toDateString();
 
+        // Orders ko reverse karein taaki latest upar aaye
         orders.reverse().forEach(order => {
             const orderDate = new Date(order.date).toDateString();
             if(orderDate === todayStr) {
                 todayCount++;
-                if(order.status !== "Cancelled") totalSale += parseFloat(order.total || 0);
+                if(order.status !== "Cancelled") {
+                    totalSale += parseFloat(order.total || 0);
+                }
                 
-                let currentTokenNum = parseInt(order.token);
-                if(currentTokenNum > maxToken) maxToken = currentTokenNum;
+                let tokenNum = parseInt(order.token);
+                if(tokenNum > currentMaxToken) currentMaxToken = tokenNum;
 
                 let statusClass = "status-pending";
                 if(order.status === "Cancelled") statusClass = "status-cancelled";
@@ -112,21 +117,23 @@
             }
         });
 
-        // Ting Sound Logic
-        if(maxToken > lastKnownToken && lastKnownToken != 0) {
-            bell.play().catch(e => console.log("Click on screen to enable sound"));
+        // Naye order par Bell bajana
+        if(currentMaxToken > lastKnownToken && lastKnownToken !== 0) {
+            bell.play().catch(e => console.log("Sound interaction required"));
         }
-        lastKnownToken = maxToken;
-        localStorage.setItem('lastProcessedToken', maxToken);
+        
+        if(currentMaxToken > 0) {
+            lastKnownToken = currentMaxToken;
+            localStorage.setItem('lastProcessedToken', currentMaxToken);
+        }
 
         list.innerHTML = html || "<div style='text-align:center; padding:50px; color:#555;'>Aaj koi orders nahi hain.</div>";
         totalOrdersDisp.innerText = todayCount;
         totalSaleDisp.innerText = totalSale.toLocaleString();
     }
 
-    // Is markDone ko aise hi rakhein taaki purana doPost ise samajh sake
     window.markDone = function(token, name) {
-        if(!confirm("Order taiyar hai?")) return;
+        if(!confirm("Order Token #" + token + " taiyar hai?")) return;
         
         const params = new URLSearchParams();
         params.append('token', token);
@@ -140,10 +147,11 @@
             headers: { "Content-Type": "application/x-www-form-urlencoded" }
         });
         
-        alert("Token #" + token + " marked as DONE!");
+        alert("Token #" + token + " Marked as DONE!");
         setTimeout(refreshAdminData, 1000); 
     };
 
+    // Auto Refresh every 30 seconds
     setInterval(refreshAdminData, 30000);
     refreshAdminData();
 </script>
