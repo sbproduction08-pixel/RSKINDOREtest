@@ -248,7 +248,7 @@
     window.cancelOrder = function() {
         const token = localStorage.getItem('lastTokenNo');
         const name = localStorage.getItem('userName');
-        if(!token) return;
+        if(!token || !name) return alert("Order details missing!");
         
         if(confirm("Order cancel karein?")) {
             fetch(bridgeUrl, {
