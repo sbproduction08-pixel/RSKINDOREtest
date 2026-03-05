@@ -57,18 +57,26 @@
     let lastKnownToken = localStorage.getItem('lastProcessedToken') || 0;
     const bell = document.getElementById('kitchenBell');
 
-    function refreshAdminData() {
-        // action=readAdmin bhej rahe hain doGet ke liye
-        fetch(adminBridge + "?action=readAdmin") 
-        .then(res => res.json())
-        .then(data => {
-            renderOrders(data);
-        })
-        .catch(err => {
-            console.log("Admin Data load nahi ho raha...");
-        });
-    }
-
+   function refreshAdminData() {
+    const url = adminBridge + "?action=readAdmin";
+    
+    fetch(url, {
+        method: 'GET',
+        mode: 'cors', // Ise 'cors' hi rehne dein
+        redirect: 'follow' // Google Script ke liye ye zaroori hai
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        renderOrders(data);
+    })
+    .catch(err => {
+        console.error("CORS Error Fix Try:", err);
+        // Agar fir bhi error aaye toh ye backup tarika hai (JSONP shortcut nahi hai isliye ignore)
+    });
+}
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
         const totalOrdersDisp = document.getElementById('admin-total-orders');
