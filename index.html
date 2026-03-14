@@ -400,6 +400,8 @@
         showTab(localStorage.getItem('activeTab') || 'home');
         if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
             startCancelTimer(300, false);
+            if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
+        startCancelTimer(300, false);
         }
     };
 </script>
