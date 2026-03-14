@@ -77,6 +77,55 @@
         #floatingCheckout { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-top: 2px solid #D4AF37; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 9999; }
         
         .footer-section { text-align: center; padding: 50px 20px; background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); border-top: 3px solid var(--gold); margin-top: 30px; }
+   
+    /* Floating Social Bar */
+.royal-social-bar {
+    position: fixed;
+    right: 15px; /* Right side position */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 9999;
+}
+
+.social-icon {
+    width: 45px;
+    height: 45px;
+    background: var(--black);
+    border: 2px solid var(--gold); /* Royal Gold Boundary */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px var(--gold-glow);
+    text-decoration: none;
+    transition: transform 0.3s;
+    animation: royalJump 3s infinite ease-in-out; /* Jumping Animation */
+}
+
+.social-icon img {
+    width: 25px;
+    height: 25px;
+}
+
+/* Har icon thoda alag time par jump karega */
+.wa-icon { animation-delay: 0s; }
+.fb-icon { animation-delay: 0.5s; }
+.ig-icon { animation-delay: 1s; }
+
+@keyframes royalJump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); } /* Jump height */
+}
+
+.social-icon:hover {
+    background: var(--gold);
+    box-shadow: 0 0 20px var(--gold);
+}
+    
+    
     </style>
 </head>
 <body>
@@ -129,6 +178,20 @@
     <p>© 2026 ROYAL STREET KITCHEN • RSK INDORE</p>
 </div>
 
+    <div class="royal-social-bar">
+    <a href="https://wa.me/917489999890" class="social-icon wa-icon" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+    </a>
+
+    <a href="https://facebook.com/YOUR_PAGE" class="social-icon fb-icon" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+    </a>
+
+    <a href="https://instagram.com/YOUR_INSTA" class="social-icon ig-icon" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
+    </a>
+</div>
+    
 <script>
     window.cart = []; 
     let cancelInterval;
