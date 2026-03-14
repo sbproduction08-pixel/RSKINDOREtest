@@ -12,49 +12,33 @@
             overflow: hidden;
         }
 
-        /* --- JO AAPNE KAHA: LEFT SIDE BRANDING WITH CROWN --- */
+        /* --- LEFT SIDE BRANDING (Jaise aapne bataya) --- */
         .left-royal-label {
             position: absolute;
-            left: -45px;
+            left: -48px;
             top: 50%;
             transform: translateY(-50%) rotate(-90deg);
             display: flex;
             align-items: center;
-            gap: 10px;
-            opacity: 0.4;
+            gap: 8px;
+            opacity: 0.5;
         }
 
         .label-text {
             color: #D4AF37;
             font-family: 'Marcellus', serif;
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 4px;
             text-transform: uppercase;
             white-space: nowrap;
         }
 
-        .label-crown {
-            color: #D4AF37;
-            font-size: 14px;
-            transform: rotate(90deg); /* Crown ko seedha rakhne ke liye */
-        }
-
-        .paigaam-title {
-            font-family: 'Marcellus', serif;
-            color: #D4AF37;
-            font-size: 30px;
-            letter-spacing: 6px;
-            margin-bottom: 5px;
-        }
-
-        .paigaam-subtitle {
-            font-family: 'Poppins', sans-serif;
-            color: #888;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 35px;
-            display: block;
+        /* --- HEADER LOGO DESIGN (Image ke mutabiq) --- */
+        .royal-header-img {
+            width: 100%;
+            max-width: 280px;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
         }
 
         /* --- 100% WORKING GOOGLE REVIEW BUTTON --- */
@@ -74,11 +58,12 @@
             transition: 0.3s;
             position: relative;
             z-index: 100;
+            font-size: 14px;
         }
 
-        .shahi-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(212, 175, 55, 0.6); }
+        .shahi-btn:active { transform: scale(0.92); }
 
-        /* Trustindex Text Color Fix */
+        /* Trustindex Color Fixes */
         .ti-widget.ti-google .ti-review-text, 
         .ti-widget.ti-google .ti-name, 
         .ti-widget.ti-google .ti-date,
@@ -86,7 +71,6 @@
         .ti-widget.ti-google .ti-rating-num {
             color: #ffffff !important;
         }
-
         .ti-widget.ti-google .ti-stars .ti-star.f {
             color: #D4AF37 !important;
         }
@@ -99,18 +83,21 @@
 
     <div class="royal-envelope">
         <div class="left-royal-label">
-            <span class="label-crown">👑</span>
+            <span style="color:#D4AF37; transform: rotate(90deg); font-size:12px;">👑</span>
             <span class="label-text">ROYAL STREET KITCHEN</span>
         </div>
         
-        <span class="paigaam-subtitle">Muntazir-e-Khaas</span>
-        <div class="paigaam-title">PAIGAAM</div>
+        <img src="royalstreetkitchen.png" class="royal-header-img" alt="Royal Street Kitchen">
         
-        <div style="height: 1.5px; width: 40%; background: linear-gradient(90deg, transparent, #D4AF37, transparent); margin: 15px auto 35px auto;"></div>
+        <div style="height: 1px; width: 60%; background: linear-gradient(90deg, transparent, #D4AF37, transparent); margin: 0 auto 30px auto;"></div>
 
-        <a href="https://search.google.com/local/writereview?placeid=ChIJidkS38T4YjkRZ17fW3G8kQo" target="_blank" class="shahi-btn">
-            WRITE A REVIEW ON GOOGLE 👑
-        </a>
+        <div style="margin-bottom: 40px;">
+            <p style="color: #888; font-size: 12px; margin-bottom: 15px;">"Muntazir-e-Khaas"</p>
+            <a href="https://g.page/r/CWde31txvJEKEBM/review" target="_blank" class="shahi-btn">
+                ARZI KAREIN (WRITE REVIEW) 👑
+            </a>
+            <p style="color: #555; font-size: 9px; margin-top: 8px;">(Google Maps par login hona zaruri hai)</p>
+        </div>
 
         <div id="trustindex-display" style="min-height: 250px;">
             <script defer async src='https://cdn.trustindex.io/loader.js?63390da67d48201047069d19ae7'></script>
