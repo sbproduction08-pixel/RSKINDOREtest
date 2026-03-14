@@ -190,7 +190,7 @@
 </div>
     
 <script>
-    window.cart = []; 
+    window.cart = JSON.parse(localStorage.getItem('userCart')) || []; 
     let cancelInterval;
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
 
@@ -295,7 +295,7 @@
             let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
             window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
 
-            window.cart = JSON.parse(localStorage.getItem('userCart')) || []; updateCartUI();
+            window.cart = []; updateCartUI();
             btn.innerText = "Order Now"; btn.disabled = false;
         })
         .catch(() => { 
@@ -360,26 +360,26 @@
     };
 
     function updateCartUI() {
-        const bar = document.getElementById('floatingCheckout');
-        const listDisp = document.getElementById('cart-items-list');
-        const totalDisp = document.getElementById('cart-total-display');
-        const socialBar = document.getElementById('royal-social-float');
-        let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-        if (window.cart.length > 0) {
-            bar.style.display = 'flex'; totalDisp.innerText = total;
-            listDisp.innerHTML = window.cart.map(item => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${item.name} x${item.qty}</span><button onclick="window.removeFromCart('${item.name}')">-</button></div>`).join('');
-// Social icons ko gayab kar do
+    const bar = document.getElementById('floatingCheckout');
+    const listDisp = document.getElementById('cart-items-list');
+    const totalDisp = document.getElementById('cart-total-display');
+    const socialBar = document.getElementById('royal-social-float');
+    
+    let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    
+    if (window.cart.length > 0) {
+        bar.style.display = 'flex'; 
+        totalDisp.innerText = total;
+        listDisp.innerHTML = window.cart.map(item => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${item.name} x${item.qty}</span><button onclick="window.removeFromCart('${item.name}')">-</button></div>`).join('');
+        
         if(socialBar) socialBar.style.display = 'none';
-
     } else {
-        // Jab cart khali ho
         bar.style.display = 'none';
-
-        // Social icons ko wapas dikha do
         if(socialBar) socialBar.style.display = 'flex';
     }
-        localStorage.setItem('userCart', JSON.stringify(window.cart));
- }
+    // Cart ko memory mein save karne ke liye:
+    localStorage.setItem('userCart', JSON.stringify(window.cart));
+}
 
     // --- ADMIN ---
     let logoClicks = 0; let clickTimer;
