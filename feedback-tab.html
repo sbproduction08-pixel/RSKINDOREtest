@@ -1,135 +1,88 @@
-<div class="feedback-container" style="animation: fadeIn 0.5s ease;">
+<div class="paigaam-wrapper" style="animation: royalEntrance 1s ease-out; padding: 10px;">
+    
     <style>
-        .feedback-wrapper {
-            background: rgba(20, 20, 20, 0.8);
-            border: 1.5px solid #D4AF37;
+        /* Royal Background & Border */
+        .royal-envelope {
+            background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%);
+            border: 2px solid #D4AF37;
             border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-            margin-top: 20px;
+            padding: 30px 15px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(212, 175, 55, 0.05);
+            overflow: hidden;
         }
 
-        .royal-heading {
+        /* Decorative Corners */
+        .royal-envelope::before, .royal-envelope::after {
+            content: "👑";
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.4;
+        }
+        .royal-envelope::before { top: 10px; left: 10px; }
+        .royal-envelope::after { bottom: 10px; right: 10px; }
+
+        /* Typography */
+        .paigaam-title {
             font-family: 'Marcellus', serif;
             color: #D4AF37;
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .paigaam-subtitle {
+            font-family: 'Poppins', sans-serif;
+            color: #888;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin-bottom: 30px;
         }
 
-        .star-box {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin: 25px 0;
+        /* Golden Divider */
+        .royal-divider {
+            height: 1px;
+            width: 60%;
+            background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+            margin: 0 auto 30px auto;
         }
 
-        .royal-star {
-            font-size: 35px;
-            color: #333; /* Default dark color */
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        /* Animation */
+        @keyframes royalEntrance {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .royal-star.selected {
-            color: #D4AF37;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
-            transform: scale(1.2);
-        }
-
-        .feedback-area {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #444;
+        /* Trustindex Customization Overlay */
+        #trustindex-wrapper {
+            background: rgba(0,0,0,0.3);
             border-radius: 12px;
-            color: #fff;
-            padding: 15px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            resize: none;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-
-        .feedback-area:focus {
-            border-color: #D4AF37;
-            outline: none;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-        }
-
-        .royal-submit-btn {
-            background: linear-gradient(45deg, #3a0d0d, #8a1a1a);
-            color: #D4AF37;
-            border: 1px solid #D4AF37;
-            padding: 12px 40px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-family: 'Marcellus', serif;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .royal-submit-btn:active {
-            transform: scale(0.95);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            padding: 10px;
+            min-height: 250px;
         }
     </style>
 
-    <div class="feedback-wrapper">
-        <div class="royal-heading">Anubhav Sajha Karein</div>
-        <p style="color: #aaa; font-size: 12px;">Aapki rai hamare liye swarna-saman hai</p>
+    <div class="royal-envelope">
+        <div class="paigaam-title">PAIGAAM</div>
+        <div class="paigaam-subtitle">Muntazir-e-Khaas (Awaiting your words)</div>
+        
+        <div class="royal-divider"></div>
 
-        <div class="star-box" id="star-rating">
-            <span class="royal-star" onclick="selectStars(1)">★</span>
-            <span class="royal-star" onclick="selectStars(2)">★</span>
-            <span class="royal-star" onclick="selectStars(3)">★</span>
-            <span class="royal-star" onclick="selectStars(4)">★</span>
-            <span class="royal-star" onclick="selectStars(5)">★</span>
+        <p style="color: #eee; font-size: 14px; line-height: 1.6; margin-bottom: 25px; font-style: italic;">
+            "Aapki rai hamare liye kisi tohfe se kam nahi. Kripya apne shahi anubhav ko duniya ke saath saajha karein."
+        </p>
+
+        <div id="trustindex-wrapper">
+            <script defer async src='https://cdn.trustindex.io/loader.js?63390da67d48201047069d19ae7'></script>
         </div>
 
-        <textarea id="feedback-msg" class="feedback-area" rows="5" placeholder="Hamari seva ke baare mein likhein..."></textarea>
-
-        <button class="royal-submit-btn" onclick="sendFeedbackToWA()">SUBMIT FEEDBACK 👑</button>
+        <div style="margin-top: 30px; opacity: 0.6;">
+            <img src="royalstreetkitchen.png" style="width: 80px; filter: grayscale(1) brightness(2);">
+            <p style="font-size: 9px; color: #D4AF37; margin-top: 10px; letter-spacing: 2px;">
+                SHAHI MEHMAN-NAWAZI • RSK INDORE
+            </p>
+        </div>
     </div>
-
-    <script>
-        let userRating = 0;
-
-        function selectStars(count) {
-            userRating = count;
-            const stars = document.querySelectorAll('.royal-star');
-            stars.forEach((star, index) => {
-                if (index < count) {
-                    star.classList.add('selected');
-                } else {
-                    star.classList.remove('selected');
-                }
-            });
-        }
-
-        function sendFeedbackToWA() {
-            const msg = document.getElementById('feedback-msg').value;
-            const userName = localStorage.getItem('userName') || "Guest";
-
-            if (userRating === 0) {
-                alert("Kripya star rating select karein!");
-                return;
-            }
-
-            let starString = "⭐".repeat(userRating);
-            let waUrl = `https://wa.me/917489999890?text=*ROYAL FEEDBACK*%0A*Name:* ${userName}%0A*Rating:* ${starString}%0A*Message:* ${msg}`;
-            
-            window.open(waUrl, '_blank');
-            alert("Dhanyawad! Aapka feedback bhej diya gaya hai.");
-        }
-    </script>
 </div>
