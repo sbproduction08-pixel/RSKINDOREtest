@@ -370,7 +370,6 @@
         if (window.cart.length > 0) {
             bar.style.display = 'flex'; totalDisp.innerText = total;
             listDisp.innerHTML = window.cart.map(item => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${item.name} x${item.qty}</span><button onclick="window.removeFromCart('${item.name}')">-</button></div>`).join('');
-        } else { bar.style.display = 'none'; }
 // Social icons ko gayab kar do
         if(socialBar) socialBar.style.display = 'none';
 
