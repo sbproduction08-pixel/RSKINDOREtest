@@ -1,34 +1,52 @@
-<div class="admin-panel-wrapper" style="animation: fadeIn 0.5s ease; padding-bottom: 50px;">
+<div class="admin-panel-wrapper" style="padding-bottom: 50px;">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
-        <div style="background: linear-gradient(45deg, #af8d19, #f1d36d); padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(212,175,55,0.3);">
-            <div style="font-size: 10px; color: #3a0d0d; font-weight: 800; text-transform: uppercase;">Total Tokens Today</div>
+        <div style="background: linear-gradient(45deg, #af8d19, #f1d36d); padding: 15px; border-radius: 12px; text-align: center;">
+            <div style="font-size: 10px; color: #3a0d0d; font-weight: 800;">Total Tokens Today</div>
             <div id="admin-total-orders" style="font-size: 26px; font-weight: bold; color: #000;">0</div>
         </div>
         <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--gold); padding: 15px; border-radius: 12px; text-align: center;">
-            <div style="font-size: 10px; color: var(--gold); font-weight: 800; text-transform: uppercase;">Estimated Sale</div>
+            <div style="font-size: 10px; color: var(--gold); font-weight: 800;">Estimated Sale</div>
             <div style="font-size: 26px; font-weight: bold; color: var(--gold);">₹<span id="admin-total-sale">0</span></div>
         </div>
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h3 style="font-family: 'Marcellus', serif; color: var(--gold); border-left: 3px solid var(--gold); padding-left: 10px; margin: 0; font-size: 16px;">Live Kitchen Feed</h3>
-        <button onclick="refreshAdminData()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; padding: 4px 10px; border-radius: 4px; cursor: pointer;">🔄 Refresh</button>
+        <button onclick="refreshAdminData()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; padding: 4px 10px; border-radius: 4px;">🔄 Refresh</button>
     </div>
     
-    <div id="admin-orders-list" style="display: flex; flex-direction: column; gap: 15px;">
-        <div style="text-align: center; padding: 40px; color: #555;">👑 Reading Sheet Data...</div>
+    <div id="admin-orders-list" style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="text-align: center; padding: 40px; color: #555;">👑 Loading Royal Data...</div>
     </div>
 </div>
 
 <audio id="kitchenBell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" loop></audio>
 
+<style>
+    .order-card {
+        background: rgba(255,255,255,0.03);
+        border: 2px solid rgba(212,175,55,0.25); /* Border wapas aa gaya */
+        padding: 18px;
+        border-radius: 15px;
+        position: relative;
+        margin-bottom: 5px;
+    }
+    .status-badge {
+        font-size: 9px; padding: 4px 10px; border-radius: 50px; text-transform: uppercase; font-weight: 800;
+        position: absolute; top: 15px; right: 15px;
+    }
+    .status-pending { background: #af8d19; color: #000; }
+    .status-cancelled { background: #3a0d0d; color: #ff4444; border: 1px solid #ff4444; }
+    .status-done { background: #1a3a1d; color: #25D366; border: 1px solid #25D366; }
+    .order-time { font-size: 10px; color: #888; margin-top: 5px; font-weight: bold; }
+    .cust-info { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px; display: block; }
+    .cust-phone { font-size: 11px; color: var(--gold); margin-bottom: 8px; display: block; }
+</style>
+
 <script>
     const adminBridge = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
     let lastKnownToken = parseInt(localStorage.getItem('lastProcessedToken')) || 0;
     const bell = document.getElementById('kitchenBell');
-
-    // Fix for Refresh Logout (Point 4)
-    localStorage.setItem('activeTab', 'admin');
 
     function refreshAdminData() {
         const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
@@ -45,72 +63,63 @@
 
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
-        const totalOrdersDisp = document.getElementById('admin-total-orders');
-        const totalSaleDisp = document.getElementById('admin-total-sale');
         let html = ""; let totalSale = 0; let todayCount = 0; let currentMaxToken = 0;
         const todayStr = new Date().toDateString();
 
         orders.reverse().forEach(order => {
-            const orderDate = new Date(order.date).toDateString();
-            if(orderDate === todayStr) {
+            const dateObj = new Date(order.date);
+            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const dateStr = dateObj.toLocaleDateString();
+            
+            if(dateObj.toDateString() === todayStr) {
                 todayCount++;
-                if(order.status !== "Cancelled" && order.status !== "Cancelled By User") {
-                    totalSale += parseFloat(order.total || 0);
-                }
-                let tokenNum = parseInt(order.token);
-                if(tokenNum > currentMaxToken) currentMaxToken = tokenNum;
-
-                let statusClass = "status-pending";
-                if(order.status.includes("Cancelled")) statusClass = "status-cancelled";
-                if(order.status === "Done") statusClass = "status-done";
-
-                html += `
-                    <div class="order-card" style="${order.status.includes('Cancelled') ? 'border-color: #ff4444; opacity:0.7;' : ''}">
-                        <span class="status-badge ${statusClass}">${order.status}</span>
-                        <div style="font-family: 'Marcellus', serif; color: var(--gold); font-size: 12px; margin-bottom: 5px;">TOKEN #${order.token}</div>
-                        <span class="cust-info">${order.name}</span>
-                        <div class="order-items">${order.items}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:bold; color:var(--gold); font-size:16px;">₹${order.total}</span>
-                            ${order.status === 'Pending' ? `
-                                <div>
-                                    <button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:6px 10px; border-radius:6px; font-weight:bold; font-size:11px; cursor:pointer; margin-right:5px;">CANCEL ❌</button>
-                                    <button onclick="updateStatus('${order.token}', '${order.name}', 'Done')" style="background:#25D366; color:white; border:none; padding:6px 15px; border-radius:6px; font-weight:bold; font-size:11px; cursor:pointer;">DONE ✅</button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
+                if(!order.status.includes("Cancelled")) totalSale += parseFloat(order.total || 0);
+                if(parseInt(order.token) > currentMaxToken) currentMaxToken = parseInt(order.token);
             }
+
+            let statusClass = order.status === "Done" ? "status-done" : (order.status.includes("Cancelled") ? "status-cancelled" : "status-pending");
+
+            html += `
+                <div class="order-card" style="${order.status.includes('Cancelled') ? 'opacity:0.6; border-color:red;' : ''}">
+                    <span class="status-badge ${statusClass}">${order.status}</span>
+                    <div style="color: var(--gold); font-size: 11px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <span class="cust-info">${order.name}</span>
+                    <span class="cust-phone">📱 ${order.phone}</span>
+                    <div class="order-items" style="color:#bbb; font-size:12px; background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; margin:8px 0;">${order.items}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-weight:bold; color:var(--gold); font-size:16px;">₹${order.total}</span>
+                            <div class="order-time">📅 ${dateStr} | 🕒 ${timeStr}</div>
+                        </div>
+                        ${order.status === 'Pending' ? `
+                            <div>
+                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled By Admin')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:6px 8px; border-radius:6px; font-size:10px; cursor:pointer;">❌ CANCEL</button>
+                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Done')" style="background:#25D366; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">✅ DONE</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
         });
 
-        if(currentMaxToken > lastKnownToken && lastKnownToken !== 0) {
-            bell.volume = 1.0;
-            bell.play();
-            // 6 second baad auto stop agar koi touch na kare (Point 3)
-            setTimeout(() => { bell.pause(); bell.currentTime = 0; }, 6000);
-        }
-        if(currentMaxToken > 0) {
-            lastKnownToken = currentMaxToken;
-            localStorage.setItem('lastProcessedToken', currentMaxToken);
-        }
-        list.innerHTML = html || "<div style='text-align:center; padding:50px; color:#555;'>Aaj koi orders nahi hain.</div>";
-        totalOrdersDisp.innerText = todayCount;
-        totalSaleDisp.innerText = totalSale.toLocaleString();
+        if(currentMaxToken > lastKnownToken && lastKnownToken !== 0) { bell.play(); setTimeout(() => { bell.pause(); bell.currentTime = 0; }, 6000); }
+        if(currentMaxToken > 0) { lastKnownToken = currentMaxToken; localStorage.setItem('lastProcessedToken', currentMaxToken); }
+        
+        list.innerHTML = html;
+        document.getElementById('admin-total-orders').innerText = todayCount;
+        document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
     }
 
-    // Stop bell on touch (Point 3)
     document.addEventListener('click', () => { bell.pause(); bell.currentTime = 0; }, {once: false});
 
     window.updateStatus = function(token, name, status) {
-        if(!confirm("Token #" + token + " ko " + status + " mark karein?")) return;
+        if(!confirm(status + " Token #" + token + "?")) return;
         const params = new URLSearchParams();
         params.append('token', token); params.append('name', name); params.append('status', status);
-        fetch(adminBridge, { method: 'POST', mode: 'no-cors', body: params.toString(), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
-        alert("Success!");
-        setTimeout(refreshAdminData, 1200);
+        fetch(adminBridge, { method: 'POST', mode: 'no-cors', body: params.toString() });
+        alert("Action Saved!"); setTimeout(refreshAdminData, 1500);
     };
 
-    setInterval(refreshAdminData, 20000);
+    setInterval(refreshAdminData, 30000);
     refreshAdminData();
 </script>
