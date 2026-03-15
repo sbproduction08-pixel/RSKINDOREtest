@@ -463,6 +463,10 @@
     // --- INITIAL LOAD ---
     window.onload = () => { 
     showTab(localStorage.getItem('activeTab') || 'home');
+    // Naya logic: Agar admin logged in hai, toh wahi dikhao
+    if(localStorage.getItem('isAdminLoggedIn') === 'true') {
+        tabToShow = 'admin';
+    showTab(tabToShow);
     
     // Refresh ke baad cart ko dobara screen par lane ke liye:
     updateCartUI(); 
