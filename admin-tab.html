@@ -84,27 +84,34 @@
 
             let statusClass = order.status === "Done" ? "status-done" : (order.status.includes("Cancelled") ? "status-cancelled" : "status-pending");
 
+            // Loop ke andar wala card ka HTML replace karein:
             html += `
-                <div class="order-card" style="${order.status.includes('Cancelled') ? 'opacity:0.6; border-color:red;' : ''}">
+                <div class="order-card" style="
+                    background: ${order.status.includes('Cancelled') ? 'rgba(58, 13, 13, 0.4)' : 'rgba(255,255,255,0.03)'}; 
+                    border: 2px solid ${order.status.includes('Cancelled') ? '#ff4444' : 'var(--gold)'};
+                    margin-bottom: 20px; /* Do cards ke beech gap */
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                ">
                     <span class="status-badge ${statusClass}">${order.status}</span>
-                    <div style="color: var(--gold); font-size: 11px; font-weight:bold;">TOKEN #${order.token}</div>
-                    <span class="cust-info">${order.name}</span>
-                    <span class="cust-phone">📱 ${order.phone}</span>
-                    <div class="order-items" style="color:#bbb; font-size:12px; background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; margin:8px 0;">${order.items}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="color: var(--gold); font-size: 11px; font-weight:bold; letter-spacing: 1px;">TOKEN #${order.token}</div>
+                    <span class="cust-info" style="font-size: 18px; color: #fff; margin-top: 5px;">${order.name}</span>
+                    <span class="cust-phone" style="color: var(--gold);">📱 ${order.phone}</span>
+                    
+                    <div class="order-items" style="color:#eee; font-size:13px; background:rgba(0,0,0,0.4); padding:12px; border-radius:10px; margin:12px 0; border: 1px solid rgba(212,175,55,0.1);">
+                        ${order.items}
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top: 1px solid rgba(212,175,55,0.1); padding-top: 10px;">
                         <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <span style="font-weight:bold; color:var(--gold); font-size:16px;">₹${order.total}</span>
-                            <div class="order-time">📅 ${dateStr} | 🕒 ${timeStr}</div>
-                            ${cancelDisplay} </div>
-                            <span style="font-weight:bold; color:var(--gold); font-size:16px;">₹${order.total}</span>
-                            <div class="order-time">📅 ${dateStr} | 🕒 ${timeStr}</div>
+                            <span style="font-weight:bold; color:var(--gold); font-size:20px;">₹${order.total}</span>
+                            <div class="order-time" style="opacity: 0.7;">🕒 Ordered: ${timeStr}</div>
+                            ${cancelDisplay} 
                         </div>
+                        
                         ${order.status === 'Pending' ? `
-                            <div>
-                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled By Admin')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:6px 8px; border-radius:6px; font-size:10px; cursor:pointer;">❌ CANCEL</button>
-                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Done')" style="background:#25D366; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">✅ DONE</button>
+                            <div style="display:flex; gap:8px;">
+                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled By Admin')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:8px 12px; border-radius:8px; font-size:11px; cursor:pointer; font-weight:bold;">CANCEL</button>
+                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Done')" style="background:#25D366; color:white; border:none; padding:8px 18px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; box-shadow: 0 0 10px rgba(37,211,102,0.3);">DONE ✅</button>
                             </div>
                         ` : ''}
                     </div>
