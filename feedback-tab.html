@@ -1,115 +1,126 @@
-<div class="paigaam-wrapper" style="animation: royalEntrance 1s ease-out; padding: 10px;">
+<div class="paigaam-wrapper" style="animation: royalEntrance 1s ease-out; padding: 10px; width: 100%;">
     
     <style>
-        /* Wide Royal Container */
+        /* Wide Container with Whitish-Charcoal Gradient */
         .royal-envelope-wide {
-            background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%);
-            border: 1px solid #D4AF37;
+            background: linear-gradient(135deg, #2a2a2a 0%, #f5f5f5 100%); /* Halka Whitish Touch */
+            border: 2px solid #D4AF37;
             border-radius: 12px;
-            padding: 30px 20px;
+            padding: 40px 25px;
             position: relative;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
-            overflow: hidden;
-            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100% !important; /* Screen par wide failne ke liye */
             box-sizing: border-box;
+            overflow: hidden;
         }
 
-        /* Top Left Small Crown (Jaise photo mein hai) */
+        /* Top Left Crown */
         .royal-envelope-wide::before {
             content: "👑";
             position: absolute;
             top: 15px;
-            left: 15px;
-            font-size: 16px;
-            opacity: 0.6;
+            left: 20px;
+            font-size: 20px;
             color: #D4AF37;
         }
 
         .paigaam-title {
             font-family: 'Marcellus', serif;
-            color: #D4AF37;
-            font-size: 28px;
-            letter-spacing: 5px;
-            margin: 5px 0;
-            text-align: left; /* Left aligned jaise photo mein hai */
-            padding-left: 5px;
+            color: #1a1a1a; /* Dark text light background par */
+            font-size: 32px;
+            letter-spacing: 6px;
+            margin: 10px 0 5px 0;
+            text-align: left;
+            font-weight: bold;
         }
 
         .paigaam-subtitle {
             font-family: 'Poppins', sans-serif;
-            color: #888;
-            font-size: 10px;
+            color: #555;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-align: left;
-            padding-left: 5px;
             margin-bottom: 30px;
+            display: block;
         }
 
-        /* 100% Working Review Button */
+        /* Royal Review Button */
         .shahi-btn-wide {
             background: linear-gradient(45deg, #D4AF37, #8a6d3b);
-            color: #000;
-            border: none;
-            padding: 14px 0;
+            color: #fff;
+            border: 1px solid #000;
+            padding: 16px 40px;
             border-radius: 8px;
             font-weight: 800;
             font-family: 'Marcellus', serif;
             cursor: pointer;
             text-decoration: none;
-            display: block;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 0 30px 5px; /* Left aligned button */
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-            font-size: 14px;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            margin-bottom: 35px;
+            transition: 0.3s;
         }
 
-        /* Trustindex AI Summary & Wide Visibility Fix */
-        .ti-widget.ti-google .ti-widget-container {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-        }
+        .shahi-btn-wide:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6); }
 
-        .ti-widget.ti-google .ti-review-text, 
+        /* --- TRUSTINDEX CUSTOM CSS (Sab kuch chamkane ke liye) --- */
+        
+        /* Reviewer ka naam aur text black/dark grey (Light background par dikhne ke liye) */
         .ti-widget.ti-google .ti-name, 
-        .ti-widget.ti-google .ti-date,
-        .ti-widget.ti-google .ti-header .ti-text,
-        .ti-widget.ti-google .ti-rating-num {
-            color: #ffffff !important;
+        .ti-widget.ti-google .ti-review-text,
+        .ti-widget.ti-google .ti-date {
+            color: #1a1a1a !important;
+            font-weight: 500 !important;
         }
 
+        /* OWNER'S REPLY - Royal Gold Look */
+        .ti-widget.ti-google .ti-inner-reply,
+        .ti-widget.ti-google .ti-owner-reply-text,
+        .ti-widget.ti-google .ti-reply-title {
+            background-color: rgba(212, 175, 55, 0.1) !important;
+            border-left: 3px solid #D4AF37 !important;
+            color: #8a6d3b !important; /* Royal Gold/Bronze shade */
+            font-style: italic !important;
+            padding: 10px !important;
+            border-radius: 4px;
+        }
+
+        /* Stars Visibility */
         .ti-widget.ti-google .ti-stars .ti-star.f {
             color: #D4AF37 !important;
         }
 
+        /* Layout Animation */
         @keyframes royalEntrance {
-            from { opacity: 0; transform: scale(0.98) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Bottom Logo Alignment */
+        .bottom-branding {
+            margin-top: 40px;
+            text-align: left;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 20px;
         }
     </style>
 
     <div class="royal-envelope-wide">
         <div class="paigaam-title">PAIGAAM</div>
-        <div class="paigaam-subtitle">Muntazir-e-Khaas (Awaiting your words)</div>
+        <span class="paigaam-subtitle">Muntazir-e-Khaas (Awaiting your words)</span>
 
         <a href="https://g.page/r/Cf-a17c_2tt0EBE/review" target="_blank" class="shahi-btn-wide">
             WRITE A REVIEW ON GOOGLE 👑
         </a>
 
-        <p style="color: #eee; font-size: 13px; line-height: 1.6; margin: 0 0 25px 5px; font-style: italic; text-align: left; opacity: 0.8;">
-            "Aapki rai hamare liye kisi tohfe se kam nahi..."
-        </p>
-
-        <div id="trustindex-wrapper" style="min-height: 200px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+        <div id="trustindex-wrapper" style="min-height: 250px;">
             <script defer async src='https://cdn.trustindex.io/loader.js?63390da67d48201047069d19ae7'></script>
         </div>
 
-        <div style="margin-top: 30px; text-align: left; padding-left: 5px;">
-            <img src="royalstreetkitchen.png" style="width: 75px; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
-            <p style="font-size: 9px; color: #D4AF37; margin-top: 5px; letter-spacing: 2px; font-weight: bold;">
+        <div class="bottom-branding">
+            <img src="royalstreetkitchen.png" style="width: 100px; filter: contrast(1.2);">
+            <p style="font-size: 10px; color: #8a6d3b; margin-top: 10px; letter-spacing: 3px; font-weight: bold;">
                 SHAHI MEHMAN-NAWAZI • RSK INDORE
             </p>
         </div>
