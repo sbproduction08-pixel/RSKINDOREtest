@@ -1,70 +1,72 @@
-<div class="paigaam-wrapper" style="animation: royalEntrance 1s ease-out; padding: 10px; max-width: 600px; margin: 0 auto;">
+<div class="paigaam-wrapper" style="animation: royalEntrance 1s ease-out; padding: 10px;">
     
     <style>
-        /* Wide Rectangle Container */
+        /* Wide Royal Container */
         .royal-envelope-wide {
             background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%);
-            border: 2px solid #D4AF37;
-            border-radius: 15px;
+            border: 1px solid #D4AF37;
+            border-radius: 12px;
             padding: 30px 20px;
             position: relative;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
-            text-align: center;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
             overflow: hidden;
-            width: 100%; /* Wide Shape */
+            width: 100%;
             box-sizing: border-box;
         }
 
-        /* Left Side Vertical Label with Crown */
-        .left-royal-label {
+        /* Top Left Small Crown (Jaise photo mein hai) */
+        .royal-envelope-wide::before {
+            content: "👑";
             position: absolute;
-            left: -42px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            opacity: 0.4;
-        }
-
-        .label-text {
+            top: 15px;
+            left: 15px;
+            font-size: 16px;
+            opacity: 0.6;
             color: #D4AF37;
-            font-family: 'Marcellus', serif;
-            font-size: 10px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            white-space: nowrap;
         }
 
-        /* Typography */
         .paigaam-title {
             font-family: 'Marcellus', serif;
             color: #D4AF37;
-            font-size: 24px;
+            font-size: 28px;
             letter-spacing: 5px;
-            margin-top: 5px;
+            margin: 5px 0;
+            text-align: left; /* Left aligned jaise photo mein hai */
+            padding-left: 5px;
         }
 
-        /* Full Width Review Button */
+        .paigaam-subtitle {
+            font-family: 'Poppins', sans-serif;
+            color: #888;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: left;
+            padding-left: 5px;
+            margin-bottom: 30px;
+        }
+
+        /* 100% Working Review Button */
         .shahi-btn-wide {
             background: linear-gradient(45deg, #D4AF37, #8a6d3b);
             color: #000;
-            border: 1px solid #000;
-            padding: 12px 0;
+            border: none;
+            padding: 14px 0;
             border-radius: 8px;
             font-weight: 800;
             font-family: 'Marcellus', serif;
             cursor: pointer;
             text-decoration: none;
-            display: block; /* Poori width lega */
+            display: block;
             width: 100%;
-            max-width: 350px;
-            margin: 20px auto 35px auto;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-            transition: 0.3s;
+            max-width: 300px;
+            margin: 0 0 30px 5px; /* Left aligned button */
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            font-size: 14px;
         }
 
-        /* Trustindex Visibility Fixes for Rectangle View */
+        /* Trustindex AI Summary & Wide Visibility Fix */
         .ti-widget.ti-google .ti-widget-container {
             width: 100% !important;
             max-width: 100% !important;
@@ -74,34 +76,42 @@
         .ti-widget.ti-google .ti-review-text, 
         .ti-widget.ti-google .ti-name, 
         .ti-widget.ti-google .ti-date,
+        .ti-widget.ti-google .ti-header .ti-text,
         .ti-widget.ti-google .ti-rating-num {
             color: #ffffff !important;
         }
 
+        .ti-widget.ti-google .ti-stars .ti-star.f {
+            color: #D4AF37 !important;
+        }
+
         @keyframes royalEntrance {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
     </style>
 
     <div class="royal-envelope-wide">
-        <div class="left-royal-label">
-            <span style="color:#D4AF37; transform: rotate(90deg); font-size:12px;">👑</span>
-            <span class="label-text">ROYAL STREET KITCHEN</span>
-        </div>
-        
         <div class="paigaam-title">PAIGAAM</div>
-        <p style="color: #888; font-size: 10px; letter-spacing: 2px; margin-bottom: 20px;">ANUBHAV-E-KHAS</p>
-        
+        <div class="paigaam-subtitle">Muntazir-e-Khaas (Awaiting your words)</div>
+
         <a href="https://g.page/r/Cf-a17c_2tt0EBE/review" target="_blank" class="shahi-btn-wide">
-    WRITE A REVIEW ON GOOGLE 👑
-</a>
-        <div id="trustindex-wide" style="min-height: 200px; width: 100%;">
+            WRITE A REVIEW ON GOOGLE 👑
+        </a>
+
+        <p style="color: #eee; font-size: 13px; line-height: 1.6; margin: 0 0 25px 5px; font-style: italic; text-align: left; opacity: 0.8;">
+            "Aapki rai hamare liye kisi tohfe se kam nahi..."
+        </p>
+
+        <div id="trustindex-wrapper" style="min-height: 200px; background: rgba(0,0,0,0.2); border-radius: 8px;">
             <script defer async src='https://cdn.trustindex.io/loader.js?63390da67d48201047069d19ae7'></script>
         </div>
 
-        <div style="margin-top: 25px; border-top: 1px solid rgba(212,175,55,0.1); padding-top: 15px;">
-            <p style="font-size: 9px; color: #555; letter-spacing: 3px;">ROYAL STREET KITCHEN • RSK INDORE</p>
+        <div style="margin-top: 30px; text-align: left; padding-left: 5px;">
+            <img src="royalstreetkitchen.png" style="width: 75px; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4));">
+            <p style="font-size: 9px; color: #D4AF37; margin-top: 5px; letter-spacing: 2px; font-weight: bold;">
+                SHAHI MEHMAN-NAWAZI • RSK INDORE
+            </p>
         </div>
     </div>
 </div>
