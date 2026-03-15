@@ -1,0 +1,97 @@
+<div class="gallery-wrapper" style="animation: royalEntrance 1s ease-out; padding: 10px;">
+    
+    <style>
+        /* --- GALLERY HEADER --- */
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 20px;
+        }
+
+        .gallery-header h2 {
+            font-family: 'Marcellus', serif;
+            color: var(--gold);
+            font-size: 28px;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .gallery-header p {
+            font-size: 10px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* --- INSTAGRAM FEED CONTAINER --- */
+        .insta-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--gold);
+            border-radius: 15px;
+            padding: 15px;
+            min-height: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Responsive Grid for Manual Photos (If needed) */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1/1;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        .photo-item:hover img {
+            transform: scale(1.1);
+        }
+
+        @keyframes royalEntrance {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <div class="gallery-header">
+        <h2>Shahi Jhalak</h2>
+        <p>Hamari Rasoi Se Seedha Aapke Dil Tak</p>
+    </div>
+
+    <div class="insta-container">
+        <div style="text-align: center; padding-top: 50px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" style="width: 50px; opacity: 0.5; margin-bottom: 15px;">
+            <p style="color: #666; font-size: 12px;">Connecting to Instagram Feed...</p>
+            
+            <div class="photo-grid">
+                <div class="photo-item"><img src="item1.jpg" alt="RSK Dish"></div>
+                <div class="photo-item"><img src="item2.jpg" alt="RSK Dish"></div>
+                <div class="photo-item"><img src="item3.jpg" alt="RSK Dish"></div>
+                <div class="photo-item"><img src="item4.jpg" alt="RSK Dish"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="https://www.instagram.com/royalstreetkitchenrskindore/" target="_blank" 
+           style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+                  color: #fff; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 13px;">
+           FOLLOW US ON INSTAGRAM 👑
+        </a>
+    </div>
+
+</div>
