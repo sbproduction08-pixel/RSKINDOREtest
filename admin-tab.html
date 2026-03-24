@@ -143,14 +143,28 @@
     };
 
     window.updateStatus = function(token, name, status, otp = "") {
-        if(!confirm(status + " Token #" + token + "?")) return;
-        const url = adminBridge + "?token=" + token + "&status=" + encodeURIComponent(status) + "&otp=" + otp;
-        fetch(url, { method: 'POST', mode: 'no-cors' })
-        .then(() => {
-            alert("Updated!");
-            setTimeout(refreshAdminData, 1000);
-        });
-    };
+    // 1. Button ko turant disable karo taaki double click na ho
+    const btn = event.target;
+    const originalText = btn.innerText;
+    btn.innerText = "⌛...";
+    btn.disabled = true;
+
+    const url = adminBridge + "?token=" + token + "&status=" + encodeURIComponent(status) + "&otp=" + otp;
+
+    // 2. No-cors mode mein fetch
+    fetch(url, { method: 'POST', mode: 'no-cors' })
+    .then(() => {
+        // 3. Sabse zaroori: Bina page hile data refresh karo
+        setTimeout(() => {
+            refreshAdminData(); // Ye function dobara data khichega aur UI update karega
+        }, 500); 
+    })
+    .catch(err => {
+        alert("Network Error!");
+        btn.innerText = originalText;
+        btn.disabled = false;
+    });
+};
 
     setInterval(refreshAdminData, 30000);
     refreshAdminData();
