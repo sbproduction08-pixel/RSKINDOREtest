@@ -1,0 +1,79 @@
+<div id="dashboard-container" style="max-width: 500px; margin: auto; padding: 20px; font-family: 'Marcellus', serif; color: white;">
+    
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
+        <div>
+            <h2 id="welcome-name" style="color: #d4af37; margin: 0;">Namaste!</h2>
+            <p id="user-email" style="font-size: 12px; opacity: 0.7; margin: 0;"></p>
+        </div>
+        <button onclick="logout()" style="background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 5px 10px; border-radius: 5px; font-size: 10px;">Logout</button>
+    </div>
+
+    <div id="live-tracker" style="display: none; background: rgba(255,255,255,0.05); border: 2px solid #d4af37; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #d4af37;">Current Order Status</div>
+        <h1 id="order-status" style="margin: 15px 0; font-size: 28px;">⌛ Loading...</h1>
+        
+        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-top: 15px;">
+            <div style="font-size: 10px; opacity: 0.8;">YOUR PICKUP OTP</div>
+            <div id="order-otp" style="font-size: 32px; font-weight: bold; letter-spacing: 10px; color: #d4af37; margin-top: 5px;">----</div>
+            <p style="font-size: 10px; margin-top: 10px; color: #aaa;">Show this code at the counter to collect your order.</p>
+        </div>
+    </div>
+
+    <div id="profile-setup" style="display: none; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid #d4af37;">
+        <h3>Complete Your Royal Profile</h3>
+        <input type="text" id="phone" placeholder="Mobile Number" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white;">
+        <input type="text" id="pref" placeholder="Taste Preference (e.g., Less Spicy)" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white;">
+        <button onclick="saveUserProfile()" style="width: 100%; background: #d4af37; color: black; padding: 15px; border: none; border-radius: 10px; font-weight: bold; margin-top: 10px;">SAVE & CONTINUE</button>
+    </div>
+
+</div>
+
+<script>
+    // Firebase initialization wahi rahega...
+    
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('welcome-name').innerText = "Namaste, " + user.displayName.split(' ')[0] + "!";
+            document.getElementById('user-email').innerText = user.email;
+            checkProfile(user);
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    function checkProfile(user) {
+        db.collection("users").doc(user.uid).get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById('live-tracker').style.display = 'block';
+                fetchLiveStatus(userData.mobile); // Mobile se sheet mein status check karo
+            } else {
+                document.getElementById('profile-setup').style.display = 'block';
+            }
+        });
+    }
+
+    function fetchLiveStatus(mobile) {
+        const gasUrl = "APKI_GOOGLE_SCRIPT_URL?action=readAdmin"; // Wahi URL jo admin panel use karta hai
+        
+        fetch(gasUrl)
+            .then(res => res.json())
+            .then(data => {
+                // Latest order dhundo is mobile number ka jo 'Done' na ho
+                const activeOrder = data.reverse().find(o => o.phone == mobile && o.status !== 'Done');
+                
+                if (activeOrder) {
+                    document.getElementById('order-status').innerText = activeOrder.status.toUpperCase();
+                    document.getElementById('order-otp').innerText = activeOrder.otp || "WAIT";
+                    
+                    // Har 15 second mein auto-refresh
+                    setTimeout(() => fetchLiveStatus(mobile), 15000);
+                } else {
+                    document.getElementById('order-status').innerText = "NO ACTIVE ORDER";
+                    document.getElementById('order-otp').innerText = "----";
+                }
+            });
+    }
+    
+    // saveUserProfile() aur logout() functions yahan aayenge...
+</script>
