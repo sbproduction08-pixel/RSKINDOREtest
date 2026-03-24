@@ -469,34 +469,69 @@
 
     window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
 
-    // --- INITIAL LOAD ---
+   // --- INITIAL LOAD ---
     window.onload = () => { 
-    let tabToShow = localStorage.getItem('activeTab') || 'home';
-    
-    // Agar admin logged in hai toh wahi dikhao
-    if(localStorage.getItem('isAdminLoggedIn') === 'true') {
-        tabToShow = 'admin';
-    }
-    
-    showTab(tabToShow);
-    updateCartUI(); 
-    
-    if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
-        startCancelTimer(300, false);
-    }
-};
-function toggleSideMenu() {
-    const drawer = document.getElementById('side-drawer');
-    const overlay = document.getElementById('drawer-overlay');
-    
-    if (drawer.classList.contains('open')) {
-        drawer.classList.remove('open');
-        overlay.style.display = 'none';
-    } else {
-        drawer.classList.add('open');
-        overlay.style.display = 'block';
-    }
-}    
+        let tabToShow = localStorage.getItem('activeTab') || 'home';
+        if(localStorage.getItem('isAdminLoggedIn') === 'true') {
+            tabToShow = 'admin';
+        }
+        showTab(tabToShow);
+        updateCartUI(); 
+        if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
+            startCancelTimer(300, false);
+        }
+    };
+
+    function toggleSideMenu() {
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        if (drawer.classList.contains('open')) {
+            drawer.classList.remove('open');
+            overlay.style.display = 'none';
+        } else {
+            drawer.classList.add('open');
+            overlay.style.display = 'block';
+        }
+    }   
 </script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDGbHAorUN14LmXtRCd1IYzKQzP8hP02AE",
+    authDomain: "rsk-test-63cee.firebaseapp.com",
+    projectId: "rsk-test-63cee",
+    storageBucket: "rsk-test-63cee.firebasestorage.app",
+    messagingSenderId: "805798855186",
+    appId: "1:805798855186:web:9b0d09decca344a9478ecb",
+    measurementId: "G-3YGPTCBQVP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.sendTestOrder = async function() {
+    try {
+      const docRef = await addDoc(collection(db, "orders"), {
+        customerName: localStorage.getItem('userName') || "Guest Royal",
+        items: "1x Paneer Tikka, 1x Coke",
+        total: 250,
+        status: "Pending",
+        timestamp: serverTimestamp()
+      });
+      alert("Royal Order Sent to Firebase! ID: " + docRef.id);
+    } catch (e) {
+      alert("Firebase Error: " + e.message);
+    }
+  }
+</script>
+
+<div style="text-align:center; margin: 20px;">
+    <button onclick="sendTestOrder()" style="padding: 12px 25px; background: linear-gradient(gold, #b8860b); color: #000; border: 2px solid #000; cursor: pointer; font-weight: bold; border-radius: 30px; box-shadow: 0 0 10px gold;">
+      Test Firebase Order 🚀
+    </button>
+</div>
 </body>
 </html>
