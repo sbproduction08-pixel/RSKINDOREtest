@@ -69,59 +69,65 @@
         orders.reverse().forEach(order => {
             const dateObj = new Date(order.date);
             const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const dateStr = dateObj.toLocaleDateString();
-            let cancelDisplay = "";
-            if(order.cancelTime && order.status.includes("Cancelled")) {
-                const cTime = new Date(order.cancelTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                cancelDisplay = `<div style="color:#ff4444; font-size:10px; margin-top:5px; font-weight:bold;">❌ CANCELLED AT: ${cTime}</div>`;
-            }
+            const todayStr = new Date().toDateString();
             
             if(dateObj.toDateString() === todayStr) {
                 todayCount++;
-                if(!order.status.includes("Cancelled")) totalSale += parseFloat(order.total || 0);
+                if(order.status === "Done") totalSale += parseFloat(order.total || 0);
                 if(parseInt(order.token) > currentMaxToken) currentMaxToken = parseInt(order.token);
             }
 
-            let statusClass = order.status === "Done" ? "status-done" : (order.status.includes("Cancelled") ? "status-cancelled" : "status-pending");
+            // --- Dynamic Button & Status Logic ---
+            let status = order.status.trim();
+            let statusClass = "status-pending";
+            let actionButtons = "";
+            let cancelButton = "";
 
-            // Loop ke andar wala card ka HTML replace karein:
+            // Status wise color and buttons
+            if (status === "Awaiting Payment") {
+                statusClass = "status-pending"; // Orange-ish
+                actionButtons = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Received')" style="background:#3498db; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">PAID ✅</button>`;
+            } else if (status === "Received") {
+                statusClass = "status-received"; // Blue
+                actionButtons = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Preparing')" style="background:#e67e22; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">START COOKING 👨‍🍳</button>`;
+            } else if (status === "Preparing") {
+                statusClass = "status-preparing"; // Dark Orange
+                actionButtons = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Ready')" style="background:#f1c40f; color:black; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">READY 🔔</button>`;
+            } else if (status === "Ready") {
+                statusClass = "status-ready"; // Yellow
+                actionButtons = `<button onclick="verifyOTP('${order.token}', '${order.name}')" style="background:#25D366; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">DELIVER (OTP) 🎁</button>`;
+            } else if (status === "Done") {
+                statusClass = "status-done"; // Green
+            } else if (status.includes("Cancelled")) {
+                statusClass = "status-cancelled"; // Red
+            }
+
+            // Cancel button logic (Only till Preparing)
+            if (status !== "Done" && status !== "Ready" && !status.includes("Cancelled")) {
+                cancelButton = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled By Admin')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:8px 12px; border-radius:8px; font-size:11px; cursor:pointer;">CANCEL</button>`;
+            }
+
             html += `
-                <div class="order-card" style="
-                    background: ${order.status.includes('Cancelled') ? 'rgba(58, 13, 13, 0.4)' : 'rgba(255,255,255,0.03)'}; 
-                    border: 2px solid ${order.status.includes('Cancelled') ? '#ff4444' : 'var(--gold)'};
-                    margin-bottom: 20px; /* Do cards ke beech gap */
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-                ">
-                    <span class="status-badge ${statusClass}">${order.status}</span>
-                    <div style="color: var(--gold); font-size: 11px; font-weight:bold; letter-spacing: 1px;">TOKEN #${order.token}</div>
-                    <span class="cust-info" style="font-size: 18px; color: #fff; margin-top: 5px;">${order.name}</span>
-                    <span class="cust-phone" style="color: var(--gold);">📱 ${order.phone}</span>
+                <div class="order-card" style="border: 2px solid ${status === 'Ready' ? '#f1c40f' : 'rgba(212,175,55,0.25)'};">
+                    <span class="status-badge ${statusClass}">${status}</span>
+                    <div style="color: var(--gold); font-size: 11px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <span class="cust-info">${order.name}</span>
+                    <span class="cust-phone">📱 ${order.phone}</span>
+                    <div class="order-items">${order.items}</div>
                     
-                    <div class="order-items" style="color:#eee; font-size:13px; background:rgba(0,0,0,0.4); padding:12px; border-radius:10px; margin:12px 0; border: 1px solid rgba(212,175,55,0.1);">
-                        ${order.items}
-                    </div>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top: 1px solid rgba(212,175,55,0.1); padding-top: 10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <span style="font-weight:bold; color:var(--gold); font-size:20px;">₹${order.total}</span>
-                            <div class="order-time" style="opacity: 0.7;">🕒 Ordered: ${timeStr}</div>
-                            ${cancelDisplay} 
+                            <span style="font-weight:bold; color:var(--gold); font-size:18px;">₹${order.total}</span>
+                            <div class="order-time">🕒 ${timeStr}</div>
                         </div>
-                        
-                        ${order.status === 'Pending' ? `
-                            <div style="display:flex; gap:8px;">
-                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled By Admin')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:8px 12px; border-radius:8px; font-size:11px; cursor:pointer; font-weight:bold;">CANCEL</button>
-                                <button onclick="updateStatus('${order.token}', '${order.name}', 'Done')" style="background:#25D366; color:white; border:none; padding:8px 18px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; box-shadow: 0 0 10px rgba(37,211,102,0.3);">DONE ✅</button>
-                            </div>
-                        ` : ''}
+                        <div style="display:flex; gap:8px;">
+                            ${cancelButton}
+                            ${actionButtons}
+                        </div>
                     </div>
                 </div>
             `;
         });
-
-        if(currentMaxToken > lastKnownToken && lastKnownToken !== 0) { bell.play(); setTimeout(() => { bell.pause(); bell.currentTime = 0; }, 6000); }
-        if(currentMaxToken > 0) { lastKnownToken = currentMaxToken; localStorage.setItem('lastProcessedToken', currentMaxToken); }
-        
         list.innerHTML = html;
         document.getElementById('admin-total-orders').innerText = todayCount;
         document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
@@ -129,22 +135,22 @@
 
     document.addEventListener('click', () => { bell.pause(); bell.currentTime = 0; }, {once: false});
 
-    window.updateStatus = function(token, name, status) {
-    if(!confirm(status + " Token #" + token + "?")) return;
-    
-    // JSON ki jagah parameters bhejenge taaki Apps Script turant pakad le
-    const url = adminBridge + "?token=" + token + "&name=" + encodeURIComponent(name) + "&status=" + encodeURIComponent(status);
+    // OTP verification function
+    window.verifyOTP = function(token, name) {
+        let otp = prompt("Customer se OTP puchiye:");
+        if(!otp) return;
+        updateStatus(token, name, 'Done', otp);
+    };
 
-    fetch(url, {
-        method: 'POST',
-        mode: 'no-cors' 
-    }).then(() => {
-        alert("Action Saved!");
-        setTimeout(refreshAdminData, 1000);
-    }).catch(err => {
-        alert("Network Error!");
-    });
-};
+    window.updateStatus = function(token, name, status, otp = "") {
+        if(!confirm(status + " Token #" + token + "?")) return;
+        const url = adminBridge + "?token=" + token + "&status=" + encodeURIComponent(status) + "&otp=" + otp;
+        fetch(url, { method: 'POST', mode: 'no-cors' })
+        .then(() => {
+            alert("Updated!");
+            setTimeout(refreshAdminData, 1000);
+        });
+    };
 
     setInterval(refreshAdminData, 30000);
     refreshAdminData();
