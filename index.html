@@ -537,7 +537,7 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const auth = getAuth(app);
+ 
 
   // --- 👑 ROYAL LOGIN SYSTEM ---
   window.registerUser = async function() {
@@ -575,6 +575,8 @@
       alert("Login Error: " + e.message);
     }
   };
+ const auth = getAuth(app);
+
 
   // --- LOGOUT ---
   window.logout = async function() {
