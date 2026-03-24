@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RSK - Royal Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body style="background: #0a0a0a; color: white; font-family: 'Marcellus', serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid #d4af37; padding: 40px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h1 style="color: #d4af37; margin-bottom: 10px;">ROYAL STREET KITCHEN</h1>
+        <p style="font-size: 14px; color: #aaa; margin-bottom: 30px;">Login to track your order and get royal rewards.</p>
+
+        <button onclick="googleLogin()" style="background: white; color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.3s;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> 
+            Continue with Google
+        </button>
+
+        <p id="status-msg" style="margin-top: 20px; font-size: 12px; color: #d4af37; display: none;">Authenticating...</p>
+    </div>
+
+    <script>
+        // --- APNA FIREBASE CONFIG YAHAN DALEIN ---
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "rsk-test-63cee.firebaseapp.com",
+            projectId: "rsk-test-63cee",
+            storageBucket: "rsk-test-63cee.appspot.com",
+            messagingSenderId: "YOUR_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function googleLogin() {
+            document.getElementById('status-msg').style.display = 'block';
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            auth.signInWithPopup(provider).then((result) => {
+                const user = result.user;
+                
+                // Firestore mein check karein ki kya user pehle se hai
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        // Purana User -> Dashboard par bhejo
+                        window.location.href = "dashboard.html";
+                    } else {
+                        // Naya User -> Dashboard par bhejo taaki wahan Mobile No. fill kar sake
+                        window.location.href = "dashboard.html";
+                    }
+                });
+            }).catch((error) => {
+                alert("Login Failed: " + error.message);
+                document.getElementById('status-msg').style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
