@@ -297,12 +297,13 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    function updateUserUI() {
-        const userName = localStorage.getItem('userName');
-        document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
-        document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
-        document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
-    }
+   function updateUserUI() {
+    const userName = localStorage.getItem('userName');
+    document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
+    document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
+    document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
+    document.getElementById('trackBtn').style.display = userName ? 'inline-block' : 'none';
+}
 
     // --- TIMER LOGIC ---
     function startCancelTimer(duration, isNew = false) {
