@@ -344,29 +344,51 @@
     }
 
     // --- ORDER & CANCEL ---
-    window.checkout = function() {
-        let uName = localStorage.getItem('userName');
-        let uPhone = localStorage.getItem('userPhone');
-        if(!uName) { alert("Pehle Login Karein!"); return window.registerUser(); }
-        if(window.cart.length === 0) return alert("Cart khali hai!");
+   window.checkout = function() {
+    // Firebase se logged-in user ka data uthao
+    const user = firebase.auth().currentUser;
+    if(!user) { 
+        alert("Pehle Login Karein!"); 
+        return window.registerUser(); 
+    }
 
-        const btn = document.getElementById('orderNowBtn');
-        btn.innerText = "Processing... ⏳"; btn.disabled = true;
+    const uName = localStorage.getItem('userName');
+    const uPhone = localStorage.getItem('userPhone');
 
-        fetch(bridgeUrl)
-        .then(res => res.text())
-        .then(currentCount => {
-            let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
-            let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+    if(window.cart.length === 0) return alert("Cart khali hai!");
 
-            fetch(bridgeUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ token: nextToken, name: uName,phone: localStorage.getItem('userPhone'), items: itemsStr, total: total, status: "Pending" })
-            });
+    const btn = document.getElementById('orderNowBtn');
+    btn.innerText = "Booking... 👑"; 
+    btn.disabled = true;
 
-            localStorage.setItem('lastTokenNo', nextToken);
+    // Token aur Order details bhejo
+    fetch(bridgeUrl)
+    .then(res => res.text())
+    .then(currentCount => {
+        let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
+        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+        let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+
+        // Google Sheet mein entry (Awaiting Payment status ke sath)
+        fetch(bridgeUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ 
+                token: nextToken, 
+                name: uName, 
+                phone: uPhone, 
+                items: itemsStr, 
+                total: total, 
+                status: "Awaiting Payment" 
+            })
+        });
+
+        localStorage.setItem('lastTokenNo', nextToken);
+        
+        // Order hote hi seedha Dashboard (Tracker) par bhej do!
+        alert("Order Placed! Please pay and track your order.");
+        showTab('dashboard');
+           
             startCancelTimer(300, true);
             
             let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
