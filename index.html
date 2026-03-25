@@ -384,9 +384,9 @@
             localStorage.setItem('lastTokenNo', nextToken);
             alert("Order Placed! Token #" + nextToken);
             
-            // WhatsApp notification
-            let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
-            window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
+           // WhatsApp notification (Is line ko replace karein)
+let waMsg = `*ROYAL STREET KITCHEN* 👑%0A*Token:* ${encodeURIComponent(nextToken)}%0A*Order:* ${encodeURIComponent(itemsStr)}%0A*Total: ₹${total}*`;
+window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
 
             window.cart = []; 
             updateCartUI();
