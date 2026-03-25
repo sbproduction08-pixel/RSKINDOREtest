@@ -494,7 +494,6 @@ window.generateRoyalBill = async function(orderData) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
 
-    // Image fetcher with safety check
     const fetchImg = async (url) => {
         try {
             const res = await fetch(url);
@@ -508,26 +507,70 @@ window.generateRoyalBill = async function(orderData) {
         } catch(e) { return null; }
     };
 
-    // YAHAN FILE NAME BILKUL SAHI HONA CHAIYE
     const logoData = await fetchImg('MAIN_LOGO.jpeg'); 
 
-    doc.setDrawColor(184, 134, 11); doc.line(10, 10, 200, 10);
-    if (logoData) { doc.addImage(logoData, 'JPEG', 15, 15, 25, 25); }
+    // Header Design
+    doc.setDrawColor(184, 134, 11);
+    doc.setLineWidth(1);
+    doc.line(10, 10, 200, 10);
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-    doc.text("ROYAL STREET KITCHEN", 45, 25);
-    doc.setFontSize(9); doc.setFont("helvetica", "normal");
-    doc.text("GSTIN: 06IDLPK8248E1Z6 | Mahalaxmi Nagar, Indore", 45, 31);
+    if (logoData) {
+        doc.addImage(logoData, 'JPEG', 15, 15, 25, 25);
+    }
 
+    // Business Info (As per your PDF)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(30, 30, 30);
+    doc.text("ROYAL STREET KITCHEN", 45, 22);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    doc.text("Township, opp. Elite Apex, nearby Bun Tea,", 45, 28);
+    doc.text("Mahalaxmi Nagar, Indore, MP 452010", 45, 32);
+    doc.text("GSTIN: 06IDLPK8248E1Z6", 45, 36);
+
+    // Status Logic (Cancel hai toh red mein dikhayega)
+    let displayStatus = orderData.status === "Done" ? "PAID & DELIVERED" : orderData.status.toUpperCase();
+    if (orderData.status.toLowerCase().includes("cancel")) {
+        doc.setTextColor(200, 0, 0); 
+    } else {
+        doc.setTextColor(0, 100, 0);
+    }
+
+    // Invoice Meta Table
     doc.autoTable({
         startY: 45,
-        head: [['Description', 'Qty', 'Total (INR)']],
-        body: [[orderData.items, "1", "Rs. " + orderData.total]],
-        theme: 'grid',
-        headStyles: { fillColor: [184, 134, 11] }
+        body: [
+            ['Order Token:', `#${orderData.token}`, 'Date:', new Date(orderData.date).toLocaleDateString()],
+            ['Customer:', orderData.name.toUpperCase(), 'Status:', displayStatus]
+        ],
+        theme: 'plain',
+        styles: { fontSize: 10, cellPadding: 1 }
     });
 
-    doc.save(`RSK_Bill_${orderData.token}.pdf`);
+    // Items Table (Exactly like your PDF)
+    doc.autoTable({
+        startY: 62,
+        head: [['S.No', 'Description', 'Qty', 'Amount (INR)']],
+        body: [[1, orderData.items, "1", "Rs. " + orderData.total]],
+        theme: 'grid',
+        headStyles: { fillColor: [184, 134, 11], textColor: [255, 255, 255] },
+        styles: { fontSize: 11, cellPadding: 5 }
+    });
+
+    let finalY = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(16);
+    doc.setTextColor(184, 134, 11);
+    doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 195, finalY, { align: "right" });
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(120, 120, 120);
+    doc.text("Thank you for dining Royally! Visit Again.", 105, finalY + 30, { align: "center" });
+
+    doc.save(`RSK_Invoice_${orderData.token}.pdf`);
 };
     // --- ADMIN ---
     let logoClicks = 0; let clickTimer;
