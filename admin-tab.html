@@ -46,31 +46,48 @@
 <script>
     const adminBridge = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
     const bell = document.getElementById('kitchenBell');
+    let lastOrderCount = 0; // New order check karne ke liye
 
+    // --- 1. DATA REFRESH ENGINE ---
     function refreshAdminData() {
         fetch(adminBridge + "?action=readAdmin")
             .then(res => res.json())
             .then(data => {
+                // Sound Alert Logic: Agar naya order aaya toh ghanti bajao
+                if (lastOrderCount !== 0 && data.length > lastOrderCount) {
+                    if(bell) {
+                        bell.play().catch(e => console.log("Bell sound blocked by browser"));
+                        setTimeout(() => { bell.pause(); bell.currentTime = 0; }, 3000);
+                    }
+                }
+                lastOrderCount = data.length;
                 renderOrders(data);
             })
             .catch(err => {
-                console.error("Admin Fetch Error:", err);
-                document.getElementById('admin-orders-list').innerHTML = "<div style='color:red; text-align:center;'>Fetch Error!</div>";
+                console.error("Fetch Error:", err);
+                document.getElementById('admin-orders-list').innerHTML = "<div style='color:red; text-align:center;'>Network Error!</div>";
             });
     }
 
+    // --- 2. ORDER RENDERER (The Heart of Admin) ---
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
-        let html = ""; let totalSale = 0; let todayCount = 0;
+        let html = ""; 
+        let totalSale = 0; 
+        let todayCount = 0;
         const todayStr = new Date().toDateString();
 
+        // Latest orders ko upar dikhane ke liye reverse loop
         [...orders].reverse().forEach(order => {
             const dateObj = new Date(order.date);
             const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
+            // Today's Stats Calculation
             if(dateObj.toDateString() === todayStr) {
                 todayCount++;
-                if(order.status === "Done") totalSale += parseFloat(order.total || 0);
+                if(order.status === "Done") {
+                    totalSale += parseFloat(order.total || 0);
+                }
             }
 
             let status = (order.status || "").trim();
@@ -78,52 +95,63 @@
             let actionBtn = "";
             let cancelBtn = "";
 
-            // --- STATUS & BUTTON LOGIC ---
+            // --- STATUS & ACTION LOGIC (Detailed) ---
             if (status === "Awaiting Payment" || status === "Pending") {
                 statusClass = "status-pending";
                 actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" style="background:#3498db; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">PAID (REC) ✅</button>`;
-            } else if (status === "Received") {
+            } 
+            else if (status === "Received") {
                 statusClass = "status-received";
                 actionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" style="background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">PREPARE 👨‍🍳</button>`;
-            } else if (status === "Preparing") {
+            } 
+            else if (status === "Preparing") {
                 statusClass = "status-preparing";
                 actionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" style="background:#f1c40f; color:black; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">READY 🔔</button>`;
-            } else if (status === "Ready") {
+            } 
+            else if (status === "Ready") {
                 statusClass = "status-ready";
                 actionBtn = `<button onclick="verifyOTP('${order.token}')" style="background:#25D366; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">DELIVER 🎁</button>`;
-            } else if (status === "Done") {
+            } 
+            else if (status === "Done") {
                 statusClass = "status-done";
-            } else if (status.toLowerCase().includes("cancel")) {
+            } 
+            else if (status.toLowerCase().includes("cancel")) {
                 statusClass = "status-cancelled";
             }
 
+            // Cancel Button Logic (Sirf active orders ke liye)
             if (status !== "Done" && !status.toLowerCase().includes("cancel")) {
                 cancelBtn = `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:10px; border-radius:8px; font-weight:bold; width:80px; font-size:10px;">CANCEL</button>`;
             }
 
-            // 🔥 FEATURE: ADMIN BILL & SHARE GROUP
+            // 🔥 ACTION GROUP: BILL & SHARE
             let billActionGroup = `
-                <div style="display:flex; gap:5px; margin-top:8px;">
-                    <button onclick='downloadAdminBillByData(${JSON.stringify(order)})' style="background:#d4af37; color:black; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; font-size:10px; font-weight:bold;">📥 BILL</button>
-                    <button onclick='shareBillOnWAByData(${JSON.stringify(order)})' style="background:#25D366; color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; font-size:10px; font-weight:bold;">💬 SHARE</button>
+                <div style="display:flex; gap:8px; margin-top:10px; border-top:1px solid rgba(212,175,55,0.1); padding-top:10px;">
+                    <button onclick='downloadAdminBillByData(${JSON.stringify(order)})' style="background:#d4af37; color:black; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold; display:flex; align-items:center; gap:5px;">📥 BILL</button>
+                    <button onclick='shareBillOnWAByData(${JSON.stringify(order)})' style="background:#25D366; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold; display:flex; align-items:center; gap:5px;">💬 SHARE</button>
                 </div>
             `;
 
+            // Final Card HTML
             html += `
                 <div class="order-card" style="border-left: 5px solid ${getStatusColor(status)};">
                     <span class="status-badge ${statusClass}">${status}</span>
-                    <div style="color: var(--gold); font-size: 11px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <div style="color: var(--gold); font-size: 11px; font-weight:bold; letter-spacing:1px;">ORDER TOKEN #${order.token}</div>
                     <span class="cust-info">${order.name}</span>
                     <span class="cust-phone">📱 ${order.phone}</span>
-                    <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin:10px 0; font-size:13px;">${order.items}</div>
+                    
+                    <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:10px; margin:12px 0; font-size:14px; border:1px solid rgba(255,255,255,0.05);">
+                        <div style="color:#aaa; font-size:10px; margin-bottom:5px; text-transform:uppercase;">Items Ordered:</div>
+                        ${order.items}
+                    </div>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                         <div style="flex:1;">
-                            <span style="font-weight:bold; color:var(--gold); font-size:20px;">₹${order.total}</span>
-                            <div class="order-time">🕒 ${timeStr}</div>
+                            <span style="font-weight:bold; color:var(--gold); font-size:22px;">₹${order.total}</span>
+                            <div class="order-time">🕒 Received at: ${timeStr}</div>
                             ${billActionGroup}
                         </div>
-                        <div style="display:flex; gap:8px; flex:2; justify-content:flex-end;">
+                        <div style="display:flex; gap:10px; flex:2; justify-content:flex-end;">
                             ${cancelBtn}
                             ${actionBtn}
                         </div>
@@ -132,52 +160,66 @@
             `;
         });
         
-        list.innerHTML = html || "<div style='text-align:center; padding:40px;'>Aaj koi order nahi hai.</div>";
+        list.innerHTML = html || "<div style='text-align:center; padding:40px; opacity:0.5;'>Aaj koi royal order nahi mila hai.</div>";
         document.getElementById('admin-total-orders').innerText = todayCount;
         document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
     }
 
+    // --- 3. HELPER FUNCTIONS ---
     function getStatusColor(s) {
-        if(s === "Done") return "#25D366";
-        if(s.includes("Cancel")) return "#ff4444";
-        if(s === "Ready") return "#f1c40f";
+        const status = s.toLowerCase();
+        if(status === "done") return "#25D366";
+        if(status.includes("cancel")) return "#ff4444";
+        if(status === "ready") return "#f1c40f";
+        if(status === "preparing") return "#e67e22";
+        if(status === "received") return "#3498db";
         return "#D4AF37";
     }
 
-    // --- NEW ADMIN FUNCTIONS ---
     window.downloadAdminBillByData = function(order) {
         if(typeof generateRoyalBill === 'function') {
             generateRoyalBill(order);
         } else {
-            alert("PDF Engine Load nahi hua. Page refresh karein.");
+            alert("Error: PDF Engine not found in index.html. Refresh the page.");
         }
     };
 
-   window.shareBillOnWAByData = function(order) {
-    const billLink = `https://sbproduction08-pixel.github.io/RSKINDOREtest/`; // Aapki website ka link
-    
-    const message = `*ROYAL STREET KITCHEN* 👑%0A---------------------------%0A*OFFICIAL DIGITAL RECEIPT*%0A%0A*Token:* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A---------------------------%0A📥 *Apna PDF Bill niche diye gaye link se download karein:*%0A${billLink}%0A%0A*Taste the Royalty! Visit Again.*`;
-    
-    window.open(`https://wa.me/91${order.phone}?text=${message}`, '_blank');
-};
+    window.shareBillOnWAByData = function(order) {
+        const msg = `*ROYAL STREET KITCHEN* 👑%0A---------------------------%0A*OFFICIAL DIGITAL RECEIPT*%0A*Token:* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A---------------------------%0AAapka bill taiyar hai. Visit Again!`;
+        window.open(`https://wa.me/91${order.phone}?text=${msg}`, '_blank');
+    };
 
     window.verifyOTP = function(token) {
-        let otp = prompt("Customer se OTP puchiye:");
+        let otp = prompt("Customer se Dashboard wala OTP puchiye:");
         if(!otp) return;
         updateStatus(token, 'Done', null, otp);
     };
 
     window.updateStatus = function(token, status, btn, otp = "") {
-        if(btn) { btn.innerText = "⏳..."; btn.disabled = true; }
+        if(btn) { 
+            btn.innerHTML = "⏳ Updating..."; 
+            btn.disabled = true; 
+        }
+
+        const payload = { token: token, status: status, otp: otp };
+
         fetch(adminBridge, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({ token: token, status: status, otp: otp })
+            body: JSON.stringify(payload)
         })
-        .then(() => { setTimeout(refreshAdminData, 1000); })
-        .catch(err => { alert("Update Failed!"); if(btn) btn.disabled = false; });
-    };
+        .then(() => {
+            console.log(`Status updated: ${status}`);
+            setTimeout(refreshAdminData, 1500);
+        })
+        .catch(err => {
+            alert("Technical Error! Check Internet.");
+            if(btn) btn.disabled = false;
+        });
+    }
 
-    setInterval(refreshAdminData, 30000);
+    // --- 4. ENGINE CONTROLS ---
+    setInterval(refreshAdminData, 20000); // Har 20 seconds mein naya order check karega
     refreshAdminData();
+
 </script>
