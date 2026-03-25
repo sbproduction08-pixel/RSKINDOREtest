@@ -495,7 +495,9 @@
         if (logoClicks === 3) {
             logoClicks = 0;
             let pass = prompt("🔐 Enter Royal Admin Key:");
-            if (pass === "RSK@2026") { showTab('admin'); }
+           if (pass === "RSK@2026") { 
+    localStorage.setItem('isAdminLoggedIn', 'true'); // Ye line zaroori hai
+    showTab('admin');
         }
     };
 
