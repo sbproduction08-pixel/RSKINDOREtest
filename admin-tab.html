@@ -153,10 +153,13 @@
         }
     };
 
-    window.shareBillOnWAByData = function(order) {
-        const msg = `*ROYAL STREET KITCHEN*%0A---------------------------%0A*INVOICE* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A---------------------------%0AAapka digital bill taiyar hai. Visit again! 👑`;
-        window.open(`https://wa.me/91${order.phone}?text=${msg}`, '_blank');
-    };
+   window.shareBillOnWAByData = function(order) {
+    const billLink = `https://sbproduction08-pixel.github.io/RSKINDOREtest/`; // Aapki website ka link
+    
+    const message = `*ROYAL STREET KITCHEN* 👑%0A---------------------------%0A*OFFICIAL DIGITAL RECEIPT*%0A%0A*Token:* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A---------------------------%0A📥 *Apna PDF Bill niche diye gaye link se download karein:*%0A${billLink}%0A%0A*Taste the Royalty! Visit Again.*`;
+    
+    window.open(`https://wa.me/91${order.phone}?text=${message}`, '_blank');
+};
 
     window.verifyOTP = function(token) {
         let otp = prompt("Customer se OTP puchiye:");
