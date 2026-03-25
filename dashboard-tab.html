@@ -37,18 +37,22 @@
 </div>
 
 <script>
-    // Ye functions index.html ke global scope se call honge
     function initDashboard() {
         const userName = localStorage.getItem('userName');
         const userPhone = localStorage.getItem('userPhone');
 
         if (userName) {
             document.getElementById('welcome-name').innerText = "Namaste, " + userName.split(' ')[0] + "!";
-            document.getElementById('user-phone-disp').innerText = "📱 " + userPhone;
+            document.getElementById('user-phone-disp').innerText = "📱 " + (userPhone || "Number missing");
             
-            if (!userPhone || userPhone === "null") {
+            // Agar phone number nahi hai toh profile setup dikhao
+            if (!userPhone || userPhone === "null" || userPhone === "") {
                 document.getElementById('profile-setup').style.display = 'block';
+                document.getElementById('live-tracker').style.display = 'none';
+                document.getElementById('no-order').style.display = 'none';
             } else {
+                // Agar phone number hai toh tracking shuru karo
+                document.getElementById('profile-setup').style.display = 'none';
                 document.getElementById('live-tracker').style.display = 'block';
                 startTracking();
             }
@@ -56,54 +60,56 @@
     }
 
     function startTracking() {
-    const phone = localStorage.getItem('userPhone');
-    // GAS URL bina kisi 'callback' parameter ke
-    const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
+        const phone = localStorage.getItem('userPhone');
+        // GAS URL - Isme callback ki zaroorat nahi hai kyunki Admin wala setup use ho raha hai
+        const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
 
-    fetch(gasUrl)
-        .then(res => res.json()) // 🔥 Ab ye seedha JSON read karega
-        .then(data => {
-            console.log("Data Received:", data);
-            
-            // Latest order dhundo
-            const myOrder = data.reverse().find(o => o.phone == phone && o.status !== 'Done');
-            
-            if (myOrder) {
-                document.getElementById('order-status').innerText = myOrder.status.toUpperCase();
-                document.getElementById('order-otp').innerText = myOrder.otp || "WAIT";
+        fetch(gasUrl)
+            .then(res => res.json()) 
+            .then(data => {
+                console.log("Dashboard Data:", data);
                 
-                // Agla update 15 second mein
-                setTimeout(startTracking, 15000);
-            } else {
-                document.getElementById('order-status').innerText = "NO ACTIVE ORDER";
-            }
-        })
-        .catch(err => {
-            console.log("Tracking Error:", err);
-            // Agar JSON error aaye toh 5 sec baad phir koshish karo
-            setTimeout(startTracking, 5000);
-        });
-}
+                // Latest order dhundo jo 'Done' na ho
+                const myOrder = data.reverse().find(o => o.phone == phone && o.status !== 'Done');
+                
+                if (myOrder) {
+                    document.getElementById('live-tracker').style.display = 'block';
+                    document.getElementById('no-order').style.display = 'none';
+                    document.getElementById('order-status').innerText = myOrder.status.toUpperCase();
+                    document.getElementById('order-otp').innerText = myOrder.otp || "WAIT";
+                    
+                    // Status ke hisaab se automatic color badlega (Optional addition)
+                    if(myOrder.status === "Ready") {
+                        document.getElementById('order-status').style.color = "#25D366";
+                    }
+                    
+                    // Agla update 15 second mein
+                    setTimeout(startTracking, 15000);
                 } else {
+                    // Agar koi active order nahi hai
                     document.getElementById('live-tracker').style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
                 }
             })
-            .catch(err => console.log("Tracking Error:", err));
+            .catch(err => {
+                console.log("Tracking Error:", err);
+                setTimeout(startTracking, 10000); // Error aane par 10 sec baad koshish
+            });
     }
 
-    // Profile save karne ka function (Firebase logic ke liye index.html ko call karega)
     window.saveRoyalProfile = function() {
         const p = document.getElementById('new-phone').value;
         const pr = document.getElementById('new-pref').value;
+        
         if(p.length < 10) return alert("Sahi number daalein!");
         
-        // Local save and reload
         localStorage.setItem('userPhone', p);
-        alert("Profile Updated!");
+        if(pr) localStorage.setItem('userPreference', pr);
+        
+        alert("Royal Profile Updated! 👑");
         location.reload(); 
     };
 
-    // Dashboard initialize karo
+    // Dashboard ko ON karo
     initDashboard();
 </script>
