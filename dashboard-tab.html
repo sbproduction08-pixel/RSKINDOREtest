@@ -117,7 +117,7 @@ function startTracking() {
                 document.getElementById('order-status').innerText = liveOrder.status.toUpperCase();
                 document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
 
-                // 🔥 TIMER FORCE HIDE LOGIC 🔥
+                // 🔥 TIMER HIDE LOGIC (FORCE)
                 const statusCheck = liveOrder.status.toLowerCase();
                 if (statusCheck !== "awaiting payment" && statusCheck !== "pending") {
                     // Interval band karo
@@ -125,15 +125,12 @@ function startTracking() {
                         clearInterval(window.cancelTimerInterval);
                         window.cancelTimerInterval = null;
                     }
-                    // Storage saaf karo
                     localStorage.removeItem('timerStartTime');
-                    localStorage.removeItem('lastTokenNo');
                     
-                    // UI se Force Hide (ID pakka 'cancel-timer-display' honi chahiye)
+                    // Sabse important: HTML mein ID 'cancel-timer-display' honi chahiye
                     const timerDiv = document.getElementById('cancel-timer-display');
                     if (timerDiv) {
                         timerDiv.style.display = 'none';
-                        console.log("Timer Hidden by Status Update");
                     }
                 }
             } else {
@@ -141,9 +138,7 @@ function startTracking() {
                 document.getElementById('no-order').style.display = 'block';
             }
 
-            // History render karo
             renderHistory(allMyOrders);
-
             setTimeout(startTracking, 15000);
         })
         .catch(err => console.log("Tracking Error:", err));
@@ -152,38 +147,42 @@ function startTracking() {
 function renderHistory(orders) {
     const historyList = document.getElementById('history-list');
     let html = "";
+    
+    // Sirf Done/Cancelled orders filter karo
+    const historyItems = orders.filter(o => o.status.toLowerCase().includes('done') || o.status.toLowerCase().includes('cancel'));
 
-    orders.forEach((order, index) => {
-        const lowStatus = order.status.toLowerCase();
-        if (lowStatus.includes('done') || lowStatus.includes('cancel')) {
-            const isCancelled = lowStatus.includes('cancel');
-            
-            // 🔥 BILL BUTTON FIX: Stringify ki jagah index use kar rahe hain taaki error na aaye
-            html += `
-                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 10px; color: #888;">TOKEN #${order.token}</div>
-                            <div style="font-size: 12px; color: #fff;">${order.items}</div>
-                            <div style="font-size: 10px; font-weight: bold; color: ${isCancelled ? '#ff4444' : '#25D366'}">${order.status.toUpperCase()}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
-                            ${!isCancelled ? `<button id="btn-bill-${index}" style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
-                        </div>
+    historyItems.forEach((order, index) => {
+        const isCancelled = order.status.toLowerCase().includes('cancel');
+        
+        // Button ko ek unique ID de rahe hain: 'hist-bill-0', 'hist-bill-1'...
+        html += `
+            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 10px; color: #888;">TOKEN #${order.token}</div>
+                        <div style="font-size: 12px; color: #fff; margin: 3px 0;">${order.items}</div>
+                        <div style="font-size: 10px; font-weight: bold; color: ${isCancelled ? '#ff4444' : '#25D366'}">${order.status.toUpperCase()}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
+                        ${!isCancelled ? `<button id="hist-bill-${index}" style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
                     </div>
                 </div>
-            `;
-        }
+            </div>
+        `;
     });
 
-    historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5;'>No past orders.</p>";
+    historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
 
-    // 🔥 Dynamic Event Listener (Taaki button click 100% kaam kare)
-    orders.forEach((order, index) => {
-        const btn = document.getElementById(`btn-bill-${index}`);
+    // 🔥 BUTTON CLICK HANDLER (Directly binding data)
+    historyItems.forEach((order, index) => {
+        const btn = document.getElementById(`hist-bill-${index}`);
         if (btn) {
-            btn.onclick = () => window.generateRoyalBill(order);
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log("Downloading bill for token:", order.token);
+                window.generateRoyalBill(order);
+            });
         }
     });
 }
