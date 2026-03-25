@@ -266,8 +266,7 @@
         V 2.0 • ROYAL STREET KITCHEN
     </div>
 </div>    
-    
-<script>
+    <script>
     window.cart = JSON.parse(localStorage.getItem('userCart')) || []; 
     let cancelInterval;
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
@@ -300,13 +299,13 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-   function updateUserUI() {
-    const userName = localStorage.getItem('userName');
-    document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
-    document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
-    document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
-    document.getElementById('trackBtn').style.display = userName ? 'inline-block' : 'none';
-}
+    function updateUserUI() {
+        const userName = localStorage.getItem('userName');
+        document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
+        document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
+        document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
+        document.getElementById('trackBtn').style.display = userName ? 'inline-block' : 'none';
+    }
 
     // --- TIMER LOGIC ---
     function startCancelTimer(duration, isNew = false) {
@@ -346,109 +345,81 @@
         }, 1000);
     }
 
-    // --- ORDER & CANCEL ---
-   window.checkout = async function() {
-    // 1. Check Login
-    const user = window.auth ? window.auth.currentUser : null;
-    
-    if(!user) { 
-        alert("Pehle Login Karein!"); 
-        return window.registerUser(); 
-    }
+    // --- ORDER & CHECKOUT (FIXED BRACKETS) ---
+    window.checkout = async function() {
+        const user = window.auth ? window.auth.currentUser : null;
+        if(!user) { alert("Pehle Login Karein!"); return window.registerUser(); }
 
-    // 2. Get User Data from LocalStorage
-    const uName = localStorage.getItem('userName') || user.displayName;
-    const uPhone = localStorage.getItem('userPhone');
+        const uName = localStorage.getItem('userName') || user.displayName;
+        const uPhone = localStorage.getItem('userPhone');
 
-    if(!uPhone || uPhone === "null") {
-        alert("Profile incomplete! Please update your mobile number in Dashboard.");
-        return showTab('dashboard');
-    }
+        if(!uPhone || uPhone === "null") {
+            alert("Profile incomplete! Dashboard mein number update karein.");
+            return showTab('dashboard');
+        }
 
-    if(!window.cart || window.cart.length === 0) return alert("Cart khali hai!");
+        if(!window.cart || window.cart.length === 0) return alert("Cart khali hai!");
 
-    const btn = document.getElementById('orderNowBtn');
-    btn.innerText = "Booking... 👑"; 
-    btn.disabled = true;
+        const btn = document.getElementById('orderNowBtn');
+        btn.innerText = "Booking... 👑"; 
+        btn.disabled = true;
 
-   try {
-    // --- 3. Get Next Token (Updated for Monthly Reset) ---
-    const tokenRes = await fetch(bridgeUrl);
-    const nextToken = await tokenRes.text(); 
-    
-    // Yahan humne parseInt hata diya hai, ab NaN ka khatra khatam!
-    console.log("Next Royal Token:", nextToken);
-    
-    let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-    let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+        try {
+            const tokenRes = await fetch(bridgeUrl);
+            const nextToken = await tokenRes.text(); 
+            
+            let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
 
-    // 4. 🔥 SEND DATA TO GOOGLE SHEET
-    // Token ko encodeURIComponent mein lapetna zaroori hai kyunki usme '-' hai
-    const finalUrl = bridgeUrl + 
-        "?token=" + encodeURIComponent(nextToken) + 
-        "&name=" + encodeURIComponent(uName) + 
-        "&phone=" + encodeURIComponent(uPhone) + 
-        "&items=" + encodeURIComponent(itemsStr) + 
-        "&total=" + total + 
-        "&status=Awaiting%20Payment";
+            const finalUrl = bridgeUrl + 
+                "?token=" + encodeURIComponent(nextToken) + 
+                "&name=" + encodeURIComponent(uName) + 
+                "&phone=" + encodeURIComponent(uPhone) + 
+                "&items=" + encodeURIComponent(itemsStr) + 
+                "&total=" + total + 
+                "&status=Awaiting%20Payment";
 
-    await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
+            await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
 
-    // 5. Success Logic
-    localStorage.setItem('lastTokenNo', nextToken);
-    
-    // Sweet Alert ya Alert
-    alert("Order Placed! Token #" + nextToken);
-    
-    showTab('dashboard'); 
-    
-    // Timer check karein (agar dashboard mein timer setup hai)
-    if (typeof startCancelTimer === 'function') {
-        startCancelTimer(300, true);
-    }
+            localStorage.setItem('lastTokenNo', nextToken);
+            alert("Order Placed! Token #" + nextToken);
+            
+            // WhatsApp notification
+            let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
+            window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
 
-} catch (err) {
-    console.error("Order Error:", err);
-    alert("Technical Error! Sheet update nahi hui.");
-}
-        
-        // WhatsApp notification
-        let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
-        window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
+            window.cart = []; 
+            updateCartUI();
+            showTab('dashboard'); 
+            startCancelTimer(300, true);
 
-        window.cart = []; 
-        updateCartUI();
-        
-    } catch (err) {
-        console.error("Order Error:", err);
-        alert("Technical Error! Sheet update nahi hui.");
-    } finally {
-        btn.innerText = "Order Now"; 
-        btn.disabled = false;
-    }
-};
+        } catch (err) {
+            console.error("Order Error:", err);
+            alert("Technical Error! Sheet update nahi hui.");
+        } finally {
+            btn.innerText = "Order Now"; 
+            btn.disabled = false;
+        }
+    };
 
     window.cancelOrder = function() {
         const token = localStorage.getItem('lastTokenNo');
         const name = localStorage.getItem('userName');
-        if(!token || !name) return alert("Order details missing!");
+        if(!token || !name) return alert("Details missing!");
         
         if(confirm("Order cancel karein?")) {
-        // Data ko URL format mein taiyar karna
-        const formData = new URLSearchParams();
-        formData.append('token', token);
-        formData.append('name', name);
-        formData.append('status', 'Cancelled By User');
+            const formData = new URLSearchParams();
+            formData.append('token', token);
+            formData.append('name', name);
+            formData.append('status', 'Cancelled By User');
 
-        fetch(bridgeUrl, {
-            method: 'POST',
-            mode: 'no-cors', 
-            body: formData.toString(), // JSON ki jagah string bhej rahe hain
-            headers: { "Content-Type": "application/x-www-form-urlencoded" }
-        });
+            fetch(bridgeUrl, {
+                method: 'POST',
+                mode: 'no-cors', 
+                body: formData.toString(),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            });
 
-            // WhatsApp aur UI logic
-        let cancelMsg = `*CANCELLED*%0A*Token:* ${token}`;
             window.open(`https://wa.me/917489999890?text=*CANCELLED*%0A*Token:* ${token}`, '_blank');
             clearInterval(cancelInterval);
             document.getElementById('cancel-bar').style.display = 'none';
@@ -483,99 +454,86 @@
     };
 
     function updateCartUI() {
-    const bar = document.getElementById('floatingCheckout');
-    const listDisp = document.getElementById('cart-items-list');
-    const totalDisp = document.getElementById('cart-total-display');
-    const socialBar = document.getElementById('royal-social-float');
-    
-    let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    
-    if (window.cart.length > 0) {
-        bar.style.display = 'flex'; 
-        totalDisp.innerText = total;
-        listDisp.innerHTML = window.cart.map(item => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${item.name} x${item.qty}</span><button onclick="window.removeFromCart('${item.name}')">-</button></div>`).join('');
+        const bar = document.getElementById('floatingCheckout');
+        const listDisp = document.getElementById('cart-items-list');
+        const totalDisp = document.getElementById('cart-total-display');
+        const socialBar = document.getElementById('royal-social-float');
         
-        if(socialBar) socialBar.style.display = 'none';
-    } else {
-        bar.style.display = 'none';
-        if(socialBar) socialBar.style.display = 'flex';
+        let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        
+        if (window.cart.length > 0) {
+            bar.style.display = 'flex'; 
+            totalDisp.innerText = total;
+            listDisp.innerHTML = window.cart.map(item => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${item.name} x${item.qty}</span><button onclick="window.removeFromCart('${item.name}')">-</button></div>`).join('');
+            if(socialBar) socialBar.style.display = 'none';
+        } else {
+            bar.style.display = 'none';
+            if(socialBar) socialBar.style.display = 'flex';
+        }
+        localStorage.setItem('userCart', JSON.stringify(window.cart));
     }
-    // Cart ko memory mein save karne ke liye:
-    localStorage.setItem('userCart', JSON.stringify(window.cart));
-}
-     // index.html ke script section mein daalna
-window.generateRoyalBill = async function(orderData) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
 
-    const fetchImg = async (url) => {
-        try {
-            const res = await fetch(url + '?v=' + Date.now()); 
-            if (!res.ok) return null;
-            const blob = await res.blob();
-            return new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-        } catch(e) { return null; }
+    // --- BILL GENERATOR ---
+    window.generateRoyalBill = async function(orderData) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        const fetchImg = async (url) => {
+            try {
+                const res = await fetch(url + '?v=' + Date.now()); 
+                if (!res.ok) return null;
+                const blob = await res.blob();
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            } catch(e) { return null; }
+        };
+
+        const logoData = await fetchImg('MAIN_LOGO.jpeg'); 
+        const bannerData = await fetchImg('royalstreetkitchen.png'); 
+
+        doc.setDrawColor(184, 134, 11); doc.setLineWidth(1);
+        doc.line(10, 10, 200, 10);
+
+        if (logoData) { doc.addImage(logoData, 'JPEG', 15, 15, 25, 25); }
+
+        doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+        doc.text("ROYAL STREET KITCHEN", 45, 22);
+        doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+        doc.text("Township, opp. Elite Apex, nearby Bun Tea,", 45, 28);
+        doc.text("Mahalaxmi Nagar, Indore, MP 452010 | GSTIN: 06IDLPK8248E1Z6", 45, 33);
+
+        let status = (orderData.status || "Pending").toUpperCase();
+        doc.setTextColor(status.includes("CANCEL") ? 200 : 0, status.includes("CANCEL") ? 0 : 100, 0);
+        
+        doc.autoTable({
+            startY: 45,
+            body: [
+                ['Order Token:', `#${orderData.token}`, 'Date:', new Date(orderData.date || Date.now()).toLocaleDateString()],
+                ['Customer:', (orderData.name || "GUEST").toUpperCase(), 'Status:', status]
+            ],
+            theme: 'plain',
+            styles: { fontSize: 10, cellPadding: 1 }
+        });
+
+        doc.autoTable({
+            startY: 62,
+            head: [['S.No', 'Description', 'Qty', 'Amount (INR)']],
+            body: [[1, orderData.items, "1", "Rs. " + orderData.total]],
+            theme: 'grid',
+            headStyles: { fillColor: [184, 134, 11] }
+        });
+
+        let finalY = doc.lastAutoTable.finalY + 15;
+        doc.setFontSize(16); doc.setTextColor(184, 134, 11);
+        doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 195, finalY, { align: "right" });
+
+        if (bannerData) { doc.addImage(bannerData, 'PNG', 55, finalY + 15, 100, 20); }
+        doc.save(`RSK_Invoice_${orderData.token}.pdf`);
     };
 
-    // --- 🖼️ Dono Images Fetch Karo ---
-    const logoData = await fetchImg('MAIN_LOGO.jpeg'); 
-    const bannerData = await fetchImg('royalstreetkitchen.png'); 
-
-    // Header Border
-    doc.setDrawColor(184, 134, 11); doc.setLineWidth(1);
-    doc.line(10, 10, 200, 10);
-
-    // 1. Logo Add Karo (Left Top)
-    if (logoData) { doc.addImage(logoData, 'JPEG', 15, 15, 25, 25); }
-
-    // 2. Business Details
-    doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-    doc.text("ROYAL STREET KITCHEN", 45, 22);
-    doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
-    doc.text("Township, opp. Elite Apex, nearby Bun Tea,", 45, 28);
-    doc.text("Mahalaxmi Nagar, Indore, MP 452010 | GSTIN: 06IDLPK8248E1Z6", 45, 33);
-
-    // Status & Meta Table
-    let status = (orderData.status || "Pending").toUpperCase();
-    doc.setTextColor(status.includes("CANCEL") ? 200 : 0, status.includes("CANCEL") ? 0 : 100, 0);
-    
-    doc.autoTable({
-        startY: 45,
-        body: [
-            ['Order Token:', `#${orderData.token}`, 'Date:', new Date(orderData.date || Date.now()).toLocaleDateString()],
-            ['Customer:', (orderData.name || "GUEST").toUpperCase(), 'Status:', status]
-        ],
-        theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 1 }
-    });
-
-    // 3. Main Items Table
-    doc.autoTable({
-        startY: 62,
-        head: [['S.No', 'Description', 'Qty', 'Amount (INR)']],
-        body: [[1, orderData.items, "1", "Rs. " + orderData.total]],
-        theme: 'grid',
-        headStyles: { fillColor: [184, 134, 11] }
-    });
-
-    let finalY = doc.lastAutoTable.finalY + 15;
-    doc.setFontSize(16); doc.setTextColor(184, 134, 11);
-    doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 195, finalY, { align: "right" });
-
-    // --- 👑 4. BANNER WAPAS LAO (Niche Center mein) ---
-    if (bannerData) {
-        doc.addImage(bannerData, 'PNG', 55, finalY + 15, 100, 20); 
-    }
-
-    doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(120, 120, 120);
-    doc.text("Thank you for dining Royally! Visit Again.", 105, finalY + 45, { align: "center" });
-
-    doc.save(`RSK_Invoice_${orderData.token}.pdf`);
-};
     // --- ADMIN ---
     let logoClicks = 0; let clickTimer;
     window.handleAdminAccess = function() {
@@ -584,31 +542,25 @@ window.generateRoyalBill = async function(orderData) {
         if (logoClicks === 3) {
             logoClicks = 0;
             let pass = prompt("🔐 Enter Royal Admin Key:");
-           if (pass === "RSK@2026") { 
-    localStorage.setItem('isAdminLoggedIn', 'true'); // Ye line zaroori hai
-    showTab('admin');}
-     }
+            if (pass === "RSK@2026") { 
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                showTab('admin');
+            }
+        }
     };
 
     window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
 
-   // --- INITIAL LOAD ---
     window.onload = () => { 
-    // Check karein ki kya Admin logged in hai session mein
-    const adminStatus = localStorage.getItem('isAdminLoggedIn');
-    let tabToShow = localStorage.getItem('activeTab') || 'home';
-
-    if (adminStatus === 'true') {
-        tabToShow = 'admin'; // Agar admin tha, toh admin hi rahega
-    }
-    
-    showTab(tabToShow);
-    updateCartUI(); 
-    
-    if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
-        startCancelTimer(300, false);
-    }
-};
+        const adminStatus = localStorage.getItem('isAdminLoggedIn');
+        let tabToShow = localStorage.getItem('activeTab') || 'home';
+        if (adminStatus === 'true') { tabToShow = 'admin'; }
+        showTab(tabToShow);
+        updateCartUI(); 
+        if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
+            startCancelTimer(300, false);
+        }
+    };
 
     function toggleSideMenu() {
         const drawer = document.getElementById('side-drawer');
