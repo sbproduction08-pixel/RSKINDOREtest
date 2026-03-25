@@ -45,127 +45,132 @@
 
 <script>
     const adminBridge = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
-    let lastKnownToken = parseInt(localStorage.getItem('lastProcessedToken')) || 0;
     const bell = document.getElementById('kitchenBell');
 
+    // 🔥 FIX 1: Seedha JSON read karne ke liye naya Refresh function
     function refreshAdminData() {
-        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-        const script = document.createElement('script');
-        script.id = 'jsonp-temp-script';
-        window[callbackName] = function(data) {
-            renderOrders(data);
-            delete window[callbackName];
-            if(document.getElementById('jsonp-temp-script')) document.getElementById('jsonp-temp-script').remove();
-        };
-        script.src = adminBridge + "?action=readAdmin&callback=" + callbackName;
-        document.body.appendChild(script);
+        fetch(adminBridge + "?action=readAdmin")
+            .then(res => res.json()) // Ab seedha JSON read hoga
+            .then(data => {
+                renderOrders(data);
+            })
+            .catch(err => {
+                console.error("Admin Fetch Error:", err);
+                document.getElementById('admin-orders-list').innerHTML = "<div style='color:red; text-align:center;'>Fetch Error! Check Apps Script.</div>";
+            });
     }
 
     function renderOrders(orders) {
-    const list = document.getElementById('admin-orders-list');
-    let html = ""; let totalSale = 0; let todayCount = 0; let currentMaxToken = 0;
-    const todayStr = new Date().toDateString();
+        const list = document.getElementById('admin-orders-list');
+        let html = ""; let totalSale = 0; let todayCount = 0;
+        const todayStr = new Date().toDateString();
 
-    orders.reverse().forEach(order => {
-        const dateObj = new Date(order.date);
-        const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        if(dateObj.toDateString() === todayStr) {
-            todayCount++;
-            if(order.status === "Done") totalSale += parseFloat(order.total || 0);
-            if(parseInt(order.token) > currentMaxToken) currentMaxToken = parseInt(order.token);
-        }
+        // Orders ko reverse karke dikhao taaki naya upar aaye
+        [...orders].reverse().forEach(order => {
+            const dateObj = new Date(order.date);
+            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            if(dateObj.toDateString() === todayStr) {
+                todayCount++;
+                if(order.status === "Done") totalSale += parseFloat(order.total || 0);
+            }
 
-        let status = (order.status || "").trim();
-        let statusClass = "";
-        let actionBtn = "";
-        let cancelBtn = "";
+            let status = (order.status || "").trim();
+            let statusClass = "status-pending"; // Default
+            let actionBtn = "";
+            let cancelBtn = "";
 
-        // --- BUTTON & COLOR LOGIC ---
-        if (status === "Awaiting Payment" || status === "Pending") {
-            statusClass = "status-pending";
-            actionBtn = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Received')" style="background:#3498db; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">PAID (REC) ✅</button>`;
-        } else if (status === "Received") {
-            statusClass = "status-received";
-            actionBtn = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Preparing')" style="background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">PREPARE 👨‍🍳</button>`;
-        } else if (status === "Preparing") {
-            statusClass = "status-preparing";
-            actionBtn = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Ready')" style="background:#f1c40f; color:black; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">READY 🔔</button>`;
-        } else if (status === "Ready") {
-            statusClass = "status-ready";
-            actionBtn = `<button onclick="verifyOTP('${order.token}', '${order.name}')" style="background:#25D366; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">DELIVER 🎁</button>`;
-        } else if (status === "Done") {
-            statusClass = "status-done";
-        } else {
-            statusClass = "status-cancelled";
-        }
+            // --- STATUS & BUTTON LOGIC ---
+            if (status === "Awaiting Payment" || status === "Pending") {
+                statusClass = "status-pending";
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" style="background:#3498db; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">PAID (REC) ✅</button>`;
+            } else if (status === "Received") {
+                statusClass = "status-received";
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" style="background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">PREPARE 👨‍🍳</button>`;
+            } else if (status === "Preparing") {
+                statusClass = "status-preparing";
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" style="background:#f1c40f; color:black; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">READY 🔔</button>`;
+            } else if (status === "Ready") {
+                statusClass = "status-ready";
+                actionBtn = `<button onclick="verifyOTP('${order.token}')" style="background:#25D366; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; flex:1;">DELIVER 🎁</button>`;
+            } else if (status === "Done") {
+                statusClass = "status-done";
+            } else if (status.toLowerCase().includes("cancel")) {
+                statusClass = "status-cancelled";
+            }
 
-        // Cancel Button: Sirf 'Done' aur 'Cancelled' ko chhod kar sabme dikhega
-        if (status !== "Done" && !status.includes("Cancelled")) {
-            cancelBtn = `<button onclick="updateStatus('${order.token}', '${order.name}', 'Cancelled By Admin')" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:10px; border-radius:8px; font-weight:bold; width:80px;">CANCEL</button>`;
-        }
+            // 🔥 FIX 2: Cancel Button Logic (Sirf Done/Cancelled ko chhod kar sabme)
+            if (status !== "Done" && !status.toLowerCase().includes("cancel")) {
+                cancelBtn = `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:#3a0d0d; color:#ff4444; border:1px solid #ff4444; padding:10px; border-radius:8px; font-weight:bold; width:80px; font-size:10px;">CANCEL</button>`;
+            }
 
-        html += `
-            <div class="order-card">
-                <span class="status-badge ${statusClass}">${status}</span>
-                <div style="color: var(--gold); font-size: 11px; font-weight:bold;">TOKEN #${order.token}</div>
-                <span class="cust-info">${order.name}</span>
-                <span class="cust-phone">📱 ${order.phone}</span>
-                <div class="order-items" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin:10px 0;">${order.items}</div>
-                
-                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                    <div style="flex:1;">
-                        <span style="font-weight:bold; color:var(--gold); font-size:20px;">₹${order.total}</span>
-                        <div class="order-time">🕒 ${timeStr}</div>
-                    </div>
+            html += `
+                <div class="order-card" style="border-left: 5px solid ${getStatusColor(status)};">
+                    <span class="status-badge ${statusClass}">${status}</span>
+                    <div style="color: var(--gold); font-size: 11px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <span class="cust-info">${order.name}</span>
+                    <span class="cust-phone">📱 ${order.phone}</span>
+                    <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin:10px 0; font-size:13px;">${order.items}</div>
                     
-                    <div style="display:flex; gap:10px; flex:2; justify-content:flex-end;">
-                        ${cancelBtn}
-                        ${actionBtn}
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div style="flex:1;">
+                            <span style="font-weight:bold; color:var(--gold); font-size:20px;">₹${order.total}</span>
+                            <div class="order-time">🕒 ${timeStr}</div>
+                        </div>
+                        <div style="display:flex; gap:8px; flex:2; justify-content:flex-end;">
+                            ${cancelBtn}
+                            ${actionBtn}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-    });
-    
-    list.innerHTML = html;
-    document.getElementById('admin-total-orders').innerText = todayCount;
-    document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
-}
+            `;
+        });
+        
+        list.innerHTML = html || "<div style='text-align:center; padding:40px;'>Aaj koi order nahi hai.</div>";
+        document.getElementById('admin-total-orders').innerText = todayCount;
+        document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
+    }
 
-    document.addEventListener('click', () => { bell.pause(); bell.currentTime = 0; }, {once: false});
+    // Helper for card border colors
+    function getStatusColor(s) {
+        if(s === "Done") return "#25D366";
+        if(s.includes("Cancel")) return "#ff4444";
+        if(s === "Ready") return "#f1c40f";
+        return "#D4AF37";
+    }
 
-    // OTP verification function
-    window.verifyOTP = function(token, name) {
+    window.verifyOTP = function(token) {
         let otp = prompt("Customer se OTP puchiye:");
         if(!otp) return;
-        updateStatus(token, name, 'Done', otp);
+        updateStatus(token, 'Done', null, otp);
     };
 
-    window.updateStatus = function(token, name, status, otp = "") {
-    // 1. Button ko turant disable karo taaki double click na ho
-    const btn = event.target;
-    const originalText = btn.innerText;
-    btn.innerText = "⌛...";
-    btn.disabled = true;
+    // 🔥 FIX 3: Naya UpdateStatus function (Jo loop nahi hone dega)
+    window.updateStatus = function(token, status, btn, otp = "") {
+        if(btn) {
+            btn.innerText = "⏳...";
+            btn.disabled = true;
+        }
 
-    const url = adminBridge + "?token=" + token + "&status=" + encodeURIComponent(status) + "&otp=" + otp;
+        const url = adminBridge;
+        const payload = { token: token, status: status, otp: otp };
 
-    // 2. No-cors mode mein fetch
-    fetch(url, { method: 'POST', mode: 'no-cors' })
-    .then(() => {
-        // 3. Sabse zaroori: Bina page hile data refresh karo
-        setTimeout(() => {
-            refreshAdminData(); // Ye function dobara data khichega aur UI update karega
-        }, 500); 
-    })
-    .catch(err => {
-        alert("Network Error!");
-        btn.innerText = originalText;
-        btn.disabled = false;
-    });
-};
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            // Status update ke baad data refresh karo
+            setTimeout(refreshAdminData, 1000);
+        })
+        .catch(err => {
+            alert("Update Failed!");
+            if(btn) btn.disabled = false;
+        });
+    };
 
+    // Auto refresh every 30 seconds
     setInterval(refreshAdminData, 30000);
     refreshAdminData();
 </script>
