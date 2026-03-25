@@ -497,8 +497,8 @@
             let pass = prompt("🔐 Enter Royal Admin Key:");
            if (pass === "RSK@2026") { 
     localStorage.setItem('isAdminLoggedIn', 'true'); // Ye line zaroori hai
-    showTab('admin');
-        }
+    showTab('admin');}
+     }
     };
 
     window.logout = function() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } };
