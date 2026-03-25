@@ -503,16 +503,21 @@
 
    // --- INITIAL LOAD ---
     window.onload = () => { 
-        let tabToShow = localStorage.getItem('activeTab') || 'home';
-        if(localStorage.getItem('isAdminLoggedIn') === 'true') {
-            tabToShow = 'admin';
-        }
-        showTab(tabToShow);
-        updateCartUI(); 
-        if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
-            startCancelTimer(300, false);
-        }
-    };
+    // Check karein ki kya Admin logged in hai session mein
+    const adminStatus = localStorage.getItem('isAdminLoggedIn');
+    let tabToShow = localStorage.getItem('activeTab') || 'home';
+
+    if (adminStatus === 'true') {
+        tabToShow = 'admin'; // Agar admin tha, toh admin hi rahega
+    }
+    
+    showTab(tabToShow);
+    updateCartUI(); 
+    
+    if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
+        startCancelTimer(300, false);
+    }
+};
 
     function toggleSideMenu() {
         const drawer = document.getElementById('side-drawer');
