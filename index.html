@@ -371,35 +371,46 @@
     btn.innerText = "Booking... 👑"; 
     btn.disabled = true;
 
-    try {
-        // --- 3. Get Next Token (Updated for Monthly Reset) ---
-const tokenRes = await fetch(bridgeUrl);
-const nextToken = await tokenRes.text();
-        // Ab humein isse 'parseInt' karke +1 karne ki zaroorat nahi hai, 
-// kyunki Apps Script ne pehle se hi agla sahi token (e.g., MAR-26-15) bana kar bhej diya hai.
+   try {
+    // --- 3. Get Next Token (Updated for Monthly Reset) ---
+    const tokenRes = await fetch(bridgeUrl);
+    const nextToken = await tokenRes.text(); 
+    
+    // Yahan humne parseInt hata diya hai, ab NaN ka khatra khatam!
+    console.log("Next Royal Token:", nextToken);
+    
+    let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
 
-console.log("Next Royal Token:", nextToken);
-        
-        let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-        let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+    // 4. 🔥 SEND DATA TO GOOGLE SHEET
+    // Token ko encodeURIComponent mein lapetna zaroori hai kyunki usme '-' hai
+    const finalUrl = bridgeUrl + 
+        "?token=" + encodeURIComponent(nextToken) + 
+        "&name=" + encodeURIComponent(uName) + 
+        "&phone=" + encodeURIComponent(uPhone) + 
+        "&items=" + encodeURIComponent(itemsStr) + 
+        "&total=" + total + 
+        "&status=Awaiting%20Payment";
 
-        // 4. 🔥 SEND DATA TO GOOGLE SHEET (Using URL Params for 100% Success)
-        const finalUrl = bridgeUrl + 
-            "?token=" + nextToken + 
-            "&name=" + encodeURIComponent(uName) + 
-            "&phone=" + encodeURIComponent(uPhone) + 
-            "&items=" + encodeURIComponent(itemsStr) + 
-            "&total=" + total + 
-            "&status=Awaiting%20Payment";
+    await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
 
-        await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
-
-        // 5. Success Logic
-        localStorage.setItem('lastTokenNo', nextToken);
-        alert("Order Placed! Token #" + nextToken);
-        
-        showTab('dashboard'); 
+    // 5. Success Logic
+    localStorage.setItem('lastTokenNo', nextToken);
+    
+    // Sweet Alert ya Alert
+    alert("Order Placed! Token #" + nextToken);
+    
+    showTab('dashboard'); 
+    
+    // Timer check karein (agar dashboard mein timer setup hai)
+    if (typeof startCancelTimer === 'function') {
         startCancelTimer(300, true);
+    }
+
+} catch (err) {
+    console.error("Order Error:", err);
+    alert("Technical Error! Sheet update nahi hui.");
+}
         
         // WhatsApp notification
         let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
