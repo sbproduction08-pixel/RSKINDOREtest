@@ -185,68 +185,98 @@ function renderHistory(orders) {
 
     // --- 5. PROFESSIONAL GST PDF GENERATOR ---
     window.generateRoyalBill = async function(orderData) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
 
-        // Logo & Branding Setup
-        const logoData = await getBase64ImageFromURL('logo.png');
+    // 🖼️ 1. Logo & Banner Fetching (With Correct Filenames)
+    const logoUrl = 'MAIN_LOGO.jpeg'; 
+    const bannerUrl = 'royalstreetkitchen.png';
+    
+    let logoData = null;
+    let bannerData = null;
 
-        // Gold Header Border
-        doc.setDrawColor(184, 134, 11);
-        doc.setLineWidth(1.2);
-        doc.line(10, 10, 200, 10);
+    try {
+        const fetchImg = async (url) => {
+            const res = await fetch(url);
+            if (!res.ok) return null;
+            const blob = await res.blob();
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        };
+        logoData = await fetchImg(logoUrl);
+        bannerData = await fetchImg(bannerUrl);
+    } catch (e) { console.warn("Images skipped:", e); }
 
-        if (logoData) {
-            doc.addImage(logoData, 'PNG', 15, 15, 25, 25);
-        }
+    // --- 🎨 Header Section ---
+    doc.setDrawColor(184, 134, 11); // Royal Gold
+    doc.setLineWidth(1);
+    doc.line(10, 10, 200, 10);
 
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22);
-        doc.setTextColor(30, 30, 30);
-        doc.text("ROYAL STREET KITCHEN", 45, 25);
-        
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(100, 100, 100);
-        doc.text("Mahalakshmi Nagar, Indore (MP) | GSTIN: [YAHAN_GST_DAALEIN]", 45, 31);
-        doc.text("Customer Support: +91 7489999890", 45, 36);
+    if (logoData) {
+        // Logo position (x: 15, y: 15, w: 25, h: 25)
+        doc.addImage(logoData, 'JPEG', 15, 15, 25, 25);
+    }
 
-        // Invoice Details Table
-        doc.autoTable({
-            startY: 45,
-            body: [
-                ['Token No:', `#${orderData.token}`, 'Date:', new Date(orderData.date).toLocaleDateString()],
-                ['Customer:', orderData.name.toUpperCase(), 'Status:', 'PAID & DELIVERED']
-            ],
-            theme: 'plain',
-            styles: { fontSize: 10, cellPadding: 2 }
-        });
+    // --- 📝 Business Details (Actual Data) ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(30, 30, 30);
+    doc.text("ROYAL STREET KITCHEN", 45, 22);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    doc.text("Township, opp. Elite Apex, nearby Bun Tea,", 45, 28);
+    doc.text("Mahalaxmi Nagar, Indore, MP 452010", 45, 32);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("GSTIN: 06IDLPK8248E1Z6", 45, 37); // ✅ GST Updated
 
-        // Main Billing Table
-        doc.autoTable({
-            startY: 65,
-            head: [['Description', 'Qty', 'Total (INR)']],
-            body: [[orderData.items, "1", "Rs. " + orderData.total]],
-            theme: 'grid',
-            headStyles: { fillColor: [184, 134, 11] },
-            styles: { fontSize: 11, cellPadding: 5 }
-        });
+    // --- 📋 Invoice Meta ---
+    doc.autoTable({
+        startY: 45,
+        body: [
+            ['Order Token:', `#${orderData.token}`, 'Date:', new Date(orderData.date).toLocaleDateString()],
+            ['Customer:', orderData.name.toUpperCase(), 'Status:', 'PAID & DELIVERED']
+        ],
+        theme: 'plain',
+        styles: { fontSize: 10, cellPadding: 1 },
+        columnStyles: { 0: { fontStyle: 'bold', width: 25 }, 2: { fontStyle: 'bold', width: 20 } }
+    });
 
-        // Grand Total Calculation
-        let finalY = doc.lastAutoTable.finalY + 15;
-        doc.setFontSize(16);
-        doc.setTextColor(184, 134, 11);
-        doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 190, finalY, { align: "right" });
+    // --- 🥘 Items Table ---
+    doc.autoTable({
+        startY: 62,
+        head: [['S.No', 'Description', 'Qty', 'Amount (INR)']],
+        body: [[1, orderData.items, "1", "Rs. " + orderData.total]],
+        theme: 'grid',
+        headStyles: { fillColor: [184, 134, 11], textColor: [255, 255, 255] },
+        styles: { fontSize: 11, cellPadding: 5 }
+    });
 
-        // Footer Message
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "italic");
-        doc.setTextColor(120, 120, 120);
-        doc.text("Visit again to experience the royalty in every bite!", 105, finalY + 30, { align: "center" });
+    // --- 💰 Grand Total ---
+    let finalY = doc.lastAutoTable.finalY + 12;
+    doc.setFontSize(16);
+    doc.setTextColor(184, 134, 11);
+    doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 195, finalY, { align: "right" });
 
-        // Save & Download
-        doc.save(`RSK_Bill_Token_${orderData.token}.pdf`);
-    };
+    // --- 🏰 Royal Banner Footer ---
+    if (bannerData) {
+        // Banner image niche (Center aligned)
+        doc.addImage(bannerData, 'PNG', 55, finalY + 10, 100, 20);
+    }
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Thank you for dining Royally! Visit Again.", 105, finalY + 40, { align: "center" });
+
+    // --- 📥 Save ---
+    doc.save(`RSK_Invoice_${orderData.token}.pdf`);
+};
 
     // --- 6. LIVE BILL DOWNLOAD BUTTON (Dashboard Trigger) ---
     window.downloadLatestBill = function() {
