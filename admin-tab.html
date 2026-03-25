@@ -48,13 +48,16 @@
     const bell = document.getElementById('kitchenBell');
     let lastOrderCount = 0;
 
+    // --- 1. DATA REFRESH (Ghanti Logic ke saath) ---
     function refreshAdminData() {
         fetch(adminBridge + "?action=readAdmin")
             .then(res => res.json())
             .then(data => {
-                if (lastOrderCount !== 0 && data.length > lastOrderCount && bell) {
-                    bell.play().catch(e => console.log("Sound blocked"));
-                    setTimeout(() => { bell.pause(); bell.currentTime = 0; }, 3000);
+                if (lastOrderCount !== 0 && data.length > lastOrderCount) {
+                    if(bell) {
+                        bell.play().catch(e => console.log("Sound Blocked"));
+                        setTimeout(() => { bell.pause(); bell.currentTime = 0; }, 3000);
+                    }
                 }
                 lastOrderCount = data.length;
                 renderOrders(data);
@@ -62,6 +65,7 @@
             .catch(err => console.error("Fetch Error:", err));
     }
 
+    // --- 2. ORDER RENDERER (Detailed & Soft UI) ---
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
         let html = ""; let totalSale = 0; let todayCount = 0;
@@ -70,67 +74,107 @@
         [...orders].reverse().forEach(order => {
             const dateObj = new Date(order.date);
             const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
             if(dateObj.toDateString() === todayStr) {
                 todayCount++;
                 if(order.status === "Done") totalSale += parseFloat(order.total || 0);
             }
 
             let status = (order.status || "").trim();
-            let statusClass = status === "Done" ? "status-done" : (status.toLowerCase().includes("cancel") ? "status-cancelled" : "status-pending");
+            let statusClass = "status-pending";
+            if(status === "Done") statusClass = "status-done";
+            else if(status.toLowerCase().includes("cancel")) statusClass = "status-cancelled";
 
-            // Soft Action Group
-            let billGroup = `
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <button onclick='window.downloadAdminBillByData(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:9px; padding:3px 8px; border-radius:4px; cursor:pointer;">📥 BILL</button>
-                    <button onclick='window.shareBillOnWAByData(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:9px; padding:3px 8px; border-radius:4px; cursor:pointer;">💬 SHARE</button>
+            // --- SOFT ACTION BUTTONS ---
+            let billActionGroup = `
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button onclick='window.downloadAdminBillByData(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">📥 BILL</button>
+                    <button onclick='window.shareBillOnWAByData(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">💬 SHARE</button>
                     ${status !== "Done" && !status.toLowerCase().includes("cancel") ? 
-                    `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:#3a0d0d; border:none; color:#ff4444; font-size:9px; padding:3px 8px; border-radius:4px;">X</button>` : ""}
+                    `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer;">CANCEL</button>` : ""}
                 </div>
             `;
 
-            // Status Step Button
-            let nextBtn = "";
-            if(status === "Awaiting Payment" || status === "Pending") nextBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" style="width:100%; margin-top:8px; background:#3498db; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:bold; font-size:11px;">PAID ✅</button>`;
-            else if(status === "Received") nextBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" style="width:100%; margin-top:8px; background:#e67e22; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:bold; font-size:11px;">PREPARE 👨‍🍳</button>`;
-            else if(status === "Preparing") nextBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" style="width:100%; margin-top:8px; background:#f1c40f; color:#000; border:none; padding:6px; border-radius:6px; font-weight:bold; font-size:11px;">READY 🔔</button>`;
-            else if(status === "Ready") nextBtn = `<button onclick="verifyOTP('${order.token}')" style="width:100%; margin-top:8px; background:#25D366; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:bold; font-size:11px;">DELIVER 🎁</button>`;
+            // --- STEP-BY-STEP STATUS BUTTONS ---
+            let mainActionBtn = "";
+            if (status === "Awaiting Payment" || status === "Pending") {
+                mainActionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" style="width:100%; margin-top:12px; background:#3498db; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">PAID (REC) ✅</button>`;
+            } else if (status === "Received") {
+                mainActionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" style="width:100%; margin-top:12px; background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">PREPARE 👨‍🍳</button>`;
+            } else if (status === "Preparing") {
+                mainActionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" style="width:100%; margin-top:12px; background:#f1c40f; color:black; border:none; padding:10px; border-radius:8px; font-weight:bold;">READY 🔔</button>`;
+            } else if (status === "Ready") {
+                mainActionBtn = `<button onclick="verifyOTP('${order.token}')" style="width:100%; margin-top:12px; background:#25D366; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">DELIVER 🎁</button>`;
+            }
 
             html += `
-                <div class="order-card" style="padding:12px; margin-bottom:10px; border-radius:12px; border-left:4px solid ${getStatusColor(status)}; background:rgba(255,255,255,0.02);">
-                    <span class="status-badge ${statusClass}" style="font-size:8px; top:8px; right:8px; padding:3px 8px;">${status}</span>
-                    <div style="color:var(--gold); font-size:10px; font-weight:bold;">TOKEN #${order.token}</div>
-                    <div style="font-size:14px; font-weight:bold; color:#fff; margin-top:2px;">${order.name}</div>
+                <div class="order-card" style="background:rgba(255,255,255,0.02); padding:15px; border-radius:15px; border-left:5px solid ${getStatusColor(status)}; margin-bottom:15px; position:relative;">
+                    <span class="status-badge ${statusClass}" style="position:absolute; top:12px; right:12px; font-size:9px; padding:4px 10px;">${status}</span>
+                    <div style="color:var(--gold); font-size:11px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <div style="font-size:16px; font-weight:bold; color:#fff; margin-top:4px;">${order.name}</div>
+                    <div style="font-size:11px; color:#888;">📱 ${order.phone}</div>
                     
-                    <div style="font-size:12px; color:#bbb; margin:6px 0;">${order.items}</div>
+                    <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin:12px 0; font-size:14px; border:1px solid rgba(212,175,55,0.1);">
+                        ${order.items}
+                    </div>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                         <div style="flex:1;">
-                            <div style="font-size:18px; font-weight:bold; color:var(--gold);">₹${order.total} <span style="font-size:9px; color:#666; font-weight:normal;">🕒 ${timeStr}</span></div>
-                            ${billGroup}
+                            <div style="font-size:20px; font-weight:bold; color:var(--gold);">₹${order.total}</div>
+                            <div style="font-size:10px; color:#666;">🕒 ${timeStr}</div>
+                            ${billActionGroup}
                         </div>
                     </div>
-                    ${nextBtn}
+                    ${mainActionBtn}
                 </div>
             `;
         });
         
-        list.innerHTML = html || "<div style='text-align:center; padding:20px; opacity:0.5;'>No Orders</div>";
+        list.innerHTML = html || "<div style='text-align:center; padding:40px; opacity:0.5;'>No Orders Today.</div>";
         document.getElementById('admin-total-orders').innerText = todayCount;
         document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
     }
 
+    // --- 3. MASTER FUNCTIONS ---
     function getStatusColor(s) {
         const st = s.toLowerCase();
         if(st === "done") return "#25D366";
         if(st.includes("cancel")) return "#ff4444";
         if(st === "ready") return "#f1c40f";
+        if(st === "preparing") return "#e67e22";
+        if(st === "received") return "#3498db";
         return "#D4AF37";
     }
 
     window.downloadAdminBillByData = function(order) {
-        if(typeof generateRoyalBill === 'function') generateRoyalBill(order);
-        else alert("Refresh Page!");
+        if(typeof generateRoyalBill === 'function') {
+            generateRoyalBill(order);
+        } else {
+            alert("PDF Engine load nahi hua. Refresh karein.");
+        }
     };
 
     window.shareBillOnWAByData = function(order) {
-        const msg = `*ROYAL STREET KITCHEN* 👑%0A*Token
+        const msg = `*ROYAL STREET KITCHEN* 👑%0A---------------------------%0A*INVOICE* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A---------------------------%0AAapka bill taiyar hai. Visit Again!`;
+        window.open(`https://wa.me/91${order.phone}?text=${msg}`, '_blank');
+    };
+
+    window.verifyOTP = function(token) {
+        let otp = prompt("Customer se OTP puchiye:");
+        if(otp) updateStatus(token, 'Done', null, otp);
+    };
+
+    window.updateStatus = function(token, status, btn, otp = "") {
+        if(btn) { btn.innerText = "⏳ Updating..."; btn.disabled = true; }
+        fetch(adminBridge, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ token: token, status: status, otp: otp })
+        })
+        .then(() => setTimeout(refreshAdminData, 1200))
+        .catch(err => { alert("Failed!"); if(btn) btn.disabled = false; });
+    }
+
+    setInterval(refreshAdminData, 20000);
+    refreshAdminData();
+</script>
