@@ -344,8 +344,8 @@
     }
 
     // --- ORDER & CANCEL ---
-   window.checkout = function() {
-    // FIX: Module wala auth access karne ke liye window.auth use karein
+   window.checkout = async function() {
+    // 1. Check Login
     const user = window.auth ? window.auth.currentUser : null;
     
     if(!user) { 
@@ -353,8 +353,14 @@
         return window.registerUser(); 
     }
 
-    const uName = localStorage.getItem('userName');
+    // 2. Get User Data from LocalStorage
+    const uName = localStorage.getItem('userName') || user.displayName;
     const uPhone = localStorage.getItem('userPhone');
+
+    if(!uPhone || uPhone === "null") {
+        alert("Profile incomplete! Please update your mobile number in Dashboard.");
+        return showTab('dashboard');
+    }
 
     if(!window.cart || window.cart.length === 0) return alert("Cart khali hai!");
 
@@ -362,31 +368,30 @@
     btn.innerText = "Booking... 👑"; 
     btn.disabled = true;
 
-    fetch(bridgeUrl)
-    .then(res => res.text())
-    .then(currentCount => {
+    try {
+        // 3. Get Next Token
+        const tokenRes = await fetch(bridgeUrl);
+        const currentCount = await tokenRes.text();
         let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
+        
         let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
         let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
 
-        // Google Sheet ko data bhejna
-        fetch(bridgeUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ 
-                token: nextToken, 
-                name: uName, 
-                phone: uPhone, 
-                items: itemsStr, 
-                total: total, 
-                status: "Awaiting Payment" 
-            })
-        });
+        // 4. 🔥 SEND DATA TO GOOGLE SHEET (Using URL Params for 100% Success)
+        const finalUrl = bridgeUrl + 
+            "?token=" + nextToken + 
+            "&name=" + encodeURIComponent(uName) + 
+            "&phone=" + encodeURIComponent(uPhone) + 
+            "&items=" + encodeURIComponent(itemsStr) + 
+            "&total=" + total + 
+            "&status=Awaiting%20Payment";
 
+        await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
+
+        // 5. Success Logic
         localStorage.setItem('lastTokenNo', nextToken);
         alert("Order Placed! Token #" + nextToken);
         
-        // Dashboard par le jao tracker dekhne ke liye
         showTab('dashboard'); 
         startCancelTimer(300, true);
         
@@ -396,15 +401,14 @@
 
         window.cart = []; 
         updateCartUI();
+        
+    } catch (err) {
+        console.error("Order Error:", err);
+        alert("Technical Error! Sheet update nahi hui.");
+    } finally {
         btn.innerText = "Order Now"; 
         btn.disabled = false;
-    })
-    .catch((err) => { 
-        console.error("Order Error:", err);
-        alert("Connection Error!"); 
-        btn.innerText = "Order Now"; 
-        btn.disabled = false; 
-    });
+    }
 };
 
     window.cancelOrder = function() {
