@@ -372,10 +372,13 @@
     btn.disabled = true;
 
     try {
-        // 3. Get Next Token
-        const tokenRes = await fetch(bridgeUrl);
-        const currentCount = await tokenRes.text();
-        let nextToken = (parseInt(currentCount) + 1).toString().padStart(2, '0');
+        // --- 3. Get Next Token (Updated for Monthly Reset) ---
+const tokenRes = await fetch(bridgeUrl);
+const nextToken = await tokenRes.text();
+        // Ab humein isse 'parseInt' karke +1 karne ki zaroorat nahi hai, 
+// kyunki Apps Script ne pehle se hi agla sahi token (e.g., MAR-26-15) bana kar bhej diya hai.
+
+console.log("Next Royal Token:", nextToken);
         
         let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
         let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
