@@ -345,8 +345,9 @@
 
     // --- ORDER & CANCEL ---
    window.checkout = function() {
-    // Firebase se logged-in user ka data uthao
-    const user = firebase.auth().currentUser;
+    // FIX: Module wala auth access karne ke liye window.auth use karein
+    const user = window.auth ? window.auth.currentUser : null;
+    
     if(!user) { 
         alert("Pehle Login Karein!"); 
         return window.registerUser(); 
@@ -355,13 +356,12 @@
     const uName = localStorage.getItem('userName');
     const uPhone = localStorage.getItem('userPhone');
 
-    if(window.cart.length === 0) return alert("Cart khali hai!");
+    if(!window.cart || window.cart.length === 0) return alert("Cart khali hai!");
 
     const btn = document.getElementById('orderNowBtn');
     btn.innerText = "Booking... 👑"; 
     btn.disabled = true;
 
-    // Token aur Order details bhejo
     fetch(bridgeUrl)
     .then(res => res.text())
     .then(currentCount => {
@@ -369,7 +369,7 @@
         let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
         let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
 
-        // Google Sheet mein entry (Awaiting Payment status ke sath)
+        // Google Sheet ko data bhejna
         fetch(bridgeUrl, {
             method: 'POST',
             mode: 'no-cors',
@@ -384,25 +384,28 @@
         });
 
         localStorage.setItem('lastTokenNo', nextToken);
+        alert("Order Placed! Token #" + nextToken);
         
-        // Order hote hi seedha Dashboard (Tracker) par bhej do!
-        alert("Order Placed! Please pay and track your order.");
-        showTab('dashboard');
-           
-            startCancelTimer(300, true);
-            
-            let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
-            window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
+        // Dashboard par le jao tracker dekhne ke liye
+        showTab('dashboard'); 
+        startCancelTimer(300, true);
+        
+        // WhatsApp notification
+        let waMsg = `*ROYAL STREET KITCHEN*%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
+        window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
 
-            window.cart = []; updateCartUI();
-            btn.innerText = "Order Now"; btn.disabled = false;
-        })
-        .catch(() => { 
-            alert("Connection Error!"); 
-            btn.innerText = "Order Now"; 
-            btn.disabled = false; 
-        });
-    };
+        window.cart = []; 
+        updateCartUI();
+        btn.innerText = "Order Now"; 
+        btn.disabled = false;
+    })
+    .catch((err) => { 
+        console.error("Order Error:", err);
+        alert("Connection Error!"); 
+        btn.innerText = "Order Now"; 
+        btn.disabled = false; 
+    });
+};
 
     window.cancelOrder = function() {
         const token = localStorage.getItem('lastTokenNo');
