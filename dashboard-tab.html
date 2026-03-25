@@ -49,29 +49,37 @@
 </div>
 
 <script>
-    let currentActiveOrder = null; // Global variable PDF ke liye data hold karega
+    // --- GLOBAL STATE ---
+    let currentActiveOrder = null;
+    let lastKnownStatus = "";
 
+    // --- 1. INITIALIZE ENGINE ---
     function initDashboard() {
         const userName = localStorage.getItem('userName');
         const userPhone = localStorage.getItem('userPhone');
 
         if (userName) {
-            document.getElementById('welcome-name').innerText = "Namaste, " + userName.split(' ')[0] + "!";
-            document.getElementById('user-phone-disp').innerText = "📱 " + (userPhone || "Number missing");
+            // Personalized Greeting
+            const firstName = userName.split(' ')[0];
+            document.getElementById('welcome-name').innerText = "Namaste, " + firstName + "!";
+            document.getElementById('user-phone-disp').innerText = "📱 " + (userPhone || "No Phone Linked");
             
+            // Layout Logic: Profile Setup vs Live Tracker
             if (!userPhone || userPhone === "" || userPhone === "null") {
                 document.getElementById('profile-setup').style.display = 'block';
                 document.getElementById('live-tracker').style.display = 'none';
                 document.getElementById('no-order').style.display = 'none';
+                document.getElementById('order-history-section').style.display = 'none';
             } else {
                 document.getElementById('profile-setup').style.display = 'none';
-                document.getElementById('live-tracker').style.display = 'block';
+                document.getElementById('order-history-section').style.display = 'block';
+                // Trigger Background Sync
                 startTracking();
             }
         }
     }
 
-    // 🔥 Helper for Image to PDF
+    // --- 2. FAST IMAGE CONVERTER (For PDF Branding) ---
     async function getBase64ImageFromURL(url) {
         try {
             const res = await fetch(url);
@@ -81,127 +89,209 @@
                 reader.onloadend = () => resolve(reader.result);
                 reader.readAsDataURL(blob);
             });
-        } catch (e) { return null; }
+        } catch (e) {
+            console.warn("Logo Image skip: " + e);
+            return null;
+        }
     }
 
+    // --- 3. LIVE ORDER & STATUS SYNC ---
     function startTracking() {
         const phone = localStorage.getItem('userPhone');
+        // Pure JSON API call for speed
         const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
 
         fetch(gasUrl)
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
-                // Latest order dhundo (chahe Done ho ya na ho)
-                const myOrder = data.reverse().find(o => o.phone == phone);
+                // Filter all orders for current user
+                const allMyOrders = data.filter(order => order.phone == phone).reverse();
                 
-                if (myOrder) {
-                    currentActiveOrder = myOrder; // Global storage for PDF
-                    const status = myOrder.status.trim();
+                // Identify the Current Active Order
+                const liveOrder = allMyOrders.find(o => 
+                    !o.status.toLowerCase().includes('done') && 
+                    !o.status.toLowerCase().includes('cancel')
+                );
+
+                if (liveOrder) {
+                    currentActiveOrder = liveOrder;
                     
                     document.getElementById('live-tracker').style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
-                    document.getElementById('order-status').innerText = status.toUpperCase();
-                    document.getElementById('order-otp').innerText = myOrder.otp || "WAIT";
+                    
+                    const statusText = liveOrder.status.toUpperCase();
+                    document.getElementById('order-status').innerText = statusText;
+                    document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
 
-                    // ✅ BILL BUTTON LOGIC: Jab order DONE ho jaye
-                    if (status.toLowerCase() === 'done') {
-                        document.getElementById('bill-download-area').style.display = 'block';
-                        document.getElementById('order-status').style.color = "#25D366";
-                        document.getElementById('order-otp').innerText = "DELIVERED";
-                        // Done hone pe loop stop (PDF ready hai)
-                    } else {
-                        document.getElementById('bill-download-area').style.display = 'none';
-                        document.getElementById('order-status').style.color = "#d4af37";
-                        
-                        // ✅ TIMER STOP LOGIC: Agar Admin ne REC/Preparing/Ready kar diya
-                        if (status.toLowerCase() !== "awaiting payment" && status.toLowerCase() !== "pending") {
-                            if (window.cancelTimerInterval) {
-                                clearInterval(window.cancelTimerInterval);
-                                localStorage.removeItem('timerStartTime');
-                                if(document.getElementById('cancel-timer-display')) {
-                                    document.getElementById('cancel-timer-display').style.display = 'none';
-                                }
+                    // ✅ FEATURE: TIMER STOP LOGIC
+                    // Jaise hi status 'Awaiting' se aage badhe, timer khatam
+                    const statusCheck = liveOrder.status.toLowerCase();
+                    if (statusCheck !== "awaiting payment" && statusCheck !== "pending") {
+                        if (window.cancelTimerInterval) {
+                            clearInterval(window.cancelTimerInterval);
+                            localStorage.removeItem('timerStartTime');
+                            if(document.getElementById('cancel-timer-display')) {
+                                document.getElementById('cancel-timer-display').style.display = 'none';
                             }
                         }
-                        setTimeout(startTracking, 15000); // 15 sec update
                     }
+
+                    // Status Change Alert (Console for now)
+                    if (lastKnownStatus !== "" && lastKnownStatus !== statusText) {
+                        console.log("Status Changed: " + statusText);
+                    }
+                    lastKnownStatus = statusText;
+
                 } else {
                     document.getElementById('live-tracker').style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
                 }
+
+                // ✅ FEATURE: UPDATE HISTORY LIST
+                renderHistory(allMyOrders);
+
+                // Auto Refresh Loop (15 seconds)
+                setTimeout(startTracking, 15000);
             })
-            .catch(err => {
-                console.log("Tracking Error:", err);
+            .catch(error => {
+                console.error("Data Sync Error:", error);
                 setTimeout(startTracking, 10000);
             });
     }
 
-    // 🔥 Trigger PDF
-    window.downloadLatestBill = function() {
-        if(currentActiveOrder) {
-            generateRoyalBill(currentActiveOrder);
-        } else {
-            alert("Order data not found!");
-        }
-    };
+    // --- 4. ROYAL HISTORY RENDERER ---
+    function renderHistory(orders) {
+        const historyList = document.getElementById('history-list');
+        let htmlRows = "";
 
-    window.generateRoyalBill = async function(order) {
+        orders.forEach(order => {
+            const currentStatus = order.status.toLowerCase();
+            
+            // History only shows Completed or Cancelled orders
+            if (currentStatus.includes('done') || currentStatus.includes('cancel')) {
+                
+                const isCancelled = currentStatus.includes('cancel');
+                const orderDate = new Date(order.date).toLocaleDateString('en-GB');
+
+                htmlRows += `
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 10px; color: #888;">${orderDate} | TOKEN #${order.token}</div>
+                                <div style="font-size: 13px; color: #fff; margin: 3px 0; font-weight: bold;">${order.items}</div>
+                                <div style="font-size: 10px; font-weight: 800; color: ${isCancelled ? '#ff4444' : '#25D366'}">
+                                    ${order.status.toUpperCase()}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #d4af37; font-weight: bold; font-size: 16px;">₹${order.total}</div>
+                                ${!isCancelled ? 
+                                    `<button onclick='generateRoyalBill(${JSON.stringify(order)})' style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer; font-weight: bold;">BILL 📥</button>` 
+                                    : ''
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        historyList.innerHTML = htmlRows || "<p style='font-size:11px; opacity:0.4; text-align:center;'>No past royal orders found.</p>";
+    }
+
+    // --- 5. PROFESSIONAL GST PDF GENERATOR ---
+    window.generateRoyalBill = async function(orderData) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
 
-        const logoUrl = 'logo.png'; // Make sure this path is correct
-        const logoData = await getBase64ImageFromURL(logoUrl);
+        // Logo & Branding Setup
+        const logoData = await getBase64ImageFromURL('logo.png');
 
-        doc.setDrawColor(184, 134, 11); doc.setLineWidth(1.5); doc.line(10, 10, 200, 10);
+        // Gold Header Border
+        doc.setDrawColor(184, 134, 11);
+        doc.setLineWidth(1.2);
+        doc.line(10, 10, 200, 10);
 
-        if (logoData) { doc.addImage(logoData, 'PNG', 15, 15, 25, 25); }
+        if (logoData) {
+            doc.addImage(logoData, 'PNG', 15, 15, 25, 25);
+        }
 
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(24); doc.setTextColor(30, 30, 30);
+        doc.setFontSize(22);
+        doc.setTextColor(30, 30, 30);
         doc.text("ROYAL STREET KITCHEN", 45, 25);
         
-        doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 100, 100);
         doc.text("Mahalakshmi Nagar, Indore (MP) | GSTIN: [YAHAN_GST_DAALEIN]", 45, 31);
-        doc.text("Contact: +91 7489999890 | Email: rskindore@gmail.com", 45, 36);
+        doc.text("Customer Support: +91 7489999890", 45, 36);
 
+        // Invoice Details Table
         doc.autoTable({
             startY: 45,
             body: [
-                ['Order Token:', `#${order.token}`, 'Date:', new Date().toLocaleDateString()],
-                ['Customer:', order.name.toUpperCase(), 'Status:', 'PAID & DELIVERED']
+                ['Token No:', `#${orderData.token}`, 'Date:', new Date(orderData.date).toLocaleDateString()],
+                ['Customer:', orderData.name.toUpperCase(), 'Status:', 'PAID & DELIVERED']
             ],
             theme: 'plain',
-            styles: { fontSize: 10, cellPadding: 1 },
-            columnStyles: { 0: { fontStyle: 'bold', width: 30 }, 2: { fontStyle: 'bold', width: 25 } }
+            styles: { fontSize: 10, cellPadding: 2 }
         });
 
+        // Main Billing Table
         doc.autoTable({
             startY: 65,
-            head: [['S.No', 'Description', 'Qty', 'Amount (INR)']],
-            body: [[1, order.items, "1", "Rs. " + order.total]],
+            head: [['Description', 'Qty', 'Total (INR)']],
+            body: [[orderData.items, "1", "Rs. " + orderData.total]],
             theme: 'grid',
-            headStyles: { fillColor: [184, 134, 11], textColor: [255, 255, 255], halign: 'center' },
+            headStyles: { fillColor: [184, 134, 11] },
             styles: { fontSize: 11, cellPadding: 5 }
         });
 
-        let finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(16); doc.setTextColor(184, 134, 11);
-        doc.text(`GRAND TOTAL: Rs. ${order.total}/-`, 195, finalY + 10, { align: "right" });
+        // Grand Total Calculation
+        let finalY = doc.lastAutoTable.finalY + 15;
+        doc.setFontSize(16);
+        doc.setTextColor(184, 134, 11);
+        doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 190, finalY, { align: "right" });
 
-        finalY += 40;
-        doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
-        doc.text("Thank you for choosing Royal Street Kitchen!", 105, finalY + 10, { align: "center" });
+        // Footer Message
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(120, 120, 120);
+        doc.text("Visit again to experience the royalty in every bite!", 105, finalY + 30, { align: "center" });
 
-        doc.save(`RSK_Invoice_${order.token}.pdf`);
+        // Save & Download
+        doc.save(`RSK_Bill_Token_${orderData.token}.pdf`);
     };
 
+    // --- 6. LIVE BILL DOWNLOAD BUTTON (Dashboard Trigger) ---
+    window.downloadLatestBill = function() {
+        if (currentActiveOrder) {
+            generateRoyalBill(currentActiveOrder);
+        } else {
+            alert("Order data loading... Please wait.");
+        }
+    };
+
+    // --- 7. PROFILE HANDLER ---
     window.saveRoyalProfile = function() {
-        const p = document.getElementById('new-phone').value;
-        if(p.length < 10) return alert("Sahi number daalein!");
-        localStorage.setItem('userPhone', p);
-        alert("Royal Profile Updated! 👑");
+        const phoneVal = document.getElementById('new-phone').value;
+        const prefVal = document.getElementById('new-pref').value;
+        
+        if (phoneVal.length < 10) {
+            return alert("Kripya 10 anko ka sahi number daalein!");
+        }
+        
+        localStorage.setItem('userPhone', phoneVal);
+        if (prefVal) {
+            localStorage.setItem('userPreference', prefVal);
+        }
+        
+        alert("Royal Profile Save Ho Gaya Hai! 👑");
         location.reload(); 
     };
 
+    // --- 8. INITIALIZE START ---
     initDashboard();
+
 </script>
