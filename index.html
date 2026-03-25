@@ -489,7 +489,46 @@
     // Cart ko memory mein save karne ke liye:
     localStorage.setItem('userCart', JSON.stringify(window.cart));
 }
+     // index.html ke script section mein daalna
+window.generateRoyalBill = async function(orderData) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
 
+    // Image fetcher with safety check
+    const fetchImg = async (url) => {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) return null;
+            const blob = await res.blob();
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        } catch(e) { return null; }
+    };
+
+    // YAHAN FILE NAME BILKUL SAHI HONA CHAIYE
+    const logoData = await fetchImg('MAIN_LOGO.jpeg'); 
+
+    doc.setDrawColor(184, 134, 11); doc.line(10, 10, 200, 10);
+    if (logoData) { doc.addImage(logoData, 'JPEG', 15, 15, 25, 25); }
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+    doc.text("ROYAL STREET KITCHEN", 45, 25);
+    doc.setFontSize(9); doc.setFont("helvetica", "normal");
+    doc.text("GSTIN: 06IDLPK8248E1Z6 | Mahalaxmi Nagar, Indore", 45, 31);
+
+    doc.autoTable({
+        startY: 45,
+        head: [['Description', 'Qty', 'Total (INR)']],
+        body: [[orderData.items, "1", "Rs. " + orderData.total]],
+        theme: 'grid',
+        headStyles: { fillColor: [184, 134, 11] }
+    });
+
+    doc.save(`RSK_Bill_${orderData.token}.pdf`);
+};
     // --- ADMIN ---
     let logoClicks = 0; let clickTimer;
     window.handleAdminAccess = function() {
