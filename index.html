@@ -307,43 +307,64 @@
         document.getElementById('trackBtn').style.display = userName ? 'inline-block' : 'none';
     }
 
-    // --- TIMER LOGIC ---
-    function startCancelTimer(duration, isNew = false) {
-        clearInterval(cancelInterval);
-        const display = document.getElementById('timer-display');
-        const bar = document.getElementById('cancel-bar');
-        const tokenSpan = document.getElementById('last-token');
-        
-        let startTime;
-        if (isNew) {
-            startTime = Date.now();
-            localStorage.setItem('timerStartTime', startTime);
-        } else {
-            startTime = parseInt(localStorage.getItem('timerStartTime'));
+   // --- TIMER LOGIC (With Admin Status Check) ---
+function startCancelTimer(duration, isNew = false) {
+    clearInterval(cancelInterval);
+    const display = document.getElementById('timer-display');
+    const bar = document.getElementById('cancel-bar');
+    const tokenSpan = document.getElementById('last-token');
+    
+    let startTime;
+    if (isNew) {
+        startTime = Date.now();
+        localStorage.setItem('timerStartTime', startTime);
+    } else {
+        startTime = parseInt(localStorage.getItem('timerStartTime'));
+    }
+
+    const token = localStorage.getItem('lastTokenNo');
+    if(!token || !startTime) return;
+
+    tokenSpan.innerText = token;
+    bar.style.display = 'block';
+
+    cancelInterval = setInterval(async function () {
+        let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+        let remainingTime = duration - elapsedTime;
+
+        // 🔥 Naya Logic: Har 10 second mein check karo ki Admin ne Receive toh nahi kiya?
+        if (remainingTime % 10 === 0) {
+            try {
+                const res = await fetch(bridgeUrl + "?action=readAdmin");
+                const orders = await res.json();
+                const myOrder = orders.find(o => o.token === token);
+                
+                // Agar Admin ne status 'Received', 'Preparing' etc kar diya toh cancel band!
+                if (myOrder && !["awaiting payment", "pending", ""].includes(myOrder.status.toLowerCase())) {
+                    console.log("Admin accepted order. Stopping cancel timer.");
+                    stopAndHideTimer();
+                    return;
+                }
+            } catch(e) { console.log("Status check failed, continuing timer..."); }
         }
 
-        const token = localStorage.getItem('lastTokenNo');
-        if(!token || !startTime) return;
+        if (remainingTime <= 0) {
+            stopAndHideTimer();
+        } else {
+            let minutes = Math.floor(remainingTime / 60);
+            let seconds = remainingTime % 60;
+            display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+        }
+    }, 1000);
+}
 
-        tokenSpan.innerText = token;
-        bar.style.display = 'block';
-
-        cancelInterval = setInterval(function () {
-            let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-            let remainingTime = duration - elapsedTime;
-
-            if (remainingTime <= 0) {
-                clearInterval(cancelInterval);
-                bar.style.display = 'none';
-                localStorage.removeItem('lastTokenNo');
-                localStorage.removeItem('timerStartTime');
-            } else {
-                let minutes = Math.floor(remainingTime / 60);
-                let seconds = remainingTime % 60;
-                display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-            }
-        }, 1000);
-    }
+// Helper to clean up
+function stopAndHideTimer() {
+    clearInterval(cancelInterval);
+    if(document.getElementById('cancel-bar')) document.getElementById('cancel-bar').style.display = 'none';
+    localStorage.removeItem('lastTokenNo');
+    localStorage.removeItem('timerStartTime');
+}
 
     // --- ORDER & CHECKOUT (FIXED BRACKETS) ---
     window.checkout = async function() {
