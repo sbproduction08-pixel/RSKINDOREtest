@@ -403,31 +403,36 @@ window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
     };
 
     window.cancelOrder = function() {
-        const token = localStorage.getItem('lastTokenNo');
-        const name = localStorage.getItem('userName');
-        if(!token || !name) return alert("Details missing!");
-        
-        if(confirm("Order cancel karein?")) {
-            const formData = new URLSearchParams();
-            formData.append('token', token);
-            formData.append('name', name);
-            formData.append('status', 'Cancelled By User');
+    const token = localStorage.getItem('lastTokenNo'); // Isme ab #001-RSK-MAR-26 jaisa format hai
+    const name = localStorage.getItem('userName');
+    
+    if(!token || !name) return alert("Order details missing!");
+    
+    if(confirm("Order cancel karein?")) {
+        const formData = new URLSearchParams();
+        formData.append('token', token);
+        formData.append('name', name);
+        formData.append('status', 'Cancelled By User');
 
-            fetch(bridgeUrl, {
-                method: 'POST',
-                mode: 'no-cors', 
-                body: formData.toString(),
-                headers: { "Content-Type": "application/x-www-form-urlencoded" }
-            });
+        fetch(bridgeUrl, {
+            method: 'POST',
+            mode: 'no-cors', 
+            body: formData.toString(),
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        });
 
-            window.open(`https://wa.me/917489999890?text=*CANCELLED*%0A*Token:* ${token}`, '_blank');
-            clearInterval(cancelInterval);
-            document.getElementById('cancel-bar').style.display = 'none';
-            localStorage.removeItem('lastTokenNo');
-            localStorage.removeItem('timerStartTime');
-            alert("Order Cancelled!");
-        }
-    };
+        // 🔥 WHATSAPP CANCEL MESSAGE FIX
+        // encodeURIComponent use kiya hai taaki '#' aur '-' sahi se WhatsApp pe jayein
+        let cancelMsg = `*CANCELLED* ❌%0A*Token:* ${encodeURIComponent(token)}`;
+        window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
+
+        clearInterval(cancelInterval);
+        document.getElementById('cancel-bar').style.display = 'none';
+        localStorage.removeItem('lastTokenNo');
+        localStorage.removeItem('timerStartTime');
+        alert("Order Cancelled!");
+    }
+};
 
     // --- AUTH & CART ---
     window.registerUser = function() {
