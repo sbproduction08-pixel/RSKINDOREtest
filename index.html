@@ -537,20 +537,17 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
- 
+  const auth = getAuth(app);
+  window.auth = auth; // 🔥 Isse 'auth' ab button ko dikhne lagega
 
-  // --- 👑 ROYAL LOGIN SYSTEM ---
   window.registerUser = async function() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      
-      // Check if user exists in Firestore
       const userDoc = await getDoc(doc(db, "users", user.uid));
       
       if (!userDoc.exists()) {
-        // Naya User: Mobile mangne ke liye Dashboard par bhejo ya yahin prompt karo
         let phone = prompt("Namaste! Aapka WhatsApp number kya hai?");
         if(phone && phone.length >= 10) {
           await setDoc(doc(db, "users", user.uid), {
@@ -564,21 +561,16 @@
           localStorage.setItem('userPhone', phone);
         }
       } else {
-        // Purana User: Data recover karo
         const userData = userDoc.data();
         localStorage.setItem('userName', userData.name);
         localStorage.setItem('userPhone', userData.phone);
       }
-      
-      location.reload(); // UI update karne ke liye
+      location.reload();
     } catch (e) {
       alert("Login Error: " + e.message);
     }
   };
- const auth = getAuth(app);
 
-
-  // --- LOGOUT ---
   window.logout = async function() {
     if(confirm("Logout?")) {
       await signOut(auth);
@@ -587,15 +579,13 @@
     }
   };
 
-  // --- STATE CHECK ---
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // User is logged in, show Tracker Tab instead of Home if needed
       if(!localStorage.getItem('activeTab')) showTab('dashboard'); 
     }
+    updateUserUI(); // 🔥 UI ko state ke hisaab se update karega
   });
 </script>
-
 <div style="text-align:center; margin: 20px;">
     <button onclick="sendTestOrder()" style="padding: 12px 25px; background: linear-gradient(gold, #b8860b); color: #000; border: 2px solid #000; cursor: pointer; font-weight: bold; border-radius: 30px; box-shadow: 0 0 10px gold;">
       Test Firebase Order 🚀
