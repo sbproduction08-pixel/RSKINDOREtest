@@ -144,7 +144,28 @@
         if(!otp) return;
         updateStatus(token, 'Done', null, otp);
     };
+    // 1. Admin se Bill Download karne ka function
+window.downloadAdminBill = function(index) {
+    const order = allAdminOrders[index]; // Maan ke chal rahe hain aapka array ye hai
+    if(typeof generateRoyalBill === 'function') {
+        generateRoyalBill(order);
+    } else {
+        alert("PDF Engine not loaded! Ek baar page refresh karein.");
+    }
+};
 
+// 2. WhatsApp pe Bill Link share karne ka function
+window.shareBillOnWA = function(index) {
+    const order = allAdminOrders[index];
+    const phone = order.phone;
+    
+    // Accountant Logic: PDF file WhatsApp pe direct script se nahi bhej sakte (security reasons), 
+    // par hum ek Royal message bhej sakte hain bill details ke saath.
+    const message = `*ROYAL STREET KITCHEN*%0A---------------------------%0A*INVOICE* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A---------------------------%0AAapka bill taiyar hai. Aap website ke Dashboard se PDF download kar sakte hain.%0A*Visit Again!* 👑`;
+    
+    const waUrl = `https://wa.me/91${phone}?text=${message}`;
+    window.open(waUrl, '_blank');
+};
     // 🔥 FIX 3: Naya UpdateStatus function (Jo loop nahi hone dega)
     window.updateStatus = function(token, status, btn, otp = "") {
         if(btn) {
