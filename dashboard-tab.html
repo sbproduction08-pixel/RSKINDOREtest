@@ -53,18 +53,15 @@
     let currentActiveOrder = null;
     let lastKnownStatus = "";
 
-    // --- 1. INITIALIZE ENGINE ---
     function initDashboard() {
         const userName = localStorage.getItem('userName');
         const userPhone = localStorage.getItem('userPhone');
 
         if (userName) {
-            // Personalized Greeting
             const firstName = userName.split(' ')[0];
             document.getElementById('welcome-name').innerText = "Namaste, " + firstName + "!";
             document.getElementById('user-phone-disp').innerText = "📱 " + (userPhone || "No Phone Linked");
             
-            // Layout Logic: Profile Setup vs Live Tracker
             if (!userPhone || userPhone === "" || userPhone === "null") {
                 document.getElementById('profile-setup').style.display = 'block';
                 document.getElementById('live-tracker').style.display = 'none';
@@ -73,221 +70,86 @@
             } else {
                 document.getElementById('profile-setup').style.display = 'none';
                 document.getElementById('order-history-section').style.display = 'block';
-                // Trigger Background Sync
                 startTracking();
             }
         }
     }
 
-    // --- 2. FAST IMAGE CONVERTER (For PDF Branding) ---
-    async function getBase64ImageFromURL(url) {
-        try {
-            const res = await fetch(url);
-            const blob = await res.blob();
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-        } catch (e) {
-            console.warn("Logo Image skip: " + e);
-            return null;
-        }
+    // --- LIVE ORDER & STATUS SYNC ---
+    function startTracking() {
+        const phone = localStorage.getItem('userPhone');
+        const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
+
+        fetch(gasUrl)
+            .then(res => res.json())
+            .then(data => {
+                const allMyOrders = data.filter(o => o.phone == phone).reverse();
+                const liveOrder = allMyOrders.find(o => !o.status.toLowerCase().includes('done') && !o.status.toLowerCase().includes('cancel'));
+
+                if (liveOrder) {
+                    currentActiveOrder = liveOrder;
+                    document.getElementById('live-tracker').style.display = 'block';
+                    document.getElementById('no-order').style.display = 'none';
+                    document.getElementById('order-status').innerText = liveOrder.status.toUpperCase();
+                    document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
+
+                    // 🔥 BUSINESS LOGIC: Status "Received" hote hi Cancel Timer band karo
+                    const s = liveOrder.status.toLowerCase();
+                    if (s !== "awaiting payment" && s !== "pending" && s !== "") {
+                        const cancelBar = document.getElementById('cancel-bar');
+                        if (cancelBar) {
+                            cancelBar.style.display = 'none';
+                            // Global cancelInterval ko clear karein (index.html mein jo defined hai)
+                            if (window.cancelInterval) {
+                                clearInterval(window.cancelInterval);
+                            }
+                            localStorage.removeItem('timerStartTime');
+                        }
+                    }
+                } else {
+                    document.getElementById('live-tracker').style.display = 'none';
+                    document.getElementById('no-order').style.display = 'block';
+                }
+
+                renderHistory(allMyOrders);
+                setTimeout(startTracking, 15000); // Har 15 sec mein sync
+            })
+            .catch(err => console.log("Tracking Error:", err));
     }
 
-    // --- 3. LIVE ORDER & STATUS SYNC ---
-function startTracking() {
-    const phone = localStorage.getItem('userPhone');
-    const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
-
-    fetch(gasUrl)
-        .then(res => res.json())
-        .then(data => {
-            const allMyOrders = data.filter(o => o.phone == phone).reverse();
-            const liveOrder = allMyOrders.find(o => !o.status.toLowerCase().includes('done') && !o.status.toLowerCase().includes('cancel'));
-
-            if (liveOrder) {
-                currentActiveOrder = liveOrder;
-                document.getElementById('live-tracker').style.display = 'block';
-                document.getElementById('no-order').style.display = 'none';
-                document.getElementById('order-status').innerText = liveOrder.status.toUpperCase();
-                document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
-
-                // 🔥 TIMER HIDE LOGIC (FORCE)
-                const statusCheck = liveOrder.status.toLowerCase();
-                if (statusCheck !== "awaiting payment" && statusCheck !== "pending") {
-                    // Interval band karo
-                    if (window.cancelTimerInterval) {
-                        clearInterval(window.cancelTimerInterval);
-                        window.cancelTimerInterval = null;
-                    }
-                    localStorage.removeItem('timerStartTime');
-                    
-                    // Sabse important: HTML mein ID 'cancel-timer-display' honi chahiye
-                    const timerDiv = document.getElementById('cancel-timer-display');
-                    if (timerDiv) {
-                        timerDiv.style.display = 'none';
-                    }
-                }
-            } else {
-                document.getElementById('live-tracker').style.display = 'none';
-                document.getElementById('no-order').style.display = 'block';
-            }
-
-            renderHistory(allMyOrders);
-            setTimeout(startTracking, 15000);
-        })
-        .catch(err => console.log("Tracking Error:", err));
-}
-
-function renderHistory(orders) {
-    const historyList = document.getElementById('history-list');
-    let html = "";
-    
-    // Sirf Done/Cancelled orders filter karo
-    const historyItems = orders.filter(o => o.status.toLowerCase().includes('done') || o.status.toLowerCase().includes('cancel'));
-
-    historyItems.forEach((order, index) => {
-        const isCancelled = order.status.toLowerCase().includes('cancel');
+    function renderHistory(orders) {
+        const historyList = document.getElementById('history-list');
+        let html = "";
         
-        // Button ko ek unique ID de rahe hain: 'hist-bill-0', 'hist-bill-1'...
-        html += `
-            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="font-size: 10px; color: #888;">TOKEN #${order.token}</div>
-                        <div style="font-size: 12px; color: #fff; margin: 3px 0;">${order.items}</div>
-                        <div style="font-size: 10px; font-weight: bold; color: ${isCancelled ? '#ff4444' : '#25D366'}">${order.status.toUpperCase()}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
-                        ${!isCancelled ? `<button id="hist-bill-${index}" style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
+        const historyItems = orders.filter(o => o.status.toLowerCase().includes('done') || o.status.toLowerCase().includes('cancel'));
+
+        historyItems.forEach((order, index) => {
+            const isCancelled = order.status.toLowerCase().includes('cancel');
+            
+            html += `
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 10px; color: #888;">TOKEN ${order.token}</div>
+                            <div style="font-size: 12px; color: #fff; margin: 3px 0;">${order.items}</div>
+                            <div style="font-size: 10px; font-weight: bold; color: ${isCancelled ? '#ff4444' : '#25D366'}">${order.status.toUpperCase()}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
+                            ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-    });
+            `;
+        });
 
-    historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
-
-    // 🔥 BUTTON CLICK HANDLER (Directly binding data)
-    historyItems.forEach((order, index) => {
-        const btn = document.getElementById(`hist-bill-${index}`);
-        if (btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log("Downloading bill for token:", order.token);
-                window.generateRoyalBill(order);
-            });
-        }
-    });
-}
-
-    // --- 5. PROFESSIONAL GST PDF GENERATOR ---
-    window.generateRoyalBill = async function(orderData) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-
-    // 🖼️ 1. Logo & Banner Fetching (With Correct Filenames)
-    const logoUrl = 'MAIN_LOGO.jpeg'; 
-    const bannerUrl = 'royalstreetkitchen.png';
-    
-    let logoData = null;
-    let bannerData = null;
-
-    try {
-        const fetchImg = async (url) => {
-            const res = await fetch(url);
-            if (!res.ok) return null;
-            const blob = await res.blob();
-            return new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-        };
-        logoData = await fetchImg(logoUrl);
-        bannerData = await fetchImg(bannerUrl);
-    } catch (e) { console.warn("Images skipped:", e); }
-
-    // --- 🎨 Header Section ---
-    doc.setDrawColor(184, 134, 11); // Royal Gold
-    doc.setLineWidth(1);
-    doc.line(10, 10, 200, 10);
-
-    if (logoData) {
-        // Logo position (x: 15, y: 15, w: 25, h: 25)
-        doc.addImage(logoData, 'JPEG', 15, 15, 25, 25);
+        historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
     }
 
-    // --- 📝 Business Details (Actual Data) ---
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(30, 30, 30);
-    doc.text("ROYAL STREET KITCHEN", 45, 22);
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(80, 80, 80);
-    doc.text("Township, opp. Elite Apex, nearby Bun Tea,", 45, 28);
-    doc.text("Mahalaxmi Nagar, Indore, MP 452010", 45, 32);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0);
-    doc.text("GSTIN: 06IDLPK8248E1Z6", 45, 37); // ✅ GST Updated
+    // --- GST PDF GENERATOR (History ke liye Fixed) ---
+    // Note: window.generateRoyalBill pehle se index.html mein honi chahiye, 
+    // agar wahan nahi hai toh ye niche wala function wahan shift kar dena.
 
-    // --- 📋 Invoice Meta ---
-    doc.autoTable({
-        startY: 45,
-        body: [
-            ['Order Token:', `#${orderData.token}`, 'Date:', new Date(orderData.date).toLocaleDateString()],
-            ['Customer:', orderData.name.toUpperCase(), 'Status:', 'PAID & DELIVERED']
-        ],
-        theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 1 },
-        columnStyles: { 0: { fontStyle: 'bold', width: 25 }, 2: { fontStyle: 'bold', width: 20 } }
-    });
-
-    // --- 🥘 Items Table ---
-    doc.autoTable({
-        startY: 62,
-        head: [['S.No', 'Description', 'Qty', 'Amount (INR)']],
-        body: [[1, orderData.items, "1", "Rs. " + orderData.total]],
-        theme: 'grid',
-        headStyles: { fillColor: [184, 134, 11], textColor: [255, 255, 255] },
-        styles: { fontSize: 11, cellPadding: 5 }
-    });
-
-    // --- 💰 Grand Total ---
-    let finalY = doc.lastAutoTable.finalY + 12;
-    doc.setFontSize(16);
-    doc.setTextColor(184, 134, 11);
-    doc.text(`GRAND TOTAL: Rs. ${orderData.total}/-`, 195, finalY, { align: "right" });
-
-    // --- 🏰 Royal Banner Footer ---
-    if (bannerData) {
-        // Banner image niche (Center aligned)
-        doc.addImage(bannerData, 'PNG', 55, finalY + 10, 100, 20);
-    }
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(100, 100, 100);
-    doc.text("Thank you for dining Royally! Visit Again.", 105, finalY + 40, { align: "center" });
-
-    // --- 📥 Save ---
-    doc.save(`RSK_Invoice_${orderData.token}.pdf`);
-};
-
-    // --- 6. LIVE BILL DOWNLOAD BUTTON (Dashboard Trigger) ---
-    window.downloadLatestBill = function() {
-        if (currentActiveOrder) {
-            generateRoyalBill(currentActiveOrder);
-        } else {
-            alert("Order data loading... Please wait.");
-        }
-    };
-
-    // --- 7. PROFILE HANDLER ---
     window.saveRoyalProfile = function() {
         const phoneVal = document.getElementById('new-phone').value;
         const prefVal = document.getElementById('new-pref').value;
@@ -305,7 +167,5 @@ function renderHistory(orders) {
         location.reload(); 
     };
 
-    // --- 8. INITIALIZE START ---
     initDashboard();
-
 </script>
