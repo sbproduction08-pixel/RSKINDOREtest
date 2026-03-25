@@ -56,25 +56,34 @@
     }
 
     function startTracking() {
-        const phone = localStorage.getItem('userPhone');
-        const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
+    const phone = localStorage.getItem('userPhone');
+    // GAS URL bina kisi 'callback' parameter ke
+    const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
 
-        fetch(gasUrl)
-            .then(res => {
-                const text = res.body ? "" : res.text(); // JSONP handle karne ke liye
-                return res.json();
-            })
-            .then(data => {
-                // Latest order dhundo jo 'Done' ya 'Cancelled' na ho
-                const myOrder = data.reverse().find(o => o.phone == phone && o.status !== 'Done' && !o.status.includes('Cancelled'));
+    fetch(gasUrl)
+        .then(res => res.json()) // 🔥 Ab ye seedha JSON read karega
+        .then(data => {
+            console.log("Data Received:", data);
+            
+            // Latest order dhundo
+            const myOrder = data.reverse().find(o => o.phone == phone && o.status !== 'Done');
+            
+            if (myOrder) {
+                document.getElementById('order-status').innerText = myOrder.status.toUpperCase();
+                document.getElementById('order-otp').innerText = myOrder.otp || "WAIT";
                 
-                if (myOrder) {
-                    document.getElementById('live-tracker').style.display = 'block';
-                    document.getElementById('no-order').style.display = 'none';
-                    document.getElementById('order-status').innerText = myOrder.status.toUpperCase();
-                    document.getElementById('order-otp').innerText = myOrder.otp || "WAIT";
-                    // Loop tracking every 15 seconds
-                    setTimeout(startTracking, 15000);
+                // Agla update 15 second mein
+                setTimeout(startTracking, 15000);
+            } else {
+                document.getElementById('order-status').innerText = "NO ACTIVE ORDER";
+            }
+        })
+        .catch(err => {
+            console.log("Tracking Error:", err);
+            // Agar JSON error aaye toh 5 sec baad phir koshish karo
+            setTimeout(startTracking, 5000);
+        });
+}
                 } else {
                     document.getElementById('live-tracker').style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
