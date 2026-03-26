@@ -57,80 +57,17 @@
 </style>
 
 <script>
-(function() {
+(async function() {
+    // 1. Pehle Inventory Status Fetch Karo
+    const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
+    let inventoryData = {};
+    try {
+        const res = await fetch(bridgeUrl + "?action=getInventory");
+        inventoryData = await res.json();
+    } catch(e) { console.log("Inventory check failed, showing all items."); }
+
     const menuData = [
-        {
-            sectionName: "👑 RSK ROYAL COMBOS",
-            sectionPhoto: "ROYAL COMBO.jpg",
-            items: [
-                { name: "Tawa Chicken + Paratha", price: 259, type: "single" },
-                { name: "Tawa Chicken + Kulcha", price: 249, type: "single" },
-                { name: "Paneer Bhurji + Paratha", price: 209, type: "single" },
-                { name: "Paneer Bhurji + Kulcha", price: 199, type: "single" },
-                { name: "Tawa Paneer + Paratha", price: 209, type: "single" },
-                { name: "Tawa Paneer + Kulcha", price: 199, type: "single" },
-                { name: "Tawa Egg + Paratha", price: 139, type: "single" },
-                { name: "Tawa Egg + Kulcha", price: 129, type: "single" },
-                { name: "Egg Bhurji + Paratha", price: 119, type: "single" },
-                { name: "Egg Bhurji + Kulcha", price: 109, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🍗 NON-VEG SPECIALS",
-            sectionPhoto: "https://images.unsplash.com/photo-1603894584115-f73f2ec851ad?auto=format&fit=crop&w=800&q=80",
-            items: [
-                { name: "RSK Special Chicken", halfPrice: 219, fullPrice: 399, type: "dual" },
-                { name: "Tawa Chicken", halfPrice: 229, fullPrice: 409, type: "dual" },
-                { name: "Chilly Chicken", halfPrice: 189, fullPrice: 349, type: "dual" },
-                { name: "Diet Paper Chicken", halfPrice: 199, fullPrice: 359, type: "dual" },
-                { name: "Creamy Paper Chicken", halfPrice: 219, fullPrice: 399, type: "dual" },
-                { name: "Fry Chicken", halfPrice: 149, fullPrice: 279, type: "dual" },
-                { name: "Finger Chicken", halfPrice: 169, fullPrice: 299, type: "dual" },
-                { name: "Chicken Cheese Balls", halfPrice: 189, fullPrice: 349, type: "dual" }
-            ]
-        },
-        {
-            sectionName: "🍛 VEG DELIGHTS",
-            sectionPhoto: "https://images.unsplash.com/photo-1585937421612-70a0f295561a?auto=format&fit=crop&w=800&q=80",
-            items: [
-                { name: "Kastoori Paneer", price: 179, type: "single" },
-                { name: "Tawa Paneer", price: 189, type: "single" },
-                { name: "Paneer Bhurji", price: 189, type: "single" },
-                { name: "Garlic Bread", price: 159, type: "single" },
-                { name: "French Fries / Potato Bites", price: 79, type: "single" },
-                { name: "Chips of Choice", price: 69, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🍜 MAGGIE CORNER",
-            sectionPhoto: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=800&q=80",
-            items: [
-                { name: "RSK Special Maggie", price: 99, type: "single" },
-                { name: "Cheese / Veg Maggie", price: 89, type: "single" },
-                { name: "Butter Maggie", price: 69, type: "single" },
-                { name: "Masala Maggie", price: 49, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🥚 EGG STATION",
-            sectionPhoto: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80",
-            items: [
-                { name: "Tawa Egg", price: 119, type: "single" },
-                { name: "Kastoori Egg / Egg Bhurji", price: 99, type: "single" },
-                { name: "Boiled Egg (2 pc)", price: 25, type: "single" }
-            ]
-        },
-        {
-            sectionName: "🫓 RICE & BREADS",
-            sectionPhoto: "https://images.unsplash.com/photo-1512058560366-cd2429ff5c7c?auto=format&fit=crop&w=800&q=80",
-            items: [
-                { name: "Chicken Fried Rice", price: 149, type: "single" },
-                { name: "Egg Fried Rice", price: 139, type: "single" },
-                { name: "Veg Fried Rice", price: 129, type: "single" },
-                { name: "Paratha", price: 25, type: "single" },
-                { name: "Kulcha", price: 20, type: "single" }
-            ]
-        }
+        // ... (Tumhara pura menuData yahan rahega)
     ];
 
     const container = document.getElementById('dynamic-menu-render');
@@ -143,23 +80,31 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
             
             section.items.forEach(item => {
-                html += `<div class="menu-card">
+                // 🔥 CHECK STOCK STATUS
+                const isOut = inventoryData[item.name] === "Out";
+                const cardStyle = isOut ? 'filter: grayscale(1); opacity: 0.6;' : '';
+                
+                html += `<div class="menu-card" style="${cardStyle}">
                     <div style="color:#fff; font-size:12px; font-weight:600; margin-bottom:8px;">${item.name}</div>`;
                 
                 if (item.type === 'single') {
-                    html += `
-                    <div style="color:#D4AF37; font-weight:bold; margin-bottom:10px; font-size:14px;">₹${item.price}</div>
-                    <button onclick="window.addToCart('${item.name}', ${item.price})" class="add-btn-royal">+ ADD</button>`;
+                    if (isOut) {
+                        html += `<div style="color:#ff4444; font-weight:bold; margin-bottom:10px; font-size:12px;">SOLD OUT ❌</div>
+                                 <button disabled class="add-btn-royal" style="background:#444;">OUT</button>`;
+                    } else {
+                        html += `<div style="color:#D4AF37; font-weight:bold; margin-bottom:10px; font-size:14px;">₹${item.price}</div>
+                                 <button onclick="window.addToCart('${item.name}', ${item.price})" class="add-btn-royal">+ ADD</button>`;
+                    }
                 } else {
-                    html += `
-                    <div style="display:flex; flex-direction:column; gap:6px;">
+                    // Dual Price Items (Half/Full)
+                    html += `<div style="display:flex; flex-direction:column; gap:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="color:#ccc; font-size:10px;">H: ₹${item.halfPrice}</span>
-                            <button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" class="dual-btn">+ H</button>
+                            ${isOut ? '<button disabled class="dual-btn" style="background:#444;">X</button>' : `<button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" class="dual-btn">+ H</button>`}
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="color:#D4AF37; font-size:10px; font-weight:bold;">F: ₹${item.fullPrice}</span>
-                            <button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" class="dual-btn dual-btn-full">+ F</button>
+                            ${isOut ? '<button disabled class="dual-btn" style="background:#444;">X</button>' : `<button onclick="window.addToCart('${item.name} (F)', ${item.fullPrice})" class="dual-btn dual-btn-full">+ F</button>`}
                         </div>
                     </div>`;
                 }
