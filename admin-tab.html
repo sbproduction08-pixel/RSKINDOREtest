@@ -89,7 +89,86 @@
             })
             .catch(err => console.error("Fetch Error:", err));
     }
+     // 1. Navigation Logic
+function openStockManager() {
+    document.getElementById('admin-main-view').style.display = 'none';
+    document.getElementById('stock-manager-view').style.display = 'block';
+    loadInventoryInAdmin();
+}
 
+function closeStockManager() {
+    document.getElementById('admin-main-view').style.display = 'block';
+    document.getElementById('stock-manager-view').style.display = 'none';
+}
+
+// 2. Load Inventory with Toggle
+async function loadInventoryInAdmin() {
+    const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
+    const res = await fetch(bridgeUrl + "?action=getInventory");
+    const invData = await res.json();
+
+    // MenuData wahi hai jo menu-tab mein tha
+    const allItems = [];
+    menuData.forEach(section => section.items.forEach(item => allItems.push(item.name)));
+
+    let html = "";
+    allItems.forEach(name => {
+        const status = invData[name] || "In";
+        const isOut = status === "Out";
+        
+        html += `
+            <div class="stock-item-row" data-name="${name.toLowerCase()}" style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #333;">
+                <span style="color:${isOut ? '#888' : '#fff'}; font-size:14px;">${name}</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:10px; color:${isOut ? '#ff4444' : '#25D366'}">${status.toUpperCase()}</span>
+                    <label class="switch">
+                        <input type="checkbox" ${!isOut ? 'checked' : ''} onchange="toggleStockItem('${name}', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('admin-inventory-list').innerHTML = html;
+}
+
+// 3. Toggle Stock Action
+async function toggleStockItem(itemName, isChecked) {
+    const newStatus = isChecked ? "In" : "Out";
+    const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
+    
+    // UI Update immediate
+    console.log(`Updating ${itemName} to ${newStatus}`);
+
+    try {
+        await fetch(bridgeUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "updateInventory",
+                itemName: itemName,
+                newStatus: newStatus
+            })
+        });
+    } catch(e) { alert("Error updating stock!"); }
+}
+
+// 4. Search Filter
+function filterStockItems() {
+    let input = document.getElementById('stockSearch').value.toLowerCase();
+    let rows = document.getElementsByClassName('stock-item-row');
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].style.display = rows[i].getAttribute('data-name').includes(input) ? "flex" : "none";
+    }
+}
+
+// 5. Admin Logout
+window.logoutAdmin = function() {
+    if(confirm("Logout from Admin Panel?")) {
+        localStorage.removeItem('isAdminLoggedIn');
+        location.reload();
+    }
+};
     // --- 2. ORDER RENDERER (Detailed & Soft UI) ---
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
