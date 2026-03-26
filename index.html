@@ -7,10 +7,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>    
     
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NQGXYF0TMG');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'G-NQGXYF0TMG');
     </script>
 
     <meta charset="UTF-8">
@@ -20,7 +22,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- SHAHI COLOR PALETTE --- */
+        /* ---------------------------------------------------------
+           1. CSS VARIABLES (ROYAL THEME)
+           --------------------------------------------------------- */
         :root { 
             --gold: #D4AF37; 
             --black: #0a0a0a; 
@@ -29,7 +33,9 @@
             --fire: #ff4500;
         }
 
-        /* --- GLOBAL STYLES --- */
+        /* ---------------------------------------------------------
+           2. GLOBAL STYLES
+           --------------------------------------------------------- */
         body { 
             margin: 0; 
             background: var(--black); 
@@ -39,7 +45,9 @@
             overflow-x: hidden; 
         }
 
-        /* --- HEADER & ANIMATIONS --- */
+        /* ---------------------------------------------------------
+           3. HEADER SECTION
+           --------------------------------------------------------- */
         header { 
             padding: 30px 10px; 
             text-align: center; 
@@ -73,6 +81,7 @@
             background: #000; 
         }
         
+        /* Fire Motion Animation Around Logo */
         .fire-motion { 
             position: absolute; 
             top: -5px; 
@@ -93,6 +102,7 @@
             100% { transform: rotate(360deg) scale(1); opacity: 0.8; } 
         }
 
+        /* Royal Title Image Styling */
         .title-wrapper { 
             position: relative; 
             flex-grow: 1; 
@@ -113,7 +123,9 @@
             50% { transform: scale(1.05); } 
         }
 
-        /* --- USER INTERFACE --- */
+        /* ---------------------------------------------------------
+           4. USER INTERFACE PANELS
+           --------------------------------------------------------- */
         .user-panel { 
             display: flex; 
             flex-direction: column; 
@@ -150,7 +162,9 @@
             cursor: pointer; 
         }
 
-        /* --- NAVIGATION --- */
+        /* ---------------------------------------------------------
+           5. NAVIGATION BAR (BOTTOM)
+           --------------------------------------------------------- */
         .bottom-nav { 
             position: sticky; 
             top: 0; 
@@ -177,21 +191,9 @@
             border-bottom: 2px solid var(--gold); 
         }
 
-        /* --- CANCEL BAR & ALERTS --- */
-        #cancel-bar { 
-            display: none; 
-            background: rgba(0,0,0,0.9); 
-            border: 2px solid var(--gold); 
-            padding: 15px; 
-            margin: 10px; 
-            border-radius: 12px; 
-            text-align: center;
-            position: sticky;
-            top: 70px;
-            z-index: 3000;
-        }
-
-        /* --- APP CONTENT AREA --- */
+        /* ---------------------------------------------------------
+           6. CONTENT AREA & CHECKOUT
+           --------------------------------------------------------- */
         .app-container { 
             max-width: 500px; 
             margin: 0 auto; 
@@ -200,7 +202,6 @@
             padding-bottom: 120px; 
         }
 
-        /* --- FLOATING CART --- */
         #floatingCheckout { 
             position: fixed; 
             bottom: 0; 
@@ -216,7 +217,22 @@
             box-sizing: border-box;
         }
 
-        /* --- SOCIAL FLOATING BAR --- */
+        #cancel-bar { 
+            display: none; 
+            background: rgba(0,0,0,0.9); 
+            border: 1px solid var(--gold); 
+            padding: 15px; 
+            margin: 10px; 
+            border-radius: 10px; 
+            text-align: center;
+            position: sticky;
+            top: 70px;
+            z-index: 3000;
+        }
+
+        /* ---------------------------------------------------------
+           7. SOCIAL & FOOTER
+           --------------------------------------------------------- */
         #royal-social-float { 
             position: fixed; 
             right: 20px; 
@@ -242,12 +258,19 @@
             animation: royalJump 3s infinite ease-in-out; 
         }
 
+        .social-icon img { 
+            width: 28px; 
+            height: 28px; 
+        }
+
         @keyframes royalJump { 
             0%, 100% { transform: translateY(0); } 
             50% { transform: translateY(-15px); } 
         }
 
-        /* --- SIDE DRAWER --- */
+        /* ---------------------------------------------------------
+           8. SIDE DRAWER MENU
+           --------------------------------------------------------- */
         #side-drawer { 
             position: fixed; 
             top: 0; 
@@ -263,9 +286,11 @@
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
+            box-sizing: border-box;
         }
 
         #side-drawer.open { right: 0; }
+
         .drawer-item { 
             color: #fff; 
             font-family: 'Marcellus', serif; 
@@ -277,6 +302,7 @@
             align-items: center; 
             gap: 15px; 
         }
+
         #drawer-overlay { 
             position: fixed; 
             top: 0; 
@@ -287,6 +313,14 @@
             display: none; 
             z-index: 4500; 
             backdrop-filter: blur(5px); 
+        }
+
+        .footer-section { 
+            text-align: center; 
+            padding: 50px 20px; 
+            background: linear-gradient(to bottom, #1a1a1a, #2a0a0a); 
+            border-top: 3px solid var(--gold); 
+            margin-top: 30px; 
         }
     </style>
 </head>
@@ -340,12 +374,16 @@
     </div>
 
     <div id="royal-social-float">
-        <a href="https://wa.me/917489999890" class="social-icon" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
-        <a href="https://www.instagram.com/royalstreetkitchenrskindore/" class="social-icon" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/174/174855.png"></a>
+        <a href="https://wa.me/917489999890" class="social-icon wa-icon" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+        </a>
+        <a href="https://www.instagram.com/royalstreetkitchenrskindore/?hl=en" class="social-icon ig-icon" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
+        </a>
     </div>
 
     <div id="drawer-overlay" onclick="toggleSideMenu()"></div>
-    
+
     <div id="side-drawer">
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="royalstreetkitchen.png" style="width: 120px;">
@@ -353,32 +391,38 @@
         </div>
         <div class="drawer-item" onclick="showTab('gallery'); toggleSideMenu()">📸 Shahi Jhalak</div>
         <div class="drawer-item" onclick="showTab('offers'); toggleSideMenu()">🎁 Shahi Saugat</div>
-        <div style="margin-top: auto; text-align: center; font-size: 10px; color: #555;">V 2.5 • ROYAL STREET KITCHEN</div>
+        <div style="margin-top: auto; text-align: center; font-size: 10px; color: #555;">
+            V 2.5 • ROYAL STREET KITCHEN
+        </div>
     </div>
 
     <script>
-        // Global State
+        // Global State Variables
         window.cart = JSON.parse(localStorage.getItem('userCart')) || []; 
         let cancelInterval;
         const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
 
-        // Tab Management System
+        /**
+         * Tab Management System
+         * Loads external HTML files and executes scripts within them
+         */
         function showTab(tabId) {
-            // Update Navigation UI
+            // Update UI Active State
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if(document.getElementById('btn-' + tabId)) document.getElementById('btn-' + tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) activeBtn.classList.add('active');
             
-            // Content Loading
             const contentArea = document.getElementById('content-area');
             contentArea.innerHTML = "<div style='text-align:center; padding:50px; color:var(--gold);'>👑 Loading Shahi Section...</div>";
             
+            // Fetch Tab Content
             fetch('./' + tabId + '-tab.html?v=' + Date.now())
             .then(res => res.text())
             .then(data => {
                 contentArea.innerHTML = data;
                 updateUserUI();
                 
-                // Re-execute scripts within the loaded tab
+                // Script Re-execution Logic
                 const scripts = contentArea.querySelectorAll('script');
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement('script');
@@ -387,25 +431,37 @@
                     oldScript.parentNode.replaceChild(newScript, oldScript);
                 });
             })
-            .catch(err => { contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Welcome!</div>"; });
+            .catch(err => { 
+                contentArea.innerHTML = "<div style='text-align:center; padding:50px;'>Namaste! Section loading failed.</div>"; 
+            });
             
-            // Persist Tab (Except Admin)
+            // Local Persistence
             if(tabId !== 'admin') localStorage.setItem('activeTab', tabId);
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // Update User Interface based on Login Status
+        /**
+         * Update Global UI Elements based on login
+         */
         function updateUserUI() {
             const userName = localStorage.getItem('userName');
-            document.getElementById('welcome-user').innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
+            const welcomeSpan = document.getElementById('welcome-user');
+            
+            if(welcomeSpan) {
+                welcomeSpan.innerHTML = userName ? "Namaste, " + userName + "! ✨" : "";
+            }
+            
             document.getElementById('loginBtn').style.display = userName ? 'none' : 'inline-block';
             document.getElementById('logoutBtn').style.display = userName ? 'inline-block' : 'none';
             document.getElementById('trackBtn').style.display = userName ? 'inline-block' : 'none';
         }
 
-        // --- 🛡️ THE ROYAL GATEKEEPER CHECKOUT ---
+        /**
+         * 🛡️ THE ROYAL GATEKEEPER CHECKOUT
+         * Validates stock in real-time before proceeding to payment
+         */
         window.checkout = async function() {
-            // Pre-checks
+            // User Validation
             const user = window.auth ? window.auth.currentUser : null;
             if(!user && !localStorage.getItem('userName')) { 
                 alert("Pehle Login Karein!"); 
@@ -414,37 +470,36 @@
 
             const uName = localStorage.getItem('userName');
             const uPhone = localStorage.getItem('userPhone');
-            
-            if(!uPhone || uPhone === "null") { 
-                alert("Profile incomplete! Dashboard mein number update karein."); 
-                return showTab('dashboard'); 
+
+            if(!uPhone || uPhone === "null") {
+                alert("Profile incomplete! Dashboard mein number update karein.");
+                return showTab('dashboard');
             }
-            
-            if(window.cart.length === 0) return alert("Cart khali hai!");
+
+            if(!window.cart || window.cart.length === 0) return alert("Cart khali hai!");
 
             const btn = document.getElementById('orderNowBtn');
             btn.innerText = "Checking Stock... 🛡️";
             btn.disabled = true;
 
             try {
-                // STEP 1: FRESH STOCK AUDIT (GATEKEEPER)
+                // --- GATEKEEPER STEP 1: STOCK AUDIT ---
                 const invRes = await fetch(bridgeUrl + "?action=getInventory");
                 const latestStock = await invRes.json();
                 let outItems = [];
 
                 window.cart.forEach(item => {
-                    // Normalize dish name for checking (H/F handles)
+                    // Extract base name to handle (H)/(F) variations
                     let cleanName = item.name.split(' (')[0].trim(); 
                     if (latestStock[cleanName] === "Out" || latestStock[item.name] === "Out") {
                         outItems.push(item.name);
                     }
                 });
 
-                // If items are out of stock
                 if (outItems.length > 0) {
                     alert(`🛑 MAAF KIJIYE!\n\nYe items khatam ho gaye hain:\n- ${outItems.join('\n- ')}\n\nInhe hata kar dobara koshish karein.`);
                     
-                    // Auto-filter cart
+                    // Auto-filter out of stock items
                     window.cart = window.cart.filter(i => !outItems.includes(i.name));
                     updateCartUI();
                     
@@ -453,16 +508,17 @@
                     return; 
                 }
 
-                // STEP 2: TOKEN GENERATION & BOOKING
-                btn.innerText = "Booking Royal Order... 👑";
+                // --- GATEKEEPER STEP 2: PROCEED TO BOOKING ---
+                btn.innerText = "Booking Order... 👑";
+                
                 const tokenRes = await fetch(bridgeUrl);
                 const nextToken = await tokenRes.text(); 
                 
                 let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
                 let itemsStr = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
 
-                // Final POST to Google Sheets
-                const postUrl = bridgeUrl + 
+                // Final API Submission
+                const finalUrl = bridgeUrl + 
                     "?token=" + encodeURIComponent(nextToken) + 
                     "&name=" + encodeURIComponent(uName) + 
                     "&phone=" + encodeURIComponent(uPhone) + 
@@ -470,120 +526,132 @@
                     "&total=" + total + 
                     "&status=Awaiting%20Payment";
 
-                await fetch(postUrl, { method: 'POST', mode: 'no-cors' });
+                await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
 
-                // SUCCESS HANDLERS
+                // Success Handling
                 localStorage.setItem('lastTokenNo', nextToken);
                 
-                // WhatsApp Trigger
+                // WhatsApp Automation
                 let waMsg = `*ROYAL STREET KITCHEN* 👑%0A*Token:* ${encodeURIComponent(nextToken)}%0A*Order:* ${encodeURIComponent(itemsStr)}%0A*Total: ₹${total}*`;
                 window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
 
-                alert("Order Confirmed! Token #" + nextToken);
+                alert("Order Placed! Token #" + nextToken);
                 
-                // Reset Cart & View
                 window.cart = []; 
                 updateCartUI();
                 showTab('dashboard'); 
-                
-                // Start Order Timer
                 startCancelTimer(300, true);
 
             } catch (err) {
-                alert("Connection Error! Sheet update nahi hui.");
-                console.error(err);
+                console.error("Checkout Error:", err);
+                alert("Technical Error! Try again.");
             } finally {
                 btn.innerText = "Order Now"; 
                 btn.disabled = false;
             }
         };
 
-        // --- ORDER TIMER & SYNC ---
+        /**
+         * Timer Logic for Cancellation Window
+         */
         function startCancelTimer(duration, isNew = false) {
             clearInterval(cancelInterval);
             const display = document.getElementById('timer-display');
             const bar = document.getElementById('cancel-bar');
+            const tokenSpan = document.getElementById('last-token');
             
-            let startTime = isNew ? Date.now() : parseInt(localStorage.getItem('timerStartTime'));
-            if (isNew) localStorage.setItem('timerStartTime', startTime);
-            
+            let startTime;
+            if (isNew) {
+                startTime = Date.now();
+                localStorage.setItem('timerStartTime', startTime);
+            } else {
+                startTime = parseInt(localStorage.getItem('timerStartTime'));
+            }
+
             const token = localStorage.getItem('lastTokenNo');
             if(!token || !startTime) return;
-            
-            document.getElementById('last-token').innerText = token;
+
+            tokenSpan.innerText = token;
             bar.style.display = 'block';
 
-            // Timer Loop
             cancelInterval = setInterval(async function () {
-                let rem = duration - Math.floor((Date.now() - startTime) / 1000);
-                
-                // Status Sync every 15 seconds
-                if (rem % 15 === 0) {
+                let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                let remainingTime = duration - elapsedTime;
+
+                // Status Check every 15s to auto-hide timer if Admin accepts
+                if (remainingTime % 15 === 0) {
                     try {
                         const res = await fetch(bridgeUrl + "?action=readAdmin");
                         const orders = await res.json();
                         const myOrder = orders.find(o => o.token === token);
                         
-                        // Stop timer if Admin starts preparation
                         if (myOrder && !["awaiting payment", "pending", ""].includes(myOrder.status.toLowerCase())) {
-                            stopAndHideTimer(); 
+                            stopAndHideTimer();
                             return;
                         }
-                    } catch(e) { console.log("Background sync failed..."); }
+                    } catch(e) { console.log("Sync failed..."); }
                 }
 
-                if (rem <= 0) { 
-                    stopAndHideTimer(); 
+                if (remainingTime <= 0) {
+                    stopAndHideTimer();
                 } else {
-                    let m = Math.floor(rem / 60);
-                    let s = rem % 60;
-                    display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+                    let minutes = Math.floor(remainingTime / 60);
+                    let seconds = remainingTime % 60;
+                    display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
                 }
             }, 1000);
         }
 
         function stopAndHideTimer() {
             clearInterval(cancelInterval);
-            document.getElementById('cancel-bar').style.display = 'none';
-            localStorage.removeItem('lastTokenNo'); 
+            if(document.getElementById('cancel-bar')) document.getElementById('cancel-bar').style.display = 'none';
+            localStorage.removeItem('lastTokenNo');
             localStorage.removeItem('timerStartTime');
         }
 
-        // Cancel Order Action
+        /**
+         * Order Cancellation Handler
+         */
         window.cancelOrder = function() {
             const token = localStorage.getItem('lastTokenNo');
             const name = localStorage.getItem('userName');
             
-            if(!token || !confirm("Aap ye order cancel karna chahte hain?")) return;
+            if(!token || !confirm("Order cancel karein?")) return;
             
-            // API Call
-            fetch(bridgeUrl, { 
-                method: 'POST', 
+            const formData = new URLSearchParams();
+            formData.append('token', token);
+            formData.append('name', name);
+            formData.append('status', 'Cancelled By User');
+
+            fetch(bridgeUrl, {
+                method: 'POST',
                 mode: 'no-cors', 
-                body: new URLSearchParams({token, name, status: 'Cancelled By User'}).toString() 
+                body: formData.toString()
             });
-            
-            // WhatsApp Alert
-            window.open(`https://wa.me/917489999890?text=*CANCELLED* ❌%0A*Token:* ${encodeURIComponent(token)}`, '_blank');
-            
-            stopAndHideTimer(); 
-            alert("Order Cancel Ho Gaya!");
+
+            let cancelMsg = `*CANCELLED* ❌%0A*Token:* ${encodeURIComponent(token)}`;
+            window.open(`https://wa.me/917489999890?text=${cancelMsg}`, '_blank');
+
+            stopAndHideTimer();
+            alert("Order Cancelled!");
         };
 
-        // --- CART ENGINE ---
+        /**
+         * 🛒 CART ENGINE FUNCTIONS
+         */
         window.addToCart = function(name, price) {
             if(!localStorage.getItem('userName')) return window.registerUser();
             const existing = window.cart.find(item => item.name === name);
             if (existing) { 
                 existing.qty += 1; 
             } else { 
-                window.cart.push({ name, price, qty: 1 }); 
+                window.cart.push({ name: name, price: price, qty: 1 }); 
             }
             updateCartUI();
         };
 
         window.removeFromCart = function(name) {
-            const idx = window.cart.findIndex(i => i.name === name);
+            const idx = window.cart.findIndex(item => item.name === name);
             if (idx > -1) { 
                 if (window.cart[idx].qty > 1) { 
                     window.cart[idx].qty -= 1; 
@@ -598,51 +666,71 @@
             const bar = document.getElementById('floatingCheckout');
             const listDisp = document.getElementById('cart-items-list');
             const totalDisp = document.getElementById('cart-total-display');
+            const socialBar = document.getElementById('royal-social-float');
             
-            let total = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let total = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             
             if (window.cart.length > 0) {
                 bar.style.display = 'flex'; 
                 totalDisp.innerText = total;
-                listDisp.innerHTML = window.cart.map(i => `
-                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                        <span>${i.name} x${i.qty}</span>
-                        <button onclick="window.removeFromCart('${i.name}')" style="background:none;border:none;color:red;font-weight:bold;cursor:pointer;">-</button>
+                listDisp.innerHTML = window.cart.map(item => `
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                        <span>${item.name} x${item.qty}</span>
+                        <button onclick="window.removeFromCart('${item.name}')" style="background:none;border:1px solid red;color:red;padding:0 5px;border-radius:4px;margin-left:8px;">-</button>
                     </div>`).join('');
-                document.getElementById('royal-social-float').style.display = 'none';
+                if(socialBar) socialBar.style.display = 'none';
             } else {
-                bar.style.display = 'none'; 
-                document.getElementById('royal-social-float').style.display = 'flex';
+                bar.style.display = 'none';
+                if(socialBar) socialBar.style.display = 'flex';
             }
             localStorage.setItem('userCart', JSON.stringify(window.cart));
         }
 
-        // --- ADMIN ACCESS LOGIC ---
+        /**
+         * Admin Hidden Access
+         */
+        let logoClicks = 0; 
+        let clickTimer;
         window.handleAdminAccess = function() {
-            window.adminClicks = (window.adminClicks || 0) + 1;
-            setTimeout(() => window.adminClicks = 0, 3000);
-            if (window.adminClicks === 3) {
-                if (prompt("Royal Admin Key:") === "RSK@2026") { 
-                    localStorage.setItem('isAdminLoggedIn', 'true'); 
-                    showTab('admin'); 
+            logoClicks++; 
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => { logoClicks = 0; }, 3000);
+            
+            if (logoClicks === 3) {
+                logoClicks = 0;
+                let pass = prompt("🔐 Enter Royal Admin Key:");
+                if (pass === "RSK@2026") { 
+                    localStorage.setItem('isAdminLoggedIn', 'true');
+                    showTab('admin');
                 }
             }
         };
 
-        // UI Helpers
+        /**
+         * Drawer Logic
+         */
         function toggleSideMenu() {
             const drawer = document.getElementById('side-drawer');
             const overlay = document.getElementById('drawer-overlay');
-            drawer.classList.toggle('open');
-            overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
+            if (drawer.classList.contains('open')) {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+            }
         }
 
-        // Page Load Initialization
-        window.onload = () => {
-            let tab = localStorage.getItem('isAdminLoggedIn') === 'true' ? 'admin' : (localStorage.getItem('activeTab') || 'home');
-            showTab(tab); 
-            updateCartUI();
-            if(localStorage.getItem('lastTokenNo')) startCancelTimer(300, false);
+        // Initialization on Load
+        window.onload = () => { 
+            const adminStatus = localStorage.getItem('isAdminLoggedIn');
+            let tabToShow = localStorage.getItem('activeTab') || 'home';
+            if (adminStatus === 'true') { tabToShow = 'admin'; }
+            showTab(tabToShow);
+            updateCartUI(); 
+            if(localStorage.getItem('lastTokenNo') && localStorage.getItem('timerStartTime')) {
+                startCancelTimer(300, false);
+            }
         };
     </script>
 
@@ -651,13 +739,13 @@
         import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDGbHAorUN14LmXtRCd1IYzKQzP8hP02AE", 
-            authDomain: "rsk-test-63cee.firebaseapp.com", 
-            projectId: "rsk-test-63cee", 
-            storageBucket: "rsk-test-63cee.firebasestorage.app", 
-            messagingSenderId: "805798855186", 
-            appId: "1:805798855186:web:9b0d09decca344a9478ecb" 
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGbHAorUN14LmXtRCd1IYzKQzP8hP02AE",
+            authDomain: "rsk-test-63cee.firebaseapp.com",
+            projectId: "rsk-test-63cee",
+            storageBucket: "rsk-test-63cee.firebasestorage.app",
+            messagingSenderId: "805798855186",
+            appId: "1:805798855186:web:9b0d09decca344a9478ecb"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -665,43 +753,49 @@
         const auth = getAuth(app);
         window.auth = auth;
 
-        // Firebase Google Login
+        /**
+         * Google Authentication Flow
+         */
         window.registerUser = async function() {
+            const provider = new GoogleAuthProvider();
             try {
-                const res = await signInWithPopup(auth, new GoogleAuthProvider());
-                const user = res.user;
-                const uDoc = await getDoc(doc(db, "users", user.uid));
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
                 
-                if (!uDoc.exists()) {
+                if (!userDoc.exists()) {
                     let phone = prompt("Namaste! Aapka WhatsApp number kya hai?");
                     if(phone && phone.length >= 10) {
-                        await setDoc(doc(db, "users", user.uid), { 
-                            name: user.displayName, 
-                            email: user.email, 
-                            phone: phone, 
-                            joinedAt: serverTimestamp() 
+                        await setDoc(doc(db, "users", user.uid), {
+                            name: user.displayName,
+                            email: user.email,
+                            phone: phone,
+                            joinedAt: serverTimestamp()
                         });
-                        localStorage.setItem('userName', user.displayName); 
+                        localStorage.setItem('userName', user.displayName);
                         localStorage.setItem('userPhone', phone);
                     }
                 } else {
-                    const data = uDoc.data();
-                    localStorage.setItem('userName', data.name); 
-                    localStorage.setItem('userPhone', data.phone);
+                    const userData = userDoc.data();
+                    localStorage.setItem('userName', userData.name);
+                    localStorage.setItem('userPhone', userData.phone);
                 }
                 location.reload();
-            } catch (e) { alert("Login failed: " + e.message); }
+            } catch (e) {
+                alert("Login Error: " + e.message);
+            }
         };
 
-        // Firebase Logout
-        window.logout = async () => { 
-            if(confirm("Royal Account se Logout karein?")) { 
-                await signOut(auth); 
-                localStorage.clear(); 
-                location.reload(); 
-            } 
+        /**
+         * Logout Logic
+         */
+        window.logout = async function() {
+            if(confirm("Logout from Royal Account?")) {
+                await signOut(auth);
+                localStorage.clear();
+                location.reload();
+            }
         };
     </script>
-
 </body>
 </html>
