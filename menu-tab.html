@@ -8,11 +8,6 @@
         padding: 10px;
         border: 1px solid rgba(212, 175, 55, 0.1);
     }
-    .menu-section-container:hover {
-        transform: scale(1.01);
-        border-color: #D4AF37;
-        background: rgba(212, 175, 55, 0.03);
-    }
     .menu-card {
         background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
         border: 1px solid rgba(255,255,255,0.1);
@@ -24,10 +19,6 @@
         transition: 0.3s;
         position: relative;
     }
-    .menu-card:hover {
-        border-color: #D4AF37;
-        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
-    }
     .add-btn-royal {
         background: linear-gradient(45deg, #af8d19, #f1d36d);
         color: #000;
@@ -38,36 +29,98 @@
         font-weight: 800;
         cursor: pointer;
         font-size: 11px;
-        text-transform: uppercase;
     }
     .dual-btn {
-        background: #444;
-        color: #fff;
-        border: none;
-        padding: 5px 8px;
-        border-radius: 4px;
-        font-size: 10px;
-        cursor: pointer;
+        background: #444; color: #fff; border: none; padding: 5px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;
     }
-    .dual-btn-full {
-        background: #D4AF37;
-        color: #000;
-        font-weight: bold;
-    }
+    .dual-btn-full { background: #D4AF37; color: #000; font-weight: bold; }
 </style>
 
 <script>
 (async function() {
-    // 1. Pehle Inventory Status Fetch Karo
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
     let inventoryData = {};
+    
+    // 1. Fetch Stock Status
     try {
         const res = await fetch(bridgeUrl + "?action=getInventory");
         inventoryData = await res.json();
-    } catch(e) { console.log("Inventory check failed, showing all items."); }
+    } catch(e) { console.log("Inventory fetch failed"); }
 
+    // 2. Full Menu Data (Ye lines missing thi)
     const menuData = [
-        // ... (Tumhara pura menuData yahan rahega)
+        {
+            sectionName: "👑 RSK ROYAL COMBOS",
+            sectionPhoto: "ROYAL COMBO.jpg",
+            items: [
+                { name: "Tawa Chicken + Paratha", price: 259, type: "single" },
+                { name: "Tawa Chicken + Kulcha", price: 249, type: "single" },
+                { name: "Paneer Bhurji + Paratha", price: 209, type: "single" },
+                { name: "Paneer Bhurji + Kulcha", price: 199, type: "single" },
+                { name: "Tawa Paneer + Paratha", price: 209, type: "single" },
+                { name: "Tawa Paneer + Kulcha", price: 199, type: "single" },
+                { name: "Tawa Egg + Paratha", price: 139, type: "single" },
+                { name: "Tawa Egg + Kulcha", price: 129, type: "single" },
+                { name: "Egg Bhurji + Paratha", price: 119, type: "single" },
+                { name: "Egg Bhurji + Kulcha", price: 109, type: "single" }
+            ]
+        },
+        {
+            sectionName: "🍗 NON-VEG SPECIALS",
+            sectionPhoto: "https://images.unsplash.com/photo-1603894584115-f73f2ec851ad?auto=format&fit=crop&w=800&q=80",
+            items: [
+                { name: "RSK Special Chicken", halfPrice: 219, fullPrice: 399, type: "dual" },
+                { name: "Tawa Chicken", halfPrice: 229, fullPrice: 409, type: "dual" },
+                { name: "Chilly Chicken", halfPrice: 189, fullPrice: 349, type: "dual" },
+                { name: "Diet Paper Chicken", halfPrice: 199, fullPrice: 359, type: "dual" },
+                { name: "Creamy Paper Chicken", halfPrice: 219, fullPrice: 399, type: "dual" },
+                { name: "Fry Chicken", halfPrice: 149, fullPrice: 279, type: "dual" },
+                { name: "Finger Chicken", halfPrice: 169, fullPrice: 299, type: "dual" },
+                { name: "Chicken Cheese Balls", halfPrice: 189, fullPrice: 349, type: "dual" }
+            ]
+        },
+        {
+            sectionName: "🍛 VEG DELIGHTS",
+            sectionPhoto: "https://images.unsplash.com/photo-1585937421612-70a0f295561a?auto=format&fit=crop&w=800&q=80",
+            items: [
+                { name: "Kastoori Paneer", price: 179, type: "single" },
+                { name: "Tawa Paneer", price: 189, type: "single" },
+                { name: "Paneer Bhurji", price: 189, type: "single" },
+                { name: "Garlic Bread", price: 159, type: "single" },
+                { name: "French Fries / Potato Bites", price: 79, type: "single" },
+                { name: "Chips of Choice", price: 69, type: "single" }
+            ]
+        },
+        {
+            sectionName: "🍜 MAGGIE CORNER",
+            sectionPhoto: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=800&q=80",
+            items: [
+                { name: "RSK Special Maggie", price: 99, type: "single" },
+                { name: "Cheese / Veg Maggie", price: 89, type: "single" },
+                { name: "Butter Maggie", price: 69, type: "single" },
+                { name: "Masala Maggie", price: 49, type: "single" }
+            ]
+        },
+        {
+            sectionName: "🥚 EGG STATION",
+            sectionPhoto: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80",
+            items: [
+                { name: "Tawa Egg", price: 119, type: "single" },
+                { name: "Kastoori Egg / Egg Bhurji", price: 99, type: "single" },
+                { name: "Boiled Egg (2 pc)", price: 25, type: "single" }
+            ]
+        },
+        {
+            sectionName: "🫓 RICE & BREADS",
+            sectionPhoto: "https://images.unsplash.com/photo-1512058560366-cd2429ff5c7c?auto=format&fit=crop&w=800&q=80",
+            items: [
+                { name: "Chicken Fried Rice", price: 149, type: "single" },
+                { name: "Egg Fried Rice", price: 139, type: "single" },
+                { name: "Veg Fried Rice", price: 129, type: "single" },
+                { name: "Paratha", price: 25, type: "single" },
+                { name: "Kulcha", price: 20, type: "single" }
+            ]
+        }
     ];
 
     const container = document.getElementById('dynamic-menu-render');
@@ -80,7 +133,6 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
             
             section.items.forEach(item => {
-                // 🔥 CHECK STOCK STATUS
                 const isOut = inventoryData[item.name] === "Out";
                 const cardStyle = isOut ? 'filter: grayscale(1); opacity: 0.6;' : '';
                 
@@ -96,7 +148,6 @@
                                  <button onclick="window.addToCart('${item.name}', ${item.price})" class="add-btn-royal">+ ADD</button>`;
                     }
                 } else {
-                    // Dual Price Items (Half/Full)
                     html += `<div style="display:flex; flex-direction:column; gap:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="color:#ccc; font-size:10px;">H: ₹${item.halfPrice}</span>
