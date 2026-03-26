@@ -217,7 +217,8 @@
             width: 100%; 
             background: #111; 
             border-top: 2px solid var(--gold); 
-            padding: 20px; 
+            padding: 10px 15px !important; /* Padding kam ki */
+    min-height: 70px;
             display: none; 
             justify-content: space-between; 
             align-items: center; 
@@ -227,10 +228,10 @@
         }
 
         #cart-items-list {
-            font-size: 11px; 
+            font-size: 10px; 
             color: var(--white); 
             margin-bottom: 10px; 
-            max-height: 90px; 
+            max-height: 60px; 
             overflow-y: auto;
             border-left: 2px solid var(--gold);
             padding-left: 10px;
@@ -421,7 +422,7 @@
         </div>
         
         <button onclick="window.checkout()" id="orderNowBtn" 
-                style="background: #25D366; color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 16px; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);">
+                style="background: #25D366; color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 14px; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);">
             ORDER NOW
         </button>
     </div>
@@ -586,7 +587,7 @@
             const originalBtnText = btn.innerText;
             
             // UI Lock: User ko rok do jab tak check ho raha hai
-            btn.innerText = "SHAHI AUDIT... 🛡️";
+            btn.innerText = "Processing... 🛡️";
             btn.disabled = true;
 
             try {
@@ -632,7 +633,7 @@
 
                 // 3. GATEKEEPER PASSED - PROCEED TO BOOKING
                 console.log("Gatekeeper: Stock Clear. Proceeding to Token...");
-                btn.innerText = "PREPARING TOKEN... 👑";
+                btn.innerText = "PREPARING TOKEN no ... 👑";
                 
                 // Fetch next token sequence from Google Script doGet
                 const tokenFetchResponse = await fetch(bridgeUrl);
