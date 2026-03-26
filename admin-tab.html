@@ -145,6 +145,15 @@
                 mainActionBtn = `<button onclick="verifyOTP('${order.token}')" style="width:100%; margin-top:12px; background:#25D366; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">DELIVER 🎁</button>`;
             }
 
+            // --- 🔥 FIXED THIS SECTION ---
+            let billActionGroup = `
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button onclick='window.downloadAdminBillByData(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">📥 BILL</button>
+                    <button onclick='window.shareBillOnWAByData(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">💬 SHARE</button>
+                    ${status !== "Done" && !status.toLowerCase().includes("cancel") ? 
+                    `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer;">CANCEL ❌</button>` : ""}
+                </div>`;
+
             html += `
                 <div class="order-card" style="border-left: 5px solid ${getStatusColor(status)};">
                     <span class="status-badge" style="background:${getStatusColor(status)}; color:${status === 'Ready' ? '#000':'#fff'}">${status}</span>
@@ -153,20 +162,12 @@
                     <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin:10px 0;">${order.items}</div>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="font-size:20px; font-weight:bold; color:var(--gold);">₹${order.total}</div>
-                        
-                        // --- SOFT ACTION BUTTONS (Bill + Cancel) ---
-let billActionGroup = `
-    <div style="display:flex; gap:8px; margin-top:10px;">
-        <button onclick='window.downloadAdminBillByData(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">📥 BILL</button>
-        <button onclick='window.shareBillOnWAByData(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">💬 SHARE</button>
-        
-        ${status !== "Done" && !status.toLowerCase().includes("cancel") ? 
-        `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer;">CANCEL ❌</button>` : ""}
+                        ${billActionGroup}
                     </div>
                     ${mainActionBtn}
-                </div>
-            `;
+                </div>`;
         });
+        
         list.innerHTML = html || "<div style='text-align:center; padding:40px; opacity:0.5;'>No Orders Today.</div>";
         document.getElementById('admin-total-orders').innerText = todayCount;
         document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
@@ -196,8 +197,7 @@ let billActionGroup = `
                             <input type="checkbox" ${!isOut ? 'checked' : ''} onchange="toggleStockItem('${name}', this.checked)">
                             <span class="slider"></span>
                         </label>
-                    </div>
-                `;
+                    </div>`;
             });
             list.innerHTML = html;
         } catch(e) { list.innerHTML = "Error loading inventory."; }
