@@ -556,17 +556,18 @@
 
         /**
          * 🛡️ ROYAL GATEKEEPER CHECKOUT ENGINE
+         /**
+         * 🛡️ THE ROYAL GATEKEEPER CHECKOUT ENGINE (STRICT VERSION)
          * Performs intensive stock audit before payment/booking
          */
         window.checkout = async function() {
-            // 1. Authentication Check
+            // 1. Initial Validations
             const user = window.auth ? window.auth.currentUser : null;
             if(!user && !localStorage.getItem('userName')) { 
                 alert("Namaste! Order karne ke liye pehle login karein."); 
                 return window.registerUser(); 
             }
 
-            // 2. Profile Check
             const uName = localStorage.getItem('userName');
             const uPhone = localStorage.getItem('userPhone');
 
@@ -575,59 +576,75 @@
                 return showTab('dashboard');
             }
 
-            // 3. Cart Integrity Check
+            // 2. Local Cart Check
+            // Hum yahan window.cart use karenge jo global state mein hai
             if(!window.cart || window.cart.length === 0) {
                 return alert("Aapki cart khali hai!");
             }
 
-            // 4. Start Gatekeeper Audit
             const btn = document.getElementById('orderNowBtn');
             const originalBtnText = btn.innerText;
-            btn.innerText = "ORDER IN PROGRESS... 🛡️";
+            
+            // UI Lock: User ko rok do jab tak check ho raha hai
+            btn.innerText = "SHAHI AUDIT... 🛡️";
             btn.disabled = true;
 
             try {
-                // --- GATEKEEPER CORE LOGIC ---
+                console.log("Gatekeeper: Checking kitchen stock...");
+                
+                // --- GATEKEEPER CORE: LIVE STOCK FETCH ---
+                // Humein bridgeUrl se taaza inventory mangwani hai
                 const inventoryResponse = await fetch(bridgeUrl + "?action=getInventory");
+                
+                if (!inventoryResponse.ok) throw new Error("Network issues");
+                
                 const latestStockData = await inventoryResponse.json();
+                console.log("Latest Kitchen Stock:", latestStockData);
+
                 let outOfStockItems = [];
 
-                // Re-verify each item in cart
+                // Re-verify each item in cart against latest data
                 window.cart.forEach(cartItem => {
-                    // Extract base name for (H) or (F) variants
+                    // Extract base name for (H) or (F) variants (e.g., "Tawa Chicken (H)" -> "Tawa Chicken")
                     let cleanDishName = cartItem.name.split(' (')[0].trim(); 
                     
+                    // Strict Check: Agar base name ya full name 'Out' marked hai
                     if (latestStockData[cleanDishName] === "Out" || latestStockData[cartItem.name] === "Out") {
                         outOfStockItems.push(cartItem.name);
                     }
                 });
 
-                // Handle Stock Failures
+                // --- GATEKEEPER BLOCKING LOGIC ---
                 if (outOfStockItems.length > 0) {
                     const listStr = outOfStockItems.join('\n- ');
-                    alert(`🛑 MAAF KIJIYE!\n\nYe items abhi kitchen mein khatam ho gaye hain:\n- ${listStr}\n\nInhe hata kar baki items order karein.`);
+                    alert(`🛑 MAAF KIJIYE URVASHI!\n\nKitchen mein ye items abhi khatam ho gaye hain:\n- ${listStr}\n\nHumne inhe cart se hata diya hai. Please baki order proceed karein.`);
                     
-                    // Auto-purge unavailable items from cart
+                    // Auto-purge unavailable items from cart immediately
                     window.cart = window.cart.filter(item => !outOfStockItems.includes(item.name));
-                    updateCartUI();
                     
-                    btn.innerText = originalBtnText;
+                    // UI aur Storage dono refresh karo
+                    updateCartUI(); 
+                    
+                    btn.innerText = "Order Now"; 
                     btn.disabled = false;
-                    return; // EXIT FLOW
+                    return; // ⛔ STOP: Yahan se flow terminate ho jayega. Order nahi banega.
                 }
 
-                // 5. GATEKEEPER PASSED - PROCEED TO BOOKING
+                // 3. GATEKEEPER PASSED - PROCEED TO BOOKING
+                console.log("Gatekeeper: Stock Clear. Proceeding to Token...");
                 btn.innerText = "PREPARING TOKEN... 👑";
                 
-                // Fetch next token sequence
+                // Fetch next token sequence from Google Script doGet
                 const tokenFetchResponse = await fetch(bridgeUrl);
                 const nextTokenId = await tokenFetchResponse.text(); 
                 
-                // Calculate Totals for Backend
+                if (!nextTokenId) throw new Error("Token generation failed");
+
+                // Calculate Totals for Sheet Entry
                 let totalAmount = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
                 let orderedItemsString = window.cart.map(item => `${item.name} x${item.qty}`).join(', ');
 
-                // Post Data to Google Sheets Bridge
+                // Final POST to Google Sheets Bridge
                 const apiEndpoint = bridgeUrl + 
                     "?token=" + encodeURIComponent(nextTokenId) + 
                     "&name=" + encodeURIComponent(uName) + 
@@ -636,28 +653,30 @@
                     "&total=" + totalAmount + 
                     "&status=Awaiting%20Payment";
 
+                // async post (no-cors mode handles the redirect)
                 await fetch(apiEndpoint, { method: 'POST', mode: 'no-cors' });
 
-                // 6. FINAL SUCCESS ACTIONS
+                // 4. FINAL SUCCESS ACTIONS
                 localStorage.setItem('lastTokenNo', nextTokenId);
                 
-                // Trigger WhatsApp Confirmation
+                // Trigger WhatsApp Confirmation window
                 let waMessageString = `*ROYAL STREET KITCHEN* 👑%0A---------------------------%0A*Token:* ${encodeURIComponent(nextTokenId)}%0A*Order:* ${encodeURIComponent(orderedItemsString)}%0A*Total: ₹${totalAmount}*%0A---------------------------%0APLEASE PROCEED WITH PAYMENT.`;
                 window.open(`https://wa.me/917489999890?text=${waMessageString}`, '_blank');
 
                 alert("Waah! Order place ho gaya hai. Token #" + nextTokenId);
                 
-                // Cleanup
+                // Cleanup Cart
                 window.cart = []; 
+                localStorage.setItem('userCart', JSON.stringify([]));
                 updateCartUI();
-                showTab('dashboard'); 
                 
-                // Start the 5-minute cancellation window
+                // Redirect to Dashboard and start timer
+                showTab('dashboard'); 
                 startCancelTimer(300, true);
 
             } catch (apiError) {
                 console.error("Booking Logic Error:", apiError);
-                alert("Technical Issue! Order sheet update nahi hui. Please refresh karke try karein.");
+                alert("Network slow hai ya Technical Error! Order record nahi hua. Dobara koshish karein.");
             } finally {
                 btn.innerText = originalBtnText;
                 btn.disabled = false;
