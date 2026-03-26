@@ -1,3 +1,7 @@
+<div style="padding: 10px; position: sticky; top: 0; z-index: 100; background: #000;">
+    <input type="text" id="customerMenuSearch" oninput="filterMenuByCustomer()" placeholder="🔍 Search Dish (e.g. Maggie, Paneer...)" 
+           style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--gold); background: #111; color: #fff; outline: none;">
+</div>
 <div id="dynamic-menu-render" style="padding: 10px;"></div>
 
 <style>
@@ -122,32 +126,50 @@
             ]
         }
     ];
-    // Har 20 second mein inventory check karo bina page refresh kiye
+    // 🔍 Customer Search Logic
+window.filterMenuByCustomer = function() {
+    let input = document.getElementById('customerMenuSearch').value.toLowerCase();
+    let cards = document.getElementsByClassName('menu-card');
+    for (let card of cards) {
+        let name = card.innerText.toLowerCase();
+        // Section containers ko handle karne ke liye card ke parent ko bhi check karein
+        card.style.display = name.includes(input) ? "flex" : "none";
+    }
+};
+
+// 🔄 LIVE SYNC: Har 5 second mein Stock check karo (Bina Refresh)
 setInterval(async function() {
-    try {
-        const res = await fetch(bridgeUrl + "?action=getInventory");
-        const newInv = await res.json();
-        
-        // Agar inventory badli hai, toh menu aur cart dono saaf karo
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let cartChanged = false;
-
-        cart = cart.filter(item => {
-            // Agar cart ka item ab 'Out' ho gaya hai
-            if (newInv[item.name] === "Out") {
-                cartChanged = true;
-                return false; // Item remove kar do
-            }
-            return true;
-        });
-
-        if (cartChanged) {
-            localStorage.setItem('cart', JSON.stringify(cart));
-            if(window.updateCartUI) window.updateCartUI(); // Cart UI refresh karo
-            alert("Kuch items stock se bahar ho gaye hain aur cart se hata diye gaye hain! ⚠️");
+    const res = await fetch(bridgeUrl + "?action=getInventory");
+    const newInv = await res.json();
+    
+    // 1. Menu UI Update (Greyscale filter toggle)
+    // Hum purane menu ko re-render nahi karenge, bas style badlenge
+    const menuCards = document.querySelectorAll('.menu-card');
+    menuCards.forEach(card => {
+        const dishName = card.querySelector('div').innerText.trim();
+        if (newInv[dishName] === "Out") {
+            card.style.filter = "grayscale(1)";
+            card.style.opacity = "0.5";
+            card.querySelector('button').disabled = true;
+            card.querySelector('button').innerText = "OUT";
+        } else {
+            card.style.filter = "none";
+            card.style.opacity = "1";
+            card.querySelector('button').disabled = false;
         }
-    } catch(e) { console.log("Live Sync Error"); }
-}, 20000);
+    });
+
+    // 2. 🔥 CART PURGE: Agar Cart mein item hai aur wo OUT ho gaya
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let originalLength = cart.length;
+    cart = cart.filter(item => newInv[item.name] !== "Out");
+    
+    if (cart.length !== originalLength) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        if(window.updateCartUI) window.updateCartUI(); // Cart total refresh karo
+        alert("🚨 Update: Kuch items khatam ho gaye hain aur cart se hata diye gaye hain!");
+    }
+}, 5000); // Har 5 second mein check!
     const container = document.getElementById('dynamic-menu-render');
     if (container) {
         let html = "";
