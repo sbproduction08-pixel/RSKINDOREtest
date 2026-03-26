@@ -367,6 +367,27 @@ function stopAndHideTimer() {
 }
 
     // --- ORDER & CHECKOUT (FIXED BRACKETS) ---
+    window.placeOrder = async function() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if(cart.length === 0) return alert("Cart khali hai!");
+
+    // 🔥 REAL-TIME STOCK CHECK BEFORE PAYMENT
+    const invRes = await fetch(bridgeUrl + "?action=getInventory");
+    const currentStock = await invRes.res.json();
+
+    for (let item of cart) {
+        if (currentStock[item.name] === "Out") {
+            alert(`Maaf kijiye, ${item.name} abhi-abhi khatam ho gaya hai!`);
+            // Cart se hatao aur function rok do
+            const newCart = cart.filter(i => i.name !== item.name);
+            localStorage.setItem('cart', JSON.stringify(newCart));
+            location.reload(); 
+            return; // Order place nahi hoga!
+        }
+    }
+
+    // ... baaki tumhara purana checkout code (Payment/Token logic)
+};    
     window.checkout = async function() {
         const user = window.auth ? window.auth.currentUser : null;
         if(!user) { alert("Pehle Login Karein!"); return window.registerUser(); }
