@@ -137,27 +137,42 @@ window.filterMenuByCustomer = function() {
     }
 };
 
-// 🔄 LIVE SYNC: Har 5 second mein Stock check karo (Bina Refresh)
+// 🔄 LIVE SYNC: Har 5 second mein Stock check karo
 setInterval(async function() {
-    const res = await fetch(bridgeUrl + "?action=getInventory");
-    const newInv = await res.json();
-    
-    // 1. Menu UI Update (Greyscale filter toggle)
-    // Hum purane menu ko re-render nahi karenge, bas style badlenge
-    const menuCards = document.querySelectorAll('.menu-card');
-    menuCards.forEach(card => {
-        const dishName = card.querySelector('div').innerText.trim();
-        if (newInv[dishName] === "Out") {
-            card.style.filter = "grayscale(1)";
-            card.style.opacity = "0.5";
-            card.querySelector('button').disabled = true;
-            card.querySelector('button').innerText = "OUT";
-        } else {
-            card.style.filter = "none";
-            card.style.opacity = "1";
-            card.querySelector('button').disabled = false;
-        }
-    });
+    try {
+        const res = await fetch(bridgeUrl + "?action=getInventory");
+        const newInv = await res.json();
+        
+        const menuCards = document.querySelectorAll('.menu-card');
+        menuCards.forEach(card => {
+            // Card ke andar se dish ka naam dhoondo
+            const dishName = card.querySelector('div').innerText.trim();
+            const btnContainer = card.querySelector('button').parentElement;
+            const isCurrentlyOut = newInv[dishName] === "Out";
+
+            if (isCurrentlyOut) {
+                card.style.filter = "grayscale(1)";
+                card.style.opacity = "0.5";
+                const btn = card.querySelector('button');
+                if(btn) {
+                    btn.disabled = true;
+                    btn.innerText = "OUT";
+                    btn.style.background = "#444";
+                }
+            } else {
+                // 🔥 FIX: Agar item IN ho gaya toh UI wapas normal karo
+                card.style.filter = "none";
+                card.style.opacity = "1";
+                const btn = card.querySelector('button');
+                if(btn && btn.innerText === "OUT") {
+                    // Page ko reload kiye bina button wapas "ADD" banane ke liye reloadMenu() call kar sakte ho
+                    // Ya simple reload:
+                    location.reload(); 
+                }
+            }
+        });
+    } catch(e) { console.log("Sync Error"); }
+}, 5000);
 
     // 2. 🔥 CART PURGE: Agar Cart mein item hai aur wo OUT ho gaya
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
