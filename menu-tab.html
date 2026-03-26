@@ -122,7 +122,32 @@
             ]
         }
     ];
+    // Har 20 second mein inventory check karo bina page refresh kiye
+setInterval(async function() {
+    try {
+        const res = await fetch(bridgeUrl + "?action=getInventory");
+        const newInv = await res.json();
+        
+        // Agar inventory badli hai, toh menu aur cart dono saaf karo
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let cartChanged = false;
 
+        cart = cart.filter(item => {
+            // Agar cart ka item ab 'Out' ho gaya hai
+            if (newInv[item.name] === "Out") {
+                cartChanged = true;
+                return false; // Item remove kar do
+            }
+            return true;
+        });
+
+        if (cartChanged) {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            if(window.updateCartUI) window.updateCartUI(); // Cart UI refresh karo
+            alert("Kuch items stock se bahar ho gaye hain aur cart se hata diye gaye hain! ⚠️");
+        }
+    } catch(e) { console.log("Live Sync Error"); }
+}, 20000);
     const container = document.getElementById('dynamic-menu-render');
     if (container) {
         let html = "";
