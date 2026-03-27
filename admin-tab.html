@@ -70,12 +70,10 @@
     function showAdminSection(sec) {
         document.getElementById('admin-orders-view').style.display = (sec === 'orders') ? 'block' : 'none';
         document.getElementById('stock-manager-view').style.display = (sec === 'stock') ? 'block' : 'none';
-        
         document.getElementById('btn-view-orders').style.background = (sec === 'orders') ? 'var(--gold)' : 'rgba(255,255,255,0.05)';
         document.getElementById('btn-view-orders').style.color = (sec === 'orders') ? '#000' : 'var(--gold)';
         document.getElementById('btn-view-stock').style.background = (sec === 'stock') ? 'var(--gold)' : 'rgba(255,255,255,0.05)';
         document.getElementById('btn-view-stock').style.color = (sec === 'stock') ? '#000' : 'var(--gold)';
-        
         if(sec === 'stock') loadInventoryInAdmin();
         else refreshAdminData();
     }
@@ -108,7 +106,6 @@
             const isCancelled = status.toLowerCase().includes("cancel");
             const isDone = status.toLowerCase() === "done";
 
-            // Main Action Logic
             let actionBtn = "";
             if (status === "Awaiting Payment" || status === "Pending") {
                 actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" class="action-btn" style="background:#3498db; color:white;">RECEIVE PAYMENT ✅</button>`;
@@ -131,7 +128,7 @@
                         ${order.updatedAt ? ` | 🕒 Update: ${new Date(order.updatedAt).toLocaleTimeString()}` : ""}
                     </div>
 
-                    <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:12px; border-radius:12px; margin-bottom:15px; line-height:1.5; color:#ddd;">
+                    <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:12px; border-radius:12px; margin-bottom:15px; color:#ddd;">
                         ${order.items}
                     </div>
 
@@ -139,9 +136,7 @@
                         <div style="font-size:22px; font-weight:900; color:var(--gold);">₹${order.total}</div>
                         <div style="display:flex; gap:10px;">
                             <button onclick='window.handleAdminBillPDF(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">📥 BILL</button>
-                            
                             ${!isCancelled ? `<button onclick='window.handleAdminWAShare(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">💬 SHARE</button>` : ""}
-                            
                             ${!isDone && !isCancelled ? `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer;">❌</button>` : ""}
                         </div>
                     </div>
@@ -154,87 +149,67 @@
         document.getElementById('admin-total-sale').innerText = sale.toLocaleString();
     }
 
-    // --- 📄 FIXED PDF LOGIC ---
+    // --- 📄 PAKKA GST BILL PDF (EXACT FORMAT) ---
     window.handleAdminBillPDF = function(order) {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert("Shahi Library load ho rahi hai... Ek baar refresh karein.");
-        return;
-    }
+        if (!window.jspdf) { alert("Library Error! Refresh Index page."); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+        // Header
+        doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+        doc.text("ROYAL STREET KITCHEN", 105, 20, { align: "center" });
+        doc.setFontSize(9); doc.setFont("helvetica", "normal");
+        doc.text("Township, opp. Elite Apex, nearby Bun Tea,\nMahalaxmi Nagar, Indore, MP 452010\nGSTIN: 06IDLPK8248E1Z6", 105, 28, { align: "center" });
 
-    // --- 1. ROYAL HEADER & ADDRESS ---
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text("ROYAL STREET KITCHEN", 105, 20, { align: "center" }); // 
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    const address = "Township, opp. Elite Apex, nearby Bun Tea,\nMahalaxmi Nagar, Indore, MP 452010\nGSTIN: 06IDLPK8248E1Z6"; // 
-    doc.text(address, 105, 28, { align: "center" });
+        // Order Info Box
+        doc.setDrawColor(200); doc.rect(15, 45, 180, 20);
+        doc.setFontSize(10);
+        doc.text(`Order Token: #${order.token}`, 20, 52);
+        doc.text(`Date: ${new Date(order.date).toLocaleDateString('en-GB')}`, 130, 52);
+        doc.text(`Customer: ${order.name.toUpperCase()}`, 20, 60);
+        doc.text(`Status: ${order.status.toUpperCase()}`, 130, 60);
 
-    // --- 2. ORDER INFO TABLE (2x2 Grid) ---
-    doc.autoTable({
-        startY: 45,
-        theme: 'grid',
-        headStyles: { fillColor: [212, 175, 55], textColor: 255 }, // Royal Gold Head
-        body: [
-            ['Order Token:', `#${order.token}`, 'Date:', new Date(order.date).toLocaleDateString('en-GB')], // 
-            ['Customer:', order.name.toUpperCase(), 'Status:', order.status.toUpperCase()] // 
-        ],
-        styles: { fontSize: 10, cellPadding: 3 }
-    });
+        // Table Header
+        doc.setFont("helvetica", "bold");
+        doc.text("S.No", 20, 75); doc.text("Description", 40, 75); doc.text("Amount (INR)", 160, 75);
+        doc.line(15, 78, 195, 78);
 
-    // --- 3. ITEMS DESCRIPTION TABLE ---
-    const itemsList = order.items.split(', ').map((item, index) => {
-        // Cleaning items like "Dish x1" into Description and Qty
-        const parts = item.split(' x');
-        const name = parts[0];
-        const qty = parts[1] || "1";
-        return [index + 1, name, qty, `Rs. ${order.total}`]; // 
-    });
+        // Items Logic
+        doc.setFont("helvetica", "normal");
+        let y = 85;
+        const items = order.items.split(', ');
+        items.forEach((item, i) => {
+            doc.text(`${i + 1}`, 22, y);
+            doc.text(item, 40, y);
+            y += 8;
+        });
 
-    doc.autoTable({
-        startY: doc.lastAutoTable.finalY + 10,
-        theme: 'striped',
-        head: [['S.No', 'Description', 'Qty', 'Amount (INR)']], // 
-        body: itemsList,
-        headStyles: { fillColor: [0, 0, 0] }, // Black Header
-        styles: { fontSize: 10 },
-        columnStyles: {
-            0: { cellWidth: 15 },
-            1: { cellWidth: 100 },
-            2: { cellWidth: 20, halign: 'center' },
-            3: { cellWidth: 40, halign: 'right' }
-        }
-    });
+        // Grand Total
+        doc.line(15, y + 2, 195, y + 2);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+        doc.text(`GRAND TOTAL: Rs. ${order.total}/-`, 190, y + 12, { align: "right" });
 
-    // --- 4. GRAND TOTAL & FOOTER ---
-    const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text(`GRAND TOTAL: Rs. ${order.total}/-`, 190, finalY, { align: "right" }); // 
+        // Timeline (Audit trail)
+        doc.setFontSize(8); doc.setTextColor(100);
+        let timeInfo = `Ordered: ${new Date(order.date).toLocaleTimeString()}`;
+        if(order.updatedAt) timeInfo += ` | Processed: ${new Date(order.updatedAt).toLocaleTimeString()}`;
+        doc.text(timeInfo, 105, y + 22, { align: "center" });
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "italic");
-    doc.text("Thank you for dining Royally! Visit Again.", 105, finalY + 20, { align: "center" }); // 
-    
-    doc.setFontSize(8);
-    doc.text("V 2.8 • RSK INDORE", 105, finalY + 28, { align: "center" });
+        doc.setFontSize(10); doc.setFont("helvetica", "italic");
+        doc.text("Thank you for dining Royally! Visit Again.", 105, y + 32, { align: "center" });
 
-    // Save File
-    doc.save(`RSK_Invoice_${order.token}.pdf`);
-   };
-    // --- 💬 SHARE LOGIC ---
+        doc.save(`RSK_Invoice_${order.token}.pdf`);
+    };
+
+    // --- 💬 WHATSAPP SHARE (COMPLETE DETAIL) ---
     window.handleAdminWAShare = function(order) {
-        const msg = `*ROYAL STREET KITCHEN* 👑%0A*Token:* %23${order.token}%0A*Order:* ${order.items}%0A*Total:* ₹${order.total}%0A*Status:* ${order.status}%0A-----------------%0A_Thank you!_`;
+        const msg = `*ROYAL STREET KITCHEN* 👑%0A--------------------------%0A*Token:* #${order.token}%0A*Customer:* ${order.name}%0A--------------------------%0A*Items:*%0A${order.items.replace(/, /g, '%0A')}%0A--------------------------%0A*Grand Total: ₹${order.total}*%0A*Status:* ${order.status}%0A--------------------------%0A_Thank you for dining Royally!_`;
         window.open(`https://wa.me/91${order.phone || ''}?text=${msg}`, '_blank');
     };
 
     // --- SYSTEM UTILS ---
     window.updateStatus = function(token, status, btn) {
-        if(btn) btn.innerText = "...";
+        if(btn) { btn.innerText = "..."; btn.disabled = true; }
         fetch(adminBridge, {
             method: 'POST', mode: 'no-cors',
             body: JSON.stringify({ token: token, status: status, updatedAt: new Date().toISOString() })
@@ -256,43 +231,33 @@
         return "#D4AF37";
     }
 
-    // --- INVENTORY (SOFT UI) ---
     async function loadInventoryInAdmin() {
         const list = document.getElementById('admin-inventory-list');
-        list.innerHTML = "<div style='text-align:center; padding:30px; color:var(--gold);'>Syncing Inventory...</div>";
-        const rskMenu = ["Tawa Chicken + Paratha", "Tawa Chicken + Kulcha", "Paneer Bhurji + Paratha", "Paneer Bhurji + Kulcha", "Tawa Paneer + Paratha", "Tawa Paneer + Kulcha", "Tawa Egg + Paratha", "Tawa Egg + Kulcha", "Egg Bhurji + Paratha", "Egg Bhurji + Kulcha", "RSK Special Chicken", "Tawa Chicken", "Chilly Chicken", "Diet Paper Chicken", "Creamy Paper Chicken", "Fry Chicken", "Finger Chicken", "Chicken Cheese Balls", "Kastoori Paneer", "Tawa Paneer", "Paneer Bhurji", "Garlic Bread", "French Fries / Potato Bites", "Chips of Choice", "RSK Special Maggie", "Cheese / Veg Maggie", "Butter Maggie", "Masala Maggie", "Tawa Egg", "Kastoori Egg / Egg Bhurji", "Boiled Egg (2 pc)", "Chicken Fried Rice", "Egg Fried Rice", "Veg Fried Rice", "Paratha", "Kulcha"];
-
+        list.innerHTML = "<div style='text-align:center; padding:30px; color:var(--gold);'>Syncing...</div>";
+        const menuItems = ["Tawa Chicken + Paratha", "Tawa Chicken + Kulcha", "Paneer Bhurji + Paratha", "Paneer Bhurji + Kulcha", "Tawa Paneer + Paratha", "Tawa Paneer + Kulcha", "Tawa Egg + Paratha", "Tawa Egg + Kulcha", "Egg Bhurji + Paratha", "Egg Bhurji + Kulcha", "RSK Special Chicken", "Tawa Chicken", "Chilly Chicken", "Diet Paper Chicken", "Creamy Paper Chicken", "Fry Chicken", "Finger Chicken", "Chicken Cheese Balls", "Kastoori Paneer", "Tawa Paneer", "Paneer Bhurji", "Garlic Bread", "French Fries / Potato Bites", "Chips of Choice", "RSK Special Maggie", "Cheese / Veg Maggie", "Butter Maggie", "Masala Maggie", "Tawa Egg", "Kastoori Egg / Egg Bhurji", "Boiled Egg (2 pc)", "Chicken Fried Rice", "Egg Fried Rice", "Veg Fried Rice", "Paratha", "Kulcha"];
         try {
             const res = await fetch(adminBridge + "?action=getInventory");
-            const invData = await res.json();
+            const data = await res.json();
             let html = "";
-            rskMenu.forEach(name => {
-                const isOut = invData[name] === "Out";
-                html += `
-                    <div class="order-card" style="padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom:5px;">
-                        <div>
-                            <div style="font-size:13px; font-weight:bold;">${name}</div>
-                            <div id="lbl-${name.replace(/\s+/g, '')}" style="font-size:9px; color:${isOut?'#ff4444':'#25D366'}">${isOut?'● OUT':'● IN STOCK'}</div>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" ${!isOut?'checked':''} onchange="toggleStockItem('${name}', this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>`;
+            menuItems.forEach(name => {
+                const isOut = data[name] === "Out";
+                html += `<div class="order-card" style="padding:12px 20px; display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <div><div style="font-size:13px; font-weight:bold;">${name}</div><div id="lbl-${name.replace(/\s+/g, '')}" style="font-size:9px; color:${isOut?'#ff4444':'#25D366'}">${isOut?'● OUT':'● IN STOCK'}</div></div>
+                    <label class="switch"><input type="checkbox" ${!isOut?'checked':''} onchange="toggleStockItem('${name}', this.checked)"><span class="slider"></span></label>
+                </div>`;
             });
             list.innerHTML = html;
         } catch(e) { list.innerHTML = "Error."; }
     }
 
     window.toggleStockItem = function(name, check) {
-        const status = check ? "In" : "Out";
-        fetch(adminBridge, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateInventory", itemName: name, newStatus: status }) });
+        fetch(adminBridge, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateInventory", itemName: name, newStatus: check ? "In" : "Out" }) });
         const lbl = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
         if(lbl) { lbl.innerText = check ? "● IN STOCK" : "● OUT"; lbl.style.color = check ? "#25D366" : "#ff4444"; }
     };
 
     window.logoutAdmin = function() { if(confirm("Logout?")) { localStorage.removeItem('isAdminLoggedIn'); location.reload(); } };
 
-    setInterval(refreshAdminData, 20000);
+    setInterval(refreshAdminData, 15000);
     refreshAdminData();
 </script>
