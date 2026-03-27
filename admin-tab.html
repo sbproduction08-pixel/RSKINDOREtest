@@ -225,7 +225,7 @@
 
     // Save File
     doc.save(`RSK_Invoice_${order.token}.pdf`);
-};
+   };
     // --- 💬 SHARE LOGIC ---
     window.handleAdminWAShare = function(order) {
         const msg = `*ROYAL STREET KITCHEN* 👑%0A*Token:* %23${order.token}%0A*Order:* ${order.items}%0A*Total:* ₹${order.total}%0A*Status:* ${order.status}%0A-----------------%0A_Thank you!_`;
