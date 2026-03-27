@@ -19,23 +19,24 @@
     const bridgeUrl = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
     let inventoryData = {};
     
-    // --- 1. SEARCH LOGIC ---
+    // --- 1. SEARCH LOGIC (WINDOW ATTACHED) ---
     window.filterMenuByCustomer = function() {
         let input = document.getElementById('customerMenuSearch').value.toLowerCase();
         let cards = document.getElementsByClassName('menu-card');
         for (let card of cards) {
             let name = card.innerText.toLowerCase();
+            // Poore card container ko hide/show karo
             card.parentElement.style.display = name.includes(input) ? "block" : "none";
         }
     };
 
-    // --- 2. FETCH STOCK DATA ---
+    // --- 2. INITIAL FETCH ---
     try {
         const res = await fetch(bridgeUrl + "?action=getInventory");
         inventoryData = await res.json();
     } catch(e) { console.log("Inventory offline"); }
 
-    // --- 3. THE MASTER 36 ITEMS LIST ---
+    // --- 3. MENU DATA (36 ITEMS) ---
     const menuData = [
         {
             sectionName: "👑 RSK ROYAL COMBOS",
@@ -125,8 +126,8 @@
                 const isOut = inventoryData[item.name] === "Out";
                 const cardStyle = isOut ? 'filter: grayscale(1); opacity: 0.5;' : '';
                 
-                html += `<div><div class="menu-card" style="${cardStyle}">
-                    <div style="color:#fff; font-size:12px; font-weight:600; margin-bottom:5px;">${item.name}</div>`;
+                html += `<div><div class="menu-card" style="${cardStyle}" data-item-type="${item.type}">
+                    <div class="dish-name-label" style="color:#fff; font-size:12px; font-weight:600; margin-bottom:5px;">${item.name}</div>`;
                 
                 if (item.type === 'single') {
                     if (isOut) {
@@ -136,7 +137,7 @@
                                  <button onclick="window.addToCart('${item.name}', ${item.price})" class="add-btn-royal">+ ADD</button>`;
                     }
                 } else {
-                    html += `<div style="display:flex; flex-direction:column; gap:5px;">
+                    html += `<div class="dual-btn-box" style="display:flex; flex-direction:column; gap:5px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="color:#ccc; font-size:10px;">H: ₹${item.halfPrice}</span>
                             ${isOut ? '<button disabled class="dual-btn">X</button>' : `<button onclick="window.addToCart('${item.name} (H)', ${item.halfPrice})" class="dual-btn">+ H</button>`}
@@ -154,45 +155,58 @@
         container.innerHTML = html;
     }
 
-    // --- LIVE STOCK AUTO-SYNC (Every 5 Seconds) ---
-setInterval(async function() {
-    try {
-        const res = await fetch(bridgeUrl + "?action=getInventory");
-        const freshStock = await res.json();
-        
-        // Saare menu cards dhoondo
-        const cards = document.querySelectorAll('.menu-card');
-        
-        cards.forEach(card => {
-            // Card ke andar se dish ka naam nikalo (pehla div)
-            const dishName = card.querySelector('div').innerText.trim();
-            const isOut = freshStock[dishName] === "Out";
-            const btn = card.querySelector('button');
+    // --- 5. LIVE STOCK AUTO-SYNC (IMPROVED FOR DUAL BUTTONS) ---
+    setInterval(async function() {
+        try {
+            const res = await fetch(bridgeUrl + "?action=getInventory");
+            const freshStock = await res.json();
+            const cards = document.querySelectorAll('.menu-card');
+            
+            cards.forEach(card => {
+                const dishName = card.querySelector('.dish-name-label').innerText.trim();
+                const isOut = freshStock[dishName] === "Out";
+                const itemType = card.getAttribute('data-item-type');
 
-            if (isOut) {
-                // Status OUT hai: Grayscale aur Button Disable
-                card.style.filter = "grayscale(1)";
-                card.style.opacity = "0.5";
-                if(btn && btn.innerText !== "OUT") {
-                    btn.disabled = true;
-                    btn.innerText = "OUT";
-                    btn.style.background = "#444";
+                if (isOut) {
+                    card.style.filter = "grayscale(1)";
+                    card.style.opacity = "0.5";
+                    // Handle buttons based on type
+                    const buttons = card.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        btn.disabled = true;
+                        if(itemType === 'single') {
+                            btn.innerText = "OUT";
+                            btn.style.background = "#444";
+                        } else {
+                            btn.innerText = "X";
+                        }
+                    });
+                } else {
+                    card.style.filter = "none";
+                    card.style.opacity = "1";
+                    // Restore buttons
+                    if(itemType === 'single') {
+                        const btn = card.querySelector('button');
+                        if(btn && btn.innerText === "OUT") {
+                            btn.disabled = false;
+                            btn.innerText = "+ ADD";
+                            btn.style.background = "linear-gradient(45deg, #af8d19, #f1d36d)";
+                        }
+                    } else {
+                        // Refresh dual buttons logic requires a simple reload or a more complex DOM rebuild
+                        // To keep it simple, if status changed to IN, we trigger a small reload if needed
+                        // or just enable them back.
+                        const buttons = card.querySelectorAll('button');
+                        if(buttons[0] && buttons[0].innerText === "X") {
+                            // If they were 'X', easiest way to get original text back is reload
+                            location.reload(); 
+                        }
+                    }
                 }
-            } else {
-                // Status IN hai: Normal Style aur Button Enable
-                card.style.filter = "none";
-                card.style.opacity = "1";
-                if(btn && btn.innerText === "OUT") {
-                    btn.disabled = false;
-                    btn.innerText = "+ ADD";
-                    btn.style.background = "linear-gradient(45deg, #af8d19, #f1d36d)";
-                }
-            }
-        });
-        console.log("Stock Auto-Synced 🔄");
-    } catch(e) { 
-        console.log("Sync failed, retrying in 5s..."); 
-    }
-}, 5000);
+            });
+            console.log("Real-time Inventory Reconciled ✅");
+        } catch(e) { console.log("Sync failed..."); }
+    }, 5000);
+
 })();
 </script>
