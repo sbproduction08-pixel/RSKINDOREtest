@@ -1,184 +1,210 @@
-<div class="admin-panel-wrapper" style="padding-bottom: 50px; font-family: 'Poppins', sans-serif; color: #fff;">
-    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid var(--gold); margin-bottom: 20px;">
+<div class="admin-panel-wrapper" style="padding-bottom: 80px; font-family: 'Poppins', sans-serif; color: #fff; max-width: 600px; margin: auto;">
+    
+    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.3); margin-bottom: 25px; backdrop-filter: blur(10px);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <div style="color: var(--gold); font-size: 14px; font-weight: 800;">WELCOME RSK ADMIN 👑</div>
-                <div style="font-size: 10px; color: #888;">Live Control Center</div>
+                <div style="color: var(--gold); font-size: 16px; font-weight: 800; font-family: 'Marcellus', serif;">ROYAL CONTROL CENTER 👑</div>
+                <div style="font-size: 10px; color: #aaa; letter-spacing: 1px;">LIVE KITCHEN MANAGEMENT</div>
             </div>
-            <button onclick="window.logoutAdmin()" style="background: none; border: 1px solid #ff4444; color: #ff4444; padding: 5px 15px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold;">Logout 🚪</button>
+            <button onclick="window.logoutAdmin()" style="background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; color: #ff4444; padding: 6px 15px; border-radius: 30px; font-size: 11px; cursor: pointer; font-weight: bold; transition: 0.3s;">LOGOUT</button>
         </div>
         
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button onclick="showAdminSection('orders')" id="btn-view-orders" style="flex: 1; background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">📦 ORDERS</button>
-            <button onclick="showAdminSection('stock')" id="btn-view-stock" style="flex: 1; background: rgba(255,255,255,0.1); color: var(--gold); border: 1px solid var(--gold); padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">🥦 MANAGE STOCK</button>
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button onclick="showAdminSection('orders')" id="btn-view-orders" style="flex: 1; background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 12px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">📦 ORDERS</button>
+            <button onclick="showAdminSection('stock')" id="btn-view-stock" style="flex: 1; background: rgba(255,255,255,0.05); color: var(--gold); border: 1px solid var(--gold); padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 12px;">🥦 INVENTORY</button>
         </div>
     </div>
 
     <div id="admin-orders-view">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
-            <div style="background: linear-gradient(45deg, #af8d19, #f1d36d); padding: 15px; border-radius: 12px; text-align: center;">
-                <div style="font-size: 10px; color: #3a0d0d; font-weight: 800;">Total Tokens Today</div>
-                <div id="admin-total-orders" style="font-size: 26px; font-weight: bold; color: #000;">0</div>
+            <div style="background: linear-gradient(135deg, #af8d19, #f1d36d); padding: 15px; border-radius: 15px; text-align: center; color: #000;">
+                <div style="font-size: 10px; font-weight: 800; text-transform: uppercase;">Today's Tokens</div>
+                <div id="admin-total-orders" style="font-size: 28px; font-weight: 900;">0</div>
             </div>
-            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--gold); padding: 15px; border-radius: 12px; text-align: center;">
-                <div style="font-size: 10px; color: var(--gold); font-weight: 800;">Estimated Sale</div>
-                <div style="font-size: 26px; font-weight: bold; color: var(--gold);">₹<span id="admin-total-sale">0</span></div>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--gold); padding: 15px; border-radius: 15px; text-align: center;">
+                <div style="font-size: 10px; color: var(--gold); font-weight: 800; text-transform: uppercase;">Total Sale</div>
+                <div style="font-size: 28px; font-weight: 900; color: var(--gold);">₹<span id="admin-total-sale">0</span></div>
             </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="font-family: 'Marcellus', serif; color: var(--gold); border-left: 3px solid var(--gold); padding-left: 10px; margin: 0; font-size: 16px;">Live Kitchen Feed</h3>
-            <button onclick="refreshAdminData()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; padding: 4px 10px; border-radius: 4px;">🔄 Refresh</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;">
+            <h3 style="font-family: 'Marcellus', serif; color: var(--gold); font-size: 16px; margin: 0;">Live Orders Flow</h3>
+            <button onclick="refreshAdminData()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; padding: 5px 12px; border-radius: 8px; cursor: pointer;">🔄 Sync</button>
         </div>
         
-        <div id="admin-orders-list" style="display: flex; flex-direction: column; gap: 15px;">
-            <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
+        <div id="admin-orders-list" style="display: flex; flex-direction: column; gap: 18px;">
+            <div style="text-align: center; padding: 50px; color: #555;">👑 Fetching Shahi Orders...</div>
         </div>
     </div>
 
     <div id="stock-manager-view" style="display: none;">
-        <div style="margin-bottom: 15px;">
+        <div style="margin-bottom: 20px;">
             <input type="text" id="stockSearch" oninput="filterStockItems()" placeholder="🔍 Search Dish Name..." 
-                   style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--gold); background: #111; color: #fff; font-size: 14px; outline: none; box-sizing: border-box;">
+                   style="width: 100%; padding: 15px; border-radius: 15px; border: 1px solid var(--gold); background: rgba(0,0,0,0.3); color: #fff; font-size: 14px; outline: none; box-sizing: border-box;">
         </div>
-        <div id="admin-inventory-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
+        <div id="admin-inventory-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
     </div>
 </div>
 
 <audio id="kitchenBell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
+<style>
+    .order-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.15); padding: 20px; border-radius: 20px; position: relative; transition: 0.3s; }
+    .status-badge { font-size: 9px; padding: 5px 12px; border-radius: 50px; text-transform: uppercase; font-weight: 800; position: absolute; top: 18px; right: 18px; letter-spacing: 1px; }
+    .action-btn { width: 100%; margin-top: 15px; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+    .action-btn:active { transform: scale(0.98); }
+    
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ff4444; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #25D366; }
+    input:checked + .slider:before { transform: translateX(24px); }
+</style>
+
 <script>
     const adminBridge = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
-    let lastOrderCount = 0;
+    let lastCount = 0;
 
-    // --- RSK MASTER MENU ---
-    const rskMenu = [
-        "Tawa Chicken + Paratha", "Tawa Chicken + Kulcha", "Paneer Bhurji + Paratha", "Paneer Bhurji + Kulcha",
-        "Tawa Paneer + Paratha", "Tawa Paneer + Kulcha", "Tawa Egg + Paratha", "Tawa Egg + Kulcha",
-        "Egg Bhurji + Paratha", "Egg Bhurji + Kulcha", "RSK Special Chicken", "Tawa Chicken", 
-        "Chilly Chicken", "Diet Paper Chicken", "Creamy Paper Chicken", "Fry Chicken", 
-        "Finger Chicken", "Chicken Cheese Balls", "Kastoori Paneer", "Tawa Paneer", 
-        "Paneer Bhurji", "Garlic Bread", "French Fries / Potato Bites", "Chips of Choice",
-        "RSK Special Maggie", "Cheese / Veg Maggie", "Butter Maggie", "Masala Maggie",
-        "Tawa Egg", "Kastoori Egg / Egg Bhurji", "Boiled Egg (2 pc)",
-        "Chicken Fried Rice", "Egg Fried Rice", "Veg Fried Rice", "Paratha", "Kulcha"
-    ];
-
-    // --- 📄 PDF BILL GENERATOR (jsPDF) ---
-    window.downloadAdminBillByData = function(order) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: [80, 150] });
-
-        doc.setFillColor(0, 0, 0);
-        doc.rect(0, 0, 80, 25, 'F');
-        doc.setTextColor(212, 175, 55);
-        doc.setFontSize(14);
-        doc.text("ROYAL STREET KITCHEN", 40, 12, { align: "center" });
-        doc.setFontSize(8);
-        doc.text("Accountant Copy - Shahi Receipt", 40, 18, { align: "center" });
-
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
-        doc.text(`Token: #${order.token}`, 5, 35);
-        doc.setFontSize(8);
-        doc.text(`Status: ${order.status.toUpperCase()}`, 75, 35, { align: "right" });
-        doc.text(`Customer: ${order.name}`, 5, 42);
-        doc.text(`Date: ${new Date(order.date).toLocaleString()}`, 5, 48);
-
-        doc.line(5, 52, 75, 52);
-        doc.setFont("helvetica", "bold");
-        doc.text("ITEMS", 5, 58);
-        doc.setFont("helvetica", "normal");
+    // --- NAVIGATION ---
+    function showAdminSection(sec) {
+        document.getElementById('admin-orders-view').style.display = (sec === 'orders') ? 'block' : 'none';
+        document.getElementById('stock-manager-view').style.display = (sec === 'stock') ? 'block' : 'none';
         
-        let splitItems = doc.splitTextToSize(order.items, 70);
-        doc.text(splitItems, 5, 65);
+        document.getElementById('btn-view-orders').style.background = (sec === 'orders') ? 'var(--gold)' : 'rgba(255,255,255,0.05)';
+        document.getElementById('btn-view-orders').style.color = (sec === 'orders') ? '#000' : 'var(--gold)';
+        document.getElementById('btn-view-stock').style.background = (sec === 'stock') ? 'var(--gold)' : 'rgba(255,255,255,0.05)';
+        document.getElementById('btn-view-stock').style.color = (sec === 'stock') ? '#000' : 'var(--gold)';
         
-        let yShift = 65 + (splitItems.length * 5);
-        doc.line(5, yShift, 75, yShift);
-        doc.setFontSize(12);
-        doc.text(`TOTAL: ₹${order.total}`, 40, yShift + 10, { align: "center" });
+        if(sec === 'stock') loadInventoryInAdmin();
+        else refreshAdminData();
+    }
 
-        doc.setFontSize(7);
-        doc.text(`Generated on: ${new Date().toLocaleString()}`, 40, yShift + 20, { align: "center" });
-        
-        doc.save(`RSK_Bill_${order.token}.pdf`);
-    };
-
-    // --- 💬 WHATSAPP SHARE LOGIC ---
-    window.shareBillOnWAByData = function(order) {
-        const msg = `*ROYAL STREET KITCHEN* 👑%0A---------------------%0A*Token:* %23${order.token}%0A*Customer:* ${order.name}%0A*Items:* ${order.items}%0A*Total: ₹${order.total}*%0A*Status:* ${order.status}%0A---------------------%0A_Thank you for ordering!_`;
-        window.open(`https://wa.me/91${order.phone || ''}?text=${msg}`, '_blank');
-    };
-
-    // --- REFRESH & RENDER ---
+    // --- LIVE SYNC ---
     function refreshAdminData() {
         fetch(adminBridge + "?action=readAdmin")
             .then(res => res.json())
             .then(data => {
-                if (lastOrderCount !== 0 && data.length > lastOrderCount) {
+                if (lastCount !== 0 && data.length > lastCount) {
                     document.getElementById('kitchenBell').play().catch(e => {});
                 }
-                lastOrderCount = data.length;
+                lastCount = data.length;
                 renderOrders(data);
             });
     }
 
     function renderOrders(orders) {
         const list = document.getElementById('admin-orders-list');
-        let html = ""; let totalSale = 0; let todayCount = 0;
-        const todayStr = new Date().toDateString();
+        let html = ""; let sale = 0; let count = 0;
+        const today = new Date().toDateString();
 
         [...orders].reverse().forEach(order => {
-            const dateObj = new Date(order.date);
-            if(dateObj.toDateString() === todayStr) {
-                todayCount++;
-                if(order.status === "Done") totalSale += parseFloat(order.total || 0);
+            if(new Date(order.date).toDateString() === today) {
+                count++;
+                if(order.status === "Done") sale += parseFloat(order.total || 0);
             }
 
-            let status = (order.status || "Pending").trim();
-            let isCancelled = status.toLowerCase().includes("cancel");
+            const status = (order.status || "Pending").trim();
+            const isCancelled = status.toLowerCase().includes("cancel");
+            const isDone = status.toLowerCase() === "done";
 
-            let mainActionBtn = "";
+            // Main Action Logic
+            let actionBtn = "";
             if (status === "Awaiting Payment" || status === "Pending") {
-                mainActionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" style="width:100%; margin-top:12px; background:#3498db; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">PAID (REC) ✅</button>`;
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" class="action-btn" style="background:#3498db; color:white;">RECEIVE PAYMENT ✅</button>`;
             } else if (status === "Received") {
-                mainActionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" style="width:100%; margin-top:12px; background:#e67e22; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">PREPARE 👨‍🍳</button>`;
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" class="action-btn" style="background:#e67e22; color:white;">START COOKING 👨‍🍳</button>`;
             } else if (status === "Preparing") {
-                mainActionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" style="width:100%; margin-top:12px; background:#f1c40f; color:black; border:none; padding:10px; border-radius:8px; font-weight:bold;">READY 🔔</button>`;
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" class="action-btn" style="background:#f1c40f; color:black;">MARK AS READY 🔔</button>`;
             } else if (status === "Ready") {
-                mainActionBtn = `<button onclick="verifyOTP('${order.token}')" style="width:100%; margin-top:12px; background:#25D366; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">DELIVER 🎁</button>`;
+                actionBtn = `<button onclick="verifyOTP('${order.token}')" class="action-btn" style="background:#25D366; color:white;">DELIVER 🎁</button>`;
             }
 
             html += `
                 <div class="order-card" style="border-left: 5px solid ${getStatusColor(status)};">
                     <span class="status-badge" style="background:${getStatusColor(status)}; color:${status === 'Ready' ? '#000':'#fff'}">${status}</span>
-                    <div style="color:var(--gold); font-size:11px; font-weight:bold;">TOKEN ${order.token}</div>
-                    <div style="font-size:16px; font-weight:bold; color:#fff; margin:4px 0;">${order.name}</div>
-                    <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; margin:10px 0;">${order.items}</div>
+                    <div style="color:var(--gold); font-size:11px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <div style="font-size:18px; font-weight:bold; color:#fff; margin:5px 0;">${order.name}</div>
+                    
+                    <div style="font-size:10px; color:#888; margin-bottom:10px;">
+                        📅 Order: ${new Date(order.date).toLocaleTimeString()} 
+                        ${order.updatedAt ? ` | 🕒 Update: ${new Date(order.updatedAt).toLocaleTimeString()}` : ""}
+                    </div>
+
+                    <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:12px; border-radius:12px; margin-bottom:15px; line-height:1.5; color:#ddd;">
+                        ${order.items}
+                    </div>
+
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-size:20px; font-weight:bold; color:var(--gold);">₹${order.total}</div>
-                        <div style="display:flex; gap:8px;">
-                            <button onclick='window.downloadAdminBillByData(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">📥 BILL</button>
-                            ${!isCancelled ? `<button onclick='window.shareBillOnWAByData(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">💬 SHARE</button>` : ""}
-                            ${status !== "Done" && !isCancelled ? `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:4px 10px; border-radius:6px; cursor:pointer;">CANCEL ❌</button>` : ""}
+                        <div style="font-size:22px; font-weight:900; color:var(--gold);">₹${order.total}</div>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick='window.handleAdminBillPDF(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">📥 BILL</button>
+                            
+                            ${!isCancelled ? `<button onclick='window.handleAdminWAShare(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">💬 SHARE</button>` : ""}
+                            
+                            ${!isDone && !isCancelled ? `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer;">❌</button>` : ""}
                         </div>
                     </div>
-                    ${mainActionBtn}
+                    ${actionBtn}
                 </div>`;
         });
         
-        document.getElementById('admin-orders-list').innerHTML = html || "<div style='text-align:center; padding:40px; opacity:0.5;'>No Orders Today.</div>";
-        document.getElementById('admin-total-orders').innerText = todayCount;
-        document.getElementById('admin-total-sale').innerText = totalSale.toLocaleString();
+        list.innerHTML = html || "<div style='text-align:center; padding:50px; opacity:0.3;'>No orders to display.</div>";
+        document.getElementById('admin-total-orders').innerText = count;
+        document.getElementById('admin-total-sale').innerText = sale.toLocaleString();
     }
 
-    // --- OTHER UTILS ---
-    window.updateStatus = function(token, status, btn, otp = "") {
-        if(btn) { btn.innerText = "⏳..."; btn.disabled = true; }
+    // --- 📄 FIXED PDF LOGIC ---
+    window.handleAdminBillPDF = function(order) {
+        if(!window.jspdf) { alert("PDF Library loading... Try again."); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: [80, 160] });
+
+        // Design
+        doc.setFillColor(0, 0, 0); doc.rect(0, 0, 80, 25, 'F');
+        doc.setTextColor(212, 175, 55); doc.setFontSize(14);
+        doc.text("ROYAL STREET KITCHEN", 40, 12, { align: "center" });
+        doc.setFontSize(8); doc.text("OFFICIAL RECEIPT - INDORE", 40, 18, { align: "center" });
+
+        doc.setTextColor(0, 0, 0); doc.setFontSize(10);
+        doc.text(`TOKEN: #${order.token}`, 5, 35);
+        doc.text(`NAME: ${order.name}`, 5, 42);
+        doc.text(`DATE: ${new Date(order.date).toLocaleString()}`, 5, 48);
+        doc.line(5, 52, 75, 52);
+
+        doc.setFont("helvetica", "bold"); doc.text("ITEMS ORDERED", 5, 58);
+        doc.setFont("helvetica", "normal");
+        let splitItems = doc.splitTextToSize(order.items, 70);
+        doc.text(splitItems, 5, 65);
+        
+        let y = 65 + (splitItems.length * 6);
+        doc.line(5, y, 75, y);
+        doc.setFontSize(12); doc.text(`TOTAL: INR ${order.total}`, 40, y + 10, { align: "center" });
+        
+        doc.setFontSize(8); doc.setTextColor(100);
+        if(order.updatedAt) doc.text(`Processed: ${new Date(order.updatedAt).toLocaleTimeString()}`, 40, y + 18, { align: "center" });
+
+        doc.save(`RSK_Bill_${order.token}.pdf`);
+    };
+
+    // --- 💬 SHARE LOGIC ---
+    window.handleAdminWAShare = function(order) {
+        const msg = `*ROYAL STREET KITCHEN* 👑%0A*Token:* %23${order.token}%0A*Order:* ${order.items}%0A*Total:* ₹${order.total}%0A*Status:* ${order.status}%0A-----------------%0A_Thank you!_`;
+        window.open(`https://wa.me/91${order.phone || ''}?text=${msg}`, '_blank');
+    };
+
+    // --- SYSTEM UTILS ---
+    window.updateStatus = function(token, status, btn) {
+        if(btn) btn.innerText = "...";
         fetch(adminBridge, {
             method: 'POST', mode: 'no-cors',
-            body: JSON.stringify({ token: token, status: status, otp: otp })
+            body: JSON.stringify({ token: token, status: status, updatedAt: new Date().toISOString() })
         }).then(() => setTimeout(refreshAdminData, 1200));
+    };
+
+    window.verifyOTP = function(token) {
+        let otp = prompt("Customer OTP:");
+        if(otp) updateStatus(token, 'Done', null);
     };
 
     function getStatusColor(s) {
@@ -191,10 +217,43 @@
         return "#D4AF37";
     }
 
-    window.logoutAdmin = function() {
-        if(confirm("Logout?")) { localStorage.removeItem('isAdminLoggedIn'); location.reload(); }
+    // --- INVENTORY (SOFT UI) ---
+    async function loadInventoryInAdmin() {
+        const list = document.getElementById('admin-inventory-list');
+        list.innerHTML = "<div style='text-align:center; padding:30px; color:var(--gold);'>Syncing Inventory...</div>";
+        const rskMenu = ["Tawa Chicken + Paratha", "Tawa Chicken + Kulcha", "Paneer Bhurji + Paratha", "Paneer Bhurji + Kulcha", "Tawa Paneer + Paratha", "Tawa Paneer + Kulcha", "Tawa Egg + Paratha", "Tawa Egg + Kulcha", "Egg Bhurji + Paratha", "Egg Bhurji + Kulcha", "RSK Special Chicken", "Tawa Chicken", "Chilly Chicken", "Diet Paper Chicken", "Creamy Paper Chicken", "Fry Chicken", "Finger Chicken", "Chicken Cheese Balls", "Kastoori Paneer", "Tawa Paneer", "Paneer Bhurji", "Garlic Bread", "French Fries / Potato Bites", "Chips of Choice", "RSK Special Maggie", "Cheese / Veg Maggie", "Butter Maggie", "Masala Maggie", "Tawa Egg", "Kastoori Egg / Egg Bhurji", "Boiled Egg (2 pc)", "Chicken Fried Rice", "Egg Fried Rice", "Veg Fried Rice", "Paratha", "Kulcha"];
+
+        try {
+            const res = await fetch(adminBridge + "?action=getInventory");
+            const invData = await res.json();
+            let html = "";
+            rskMenu.forEach(name => {
+                const isOut = invData[name] === "Out";
+                html += `
+                    <div class="order-card" style="padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom:5px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:bold;">${name}</div>
+                            <div id="lbl-${name.replace(/\s+/g, '')}" style="font-size:9px; color:${isOut?'#ff4444':'#25D366'}">${isOut?'● OUT':'● IN STOCK'}</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" ${!isOut?'checked':''} onchange="toggleStockItem('${name}', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>`;
+            });
+            list.innerHTML = html;
+        } catch(e) { list.innerHTML = "Error."; }
+    }
+
+    window.toggleStockItem = function(name, check) {
+        const status = check ? "In" : "Out";
+        fetch(adminBridge, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateInventory", itemName: name, newStatus: status }) });
+        const lbl = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
+        if(lbl) { lbl.innerText = check ? "● IN STOCK" : "● OUT"; lbl.style.color = check ? "#25D366" : "#ff4444"; }
     };
 
-    setInterval(refreshAdminData, 15000);
+    window.logoutAdmin = function() { if(confirm("Logout?")) { localStorage.removeItem('isAdminLoggedIn'); location.reload(); } };
+
+    setInterval(refreshAdminData, 20000);
     refreshAdminData();
 </script>
