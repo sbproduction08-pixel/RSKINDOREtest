@@ -153,5 +153,46 @@
         });
         container.innerHTML = html;
     }
+
+    // --- LIVE STOCK AUTO-SYNC (Every 5 Seconds) ---
+setInterval(async function() {
+    try {
+        const res = await fetch(bridgeUrl + "?action=getInventory");
+        const freshStock = await res.json();
+        
+        // Saare menu cards dhoondo
+        const cards = document.querySelectorAll('.menu-card');
+        
+        cards.forEach(card => {
+            // Card ke andar se dish ka naam nikalo (pehla div)
+            const dishName = card.querySelector('div').innerText.trim();
+            const isOut = freshStock[dishName] === "Out";
+            const btn = card.querySelector('button');
+
+            if (isOut) {
+                // Status OUT hai: Grayscale aur Button Disable
+                card.style.filter = "grayscale(1)";
+                card.style.opacity = "0.5";
+                if(btn && btn.innerText !== "OUT") {
+                    btn.disabled = true;
+                    btn.innerText = "OUT";
+                    btn.style.background = "#444";
+                }
+            } else {
+                // Status IN hai: Normal Style aur Button Enable
+                card.style.filter = "none";
+                card.style.opacity = "1";
+                if(btn && btn.innerText === "OUT") {
+                    btn.disabled = false;
+                    btn.innerText = "+ ADD";
+                    btn.style.background = "linear-gradient(45deg, #af8d19, #f1d36d)";
+                }
+            }
+        });
+        console.log("Stock Auto-Synced 🔄");
+    } catch(e) { 
+        console.log("Sync failed, retrying in 5s..."); 
+    }
+}, 5000);
 })();
 </script>
