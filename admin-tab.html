@@ -151,56 +151,93 @@
 
     // --- 📄 PAKKA GST BILL PDF (EXACT FORMAT) ---
     window.handleAdminBillPDF = function(order) {
-        if (!window.jspdf) { alert("Library Error! Refresh Index page."); return; }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    if (!window.jspdf) { alert("Library missing!"); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-        // Header
-        doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+    // --- 1. LOGO & BANNER ---
+    // Note: 'MAIN_LOGO.jpeg' aur 'royalstreetkitchen.png' wahi files hain jo Index mein hain
+    try {
+        // Logo (Top Left)
+        doc.addImage('MAIN_LOGO.jpeg', 'JPEG', 15, 10, 25, 25); 
+        // Banner Title (Middle)
+        doc.addImage('royalstreetkitchen.png', 'PNG', 50, 10, 110, 15);
+    } catch (e) {
+        console.log("Images not found, using text instead.");
+        doc.setFontSize(22);
         doc.text("ROYAL STREET KITCHEN", 105, 20, { align: "center" });
-        doc.setFontSize(9); doc.setFont("helvetica", "normal");
-        doc.text("Township, opp. Elite Apex, nearby Bun Tea,\nMahalaxmi Nagar, Indore, MP 452010\nGSTIN: 06IDLPK8248E1Z6", 105, 28, { align: "center" });
+    }
 
-        // Order Info Box
-        doc.setDrawColor(200); doc.rect(15, 45, 180, 20);
-        doc.setFontSize(10);
-        doc.text(`Order Token: #${order.token}`, 20, 52);
-        doc.text(`Date: ${new Date(order.date).toLocaleDateString('en-GB')}`, 130, 52);
-        doc.text(`Customer: ${order.name.toUpperCase()}`, 20, 60);
-        doc.text(`Status: ${order.status.toUpperCase()}`, 130, 60);
+    // --- 2. SHOP ADDRESS & GST ---
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    const addr = "Township, opp. Elite Apex, nearby Bun Tea,\nMahalaxmi Nagar, Indore, MP 452010\nGSTIN: 06IDLPK8248E1Z6";
+    doc.text(addr, 105, 30, { align: "center" });
 
-        // Table Header
-        doc.setFont("helvetica", "bold");
-        doc.text("S.No", 20, 75); doc.text("Description", 40, 75); doc.text("Amount (INR)", 160, 75);
-        doc.line(15, 78, 195, 78);
+    // --- 3. ORDER INFO BOX ---
+    doc.setDrawColor(212, 175, 55); // Royal Gold Border
+    doc.rect(15, 48, 180, 22);
+    doc.setFontSize(10);
+    doc.text(`Order Token: #${order.token}`, 20, 55);
+    doc.text(`Date: ${new Date(order.date).toLocaleDateString('en-GB')}`, 140, 55);
+    doc.text(`Customer: ${order.name.toUpperCase()}`, 20, 63);
+    
+    // Status color logic in PDF
+    const currentStatus = (order.status || "Pending").toUpperCase();
+    if(currentStatus.includes("CANCEL")) doc.setTextColor(200, 0, 0); // Red for Cancel
+    doc.text(`Status: ${currentStatus}`, 140, 63);
+    doc.setTextColor(0, 0, 0); // Back to black
 
-        // Items Logic
-        doc.setFont("helvetica", "normal");
-        let y = 85;
-        const items = order.items.split(', ');
-        items.forEach((item, i) => {
-            doc.text(`${i + 1}`, 22, y);
-            doc.text(item, 40, y);
-            y += 8;
-        });
+    // --- 4. ITEMS TABLE ---
+    doc.setFont("helvetica", "bold");
+    doc.setFillColor(240, 240, 240);
+    doc.rect(15, 75, 180, 8, 'F');
+    doc.text("S.No", 20, 80);
+    doc.text("Description", 45, 80);
+    doc.text("Amount (INR)", 165, 80);
+    doc.line(15, 83, 195, 83);
 
-        // Grand Total
-        doc.line(15, y + 2, 195, y + 2);
-        doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-        doc.text(`GRAND TOTAL: Rs. ${order.total}/-`, 190, y + 12, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    let y = 90;
+    const items = order.items.split(', ');
+    items.forEach((item, i) => {
+        doc.text(`${i + 1}`, 22, y);
+        doc.text(item, 45, y);
+        y += 8;
+    });
 
-        // Timeline (Audit trail)
-        doc.setFontSize(8); doc.setTextColor(100);
-        let timeInfo = `Ordered: ${new Date(order.date).toLocaleTimeString()}`;
-        if(order.updatedAt) timeInfo += ` | Processed: ${new Date(order.updatedAt).toLocaleTimeString()}`;
-        doc.text(timeInfo, 105, y + 22, { align: "center" });
+    // --- 5. AUDIT TIMELINE (CANCELLATION/DONE TIME) ---
+    doc.line(15, y, 195, y);
+    doc.setFontSize(8);
+    doc.setTextColor(100);
+    
+    let timeLog = `Ordered At: ${new Date(order.date).toLocaleTimeString()}`;
+    
+    // 🔥 CANCELLATION TIME LOGIC
+    if(currentStatus.includes("CANCEL")) {
+        // Agar order cancel hua hai toh uska update time dikhao
+        const cancelTime = order.updatedAt ? new Date(order.updatedAt).toLocaleTimeString() : "N/A";
+        timeLog += ` | ❌ Cancelled At: ${cancelTime}`;
+    } else if (currentStatus === "DONE" || currentStatus === "PAID & DELIVERED") {
+        const deliverTime = order.updatedAt ? new Date(order.updatedAt).toLocaleTimeString() : "N/A";
+        timeLog += ` | ✅ Delivered At: ${deliverTime}`;
+    }
+    
+    doc.text(timeLog, 105, y + 8, { align: "center" });
 
-        doc.setFontSize(10); doc.setFont("helvetica", "italic");
-        doc.text("Thank you for dining Royally! Visit Again.", 105, y + 32, { align: "center" });
+    // --- 6. GRAND TOTAL & FOOTER ---
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`GRAND TOTAL: Rs. ${order.total}/-`, 190, y + 20, { align: "right" });
 
-        doc.save(`RSK_Invoice_${order.token}.pdf`);
-    };
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(212, 175, 55);
+    doc.text("Thank you for dining Royally! Visit Again.", 105, y + 35, { align: "center" });
 
+    doc.save(`RSK_Invoice_${order.token}.pdf`);
+};
     // --- 💬 WHATSAPP SHARE (COMPLETE DETAIL) ---
     window.handleAdminWAShare = function(order) {
         const msg = `*ROYAL STREET KITCHEN* 👑%0A--------------------------%0A*Token:* #${order.token}%0A*Customer:* ${order.name}%0A--------------------------%0A*Items:*%0A${order.items.replace(/, /g, '%0A')}%0A--------------------------%0A*Grand Total: ₹${order.total}*%0A*Status:* ${order.status}%0A--------------------------%0A_Thank you for dining Royally!_`;
