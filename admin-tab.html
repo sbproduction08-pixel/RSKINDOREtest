@@ -159,10 +159,9 @@
 
     // --- 5. 💬 WHATSAPP SHARE (Original) ---
     window.handleAdminWAShare = function(order) {
-        const msg = `*ROYAL STREET KITCHEN* 👑%0A*Token:* #${order.token}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}`;
-        window.open(`https://wa.me/91${order.phone || ''}?text=${msg}`, '_blank');
-    };
-
+    const msg = `*ROYAL STREET KITCHEN* 👑%0A--------------------------%0A*Token:* #${order.token}%0A*Items:* ${order.items}%0A*Total:* ₹${order.total}%0A*Status:* ${order.status}%0A--------------------------%0A_Thank you for being Royal!_`;
+    window.open(`https://wa.me/91${order.phone}?text=${msg}`, '_blank');
+};
     // --- 6. 🥦 INVENTORY LOGIC (Original) ---
     async function loadInventoryInAdmin() {
         const list = document.getElementById('admin-inventory-list');
