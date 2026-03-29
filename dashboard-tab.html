@@ -38,6 +38,17 @@
     <div id="history-list" style="display: flex; flex-direction: column; gap: 12px;">
         <p style="font-size: 11px; opacity: 0.5;">Loading your past treats...</p>
     </div>
+    <div id="status-line-container" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border: 1px solid rgba(212,175,55,0.2);">
+    <div style="display: flex; justify-content: space-between; position: relative;">
+        <div style="position: absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: #333; z-index: 1;"></div>
+        <div id="gold-progress" style="position: absolute; top: 12px; left: 10%; width: 0%; height: 2px; background: var(--gold); box-shadow: 0 0 10px var(--gold); z-index: 2; transition: 1s;"></div>
+        
+        <div class="shahi-step" data-step="Pending">Awaiting</div>
+        <div class="shahi-step" data-step="Received">Received</div>
+        <div class="shahi-step" data-step="Preparing">Cooking</div>
+        <div class="shahi-step" data-step="Ready">Ready</div>
+        <div class="shahi-step" data-step="Done">Served</div>
+    </div>
     
     <div id="bill-download-area" style="display: none; margin-top: 25px; padding: 15px; border-top: 1px dashed rgba(212,175,55,0.3);">
     <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Aapka Royal Bill taiyar hai!</p>
@@ -116,7 +127,15 @@
             })
             .catch(err => console.log("Tracking Error:", err));
     }
-
+    function syncStatusTracker(status) {
+    const s = status.toLowerCase();
+    const bar = document.getElementById('gold-progress');
+    if(s.includes('pending')) bar.style.width = '0%';
+    else if(s.includes('received')) bar.style.width = '25%';
+    else if(s.includes('preparing')) bar.style.width = '50%';
+    else if(s.includes('ready')) { bar.style.width = '75%'; playRoyalBell(); }
+    else if(s.includes('done')) bar.style.width = '100%';
+    }
     function renderHistory(orders) {
         const historyList = document.getElementById('history-list');
         let html = "";
