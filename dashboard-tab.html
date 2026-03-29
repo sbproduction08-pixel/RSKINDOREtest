@@ -81,7 +81,6 @@
 
 <script>
     // --- GLOBAL STATE ---
-    // Variable ka naam badal diya taaki 'Already Declared' error na aaye
     let rskLiveOrder = null; 
     let lastKnownStatus = "";
 
@@ -109,7 +108,7 @@
 
     function startTracking() {
         const phone = localStorage.getItem('userPhone');
-        // UPDATE: Naya Script URL yahan daalein
+        // UPDATE: Apna naya Script URL yahan check kar lena
         const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
 
         fetch(gasUrl)
@@ -125,7 +124,6 @@
                     document.getElementById('order-status').innerText = liveOrder.status.toUpperCase();
                     document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
 
-                    // Naya Tracker Logic (Bina error ke)
                     syncRoyalProgress(liveOrder.status);
 
                     const s = liveOrder.status.toLowerCase();
@@ -162,6 +160,7 @@
         const historyList = document.getElementById('history-list');
         let html = "";
         const historyItems = orders.filter(o => o.status.toLowerCase().includes('done') || o.status.toLowerCase().includes('cancel'));
+        
         historyItems.forEach((order) => {
             const isCancelled = order.status.toLowerCase().includes('cancel');
             html += `
@@ -174,12 +173,30 @@
                         </div>
                         <div style="text-align: right;">
                             <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
+                            ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
                         </div>
                     </div>
                 </div>`;
         });
         historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
     }
+
+    // --- WAPAS ADD KIYA: Profile Save Logic ---
+    window.saveRoyalProfile = function() {
+        const phoneVal = document.getElementById('new-phone').value;
+        const prefVal = document.getElementById('new-pref').value;
+        if (phoneVal.length < 10) return alert("Kripya 10 anko ka sahi number daalein!");
+        localStorage.setItem('userPhone', phoneVal);
+        if (prefVal) localStorage.setItem('userPreference', prefVal);
+        alert("Royal Profile Save Ho Gaya Hai! 👑");
+        location.reload(); 
+    };
+
+    // --- WAPAS ADD KIYA: Bill Generator Link (Agar index.html mein nahi hai toh) ---
+    window.generateRoyalBill = function(order) {
+        alert("Generating Bill for Token: " + order.token);
+        // Yahan aapka PDF/Bill ka logic chalta hai
+    };
 
     initDashboard();
 </script>
