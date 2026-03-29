@@ -81,8 +81,10 @@
 
 <script>
     // --- GLOBAL STATE ---
-    var rskLiveOrder = null; 
+    var rskLiveOrder = null; // Conflict fix ke liye 'var' rakha hai
     let lastKnownStatus = "";
+    // Yahan apna naya Apps Script URL zaroor daalna
+    const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec";
 
     function initDashboard() {
         const userName = localStorage.getItem('userName');
@@ -108,10 +110,8 @@
 
     function startTracking() {
         const phone = localStorage.getItem('userPhone');
-        // UPDATE: Apna naya Script URL yahan check kar lena
-        const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
-
-        fetch(gasUrl)
+        
+        fetch(gasUrl + "?action=readAdmin")
             .then(res => res.json())
             .then(data => {
                 const allMyOrders = data.filter(o => o.phone == phone).reverse();
@@ -121,10 +121,9 @@
                     rskLiveOrder = liveOrder;
                     document.getElementById('live-tracker').style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
-                    document.getElementById('order-status').innerText = liveOrder.status.toUpperCase();
-                    document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
-
-                    syncRoyalProgress(liveOrder.status);
+                    
+                    // --- UPDATION: OTP Card Position Fix (Matches image_10.png) ---
+                    renderLiveTracker(liveOrder);
 
                     const s = liveOrder.status.toLowerCase();
                     if (s !== "awaiting payment" && s !== "pending" && s !== "") {
@@ -145,26 +144,28 @@
             .catch(err => console.log("Tracking Error:", err));
     }
 
+    // --- UPDATION: OTP Card ABOVE Progress Line (Matches your request) ---
     function renderLiveTracker(liveOrder) {
-    const trackerDiv = document.getElementById('live-tracker');
-    trackerDiv.innerHTML = `
-        <div style="margin-bottom: 20px;">
-            <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
-                <div id="gold-progress" style="height: 100%; width: 0%; background: linear-gradient(90deg, #d4af37, #f1c40f); transition: width 1s ease;"></div>
+        const trackerDiv = document.getElementById('live-tracker');
+        trackerDiv.innerHTML = `
+            <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1.5px dashed #d4af37; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 0 15px rgba(212,175,55,0.2);">
+                <div style="font-size: 11px; color: #888; letter-spacing: 2px;">SHOW THIS OTP AT COUNTER</div>
+                <div style="font-size: 38px; font-weight: 900; color: #fff; margin: 10px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">${liveOrder.otp || 'WAIT'}</div>
+                <div style="font-size: 14px; color: #d4af37; font-weight: bold;">STATUS: <span id="order-status">${liveOrder.status.toUpperCase()}</span></div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #d4af37; margin-top: 5px;">
-                <span>RECEIVED</span><span>PREPARING</span><span>READY</span>
-            </div>
-        </div>
 
-        <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1px solid #d4af37; padding: 15px; border-radius: 15px; text-align: center;">
-            <div style="font-size: 12px; color: #888; letter-spacing: 1px;">SHOW THIS OTP AT COUNTER</div>
-            <div style="font-size: 32px; font-weight: 900; color: #fff; margin: 10px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">${liveOrder.otp}</div>
-            <div style="font-size: 14px; color: #d4af37; font-weight: bold;">STATUS: <span id="order-status">${liveOrder.status.toUpperCase()}</span></div>
-        </div>
-    `;
-    syncRoyalProgress(liveOrder.status);
-}
+            <div style="margin-bottom: 20px; padding: 0 10px;">
+                <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+                    <div id="gold-progress" style="height: 100%; width: 0%; background: linear-gradient(90deg, #d4af37, #f1c40f); transition: width 1s ease;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: #d4af37; margin-top: 8px; font-weight:bold;">
+                    <span>RECEIVED</span><span>PREPARING</span><span>READY</span>
+                </div>
+            </div>
+        `;
+        syncRoyalProgress(liveOrder.status);
+    }
+
     function syncRoyalProgress(status) {
         const s = status.toLowerCase();
         const bar = document.getElementById('gold-progress');
@@ -193,7 +194,7 @@
                         </div>
                         <div style="text-align: right;">
                             <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
-                            ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
+                            ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:var(--gold); color:#000; border:none; padding:5px 12px; border-radius:8px; font-size:11px; margin-top:8px; cursor:pointer; font-weight:bold;">BILL 📥</button>` : ''}
                         </div>
                     </div>
                 </div>`;
@@ -201,7 +202,42 @@
         historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
     }
 
-    // --- WAPAS ADD KIYA: Profile Save Logic ---
+    // --- UPDATION: GST BILL PDF DOWNLOAD (With Logo & GSTIN) ---
+    window.generateRoyalBill = function(order) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a5' });
+
+        // Add Banner/Logo (Replace URL with your hosted img)
+        try {
+            doc.addImage('https://sbproduction08-pixel.github.io/royalstreetkitchen.png', 'PNG', 0, 0, 148, 25);
+        } catch(e) { 
+            doc.setFontSize(18); doc.text("ROYAL STREET KITCHEN", 74, 15, {align: "center"}); 
+        }
+        
+        doc.setFontSize(10); doc.setTextColor(100);
+        doc.text("Township, opp. Elite Apex, Mahalaxmi Nagar, Indore (MP)", 74, 30, {align: "center"});
+        doc.text("GSTIN: 23ABCDE1234F1Z5", 74, 35, {align: "center"});
+
+        doc.setDrawColor(212, 175, 55); doc.line(10, 40, 138, 40);
+
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`Token: #${order.token}`, 12, 48); doc.text(`Date: ${new Date().toLocaleDateString()}`, 100, 48);
+        doc.text(`Customer: ${order.name.toUpperCase()}`, 12, 55);
+
+        doc.setFillColor(240, 240, 240); doc.rect(10, 65, 128, 8, 'F');
+        doc.text("Description", 15, 70); doc.text("Amount", 110, 70);
+
+        let y = 80;
+        order.items.split(', ').forEach((item, i) => {
+            doc.text(`${i+1}. ${item}`, 15, y); y += 8;
+        });
+
+        doc.line(10, y, 138, y);
+        doc.setFontSize(14); doc.text(`GRAND TOTAL: ₹${order.total}/-`, 135, y + 15, { align: "right" });
+        
+        doc.save(`RSK_Bill_${order.token}.pdf`);
+    };
+
     window.saveRoyalProfile = function() {
         const phoneVal = document.getElementById('new-phone').value;
         const prefVal = document.getElementById('new-pref').value;
@@ -210,12 +246,6 @@
         if (prefVal) localStorage.setItem('userPreference', prefVal);
         alert("Royal Profile Save Ho Gaya Hai! 👑");
         location.reload(); 
-    };
-
-    // --- WAPAS ADD KIYA: Bill Generator Link (Agar index.html mein nahi hai toh) ---
-    window.generateRoyalBill = function(order) {
-        alert("Generating Bill for Token: " + order.token);
-        // Yahan aapka PDF/Bill ka logic chalta hai
     };
 
     initDashboard();
