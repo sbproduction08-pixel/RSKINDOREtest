@@ -80,12 +80,10 @@
 </div>
 
 <script>
-    // --- GLOBAL STATE (Wahi purana) ---
-    let currentActiveOrder = null;
+    // --- GLOBAL STATE ---
+    // Variable ka naam badal diya taaki 'Already Declared' error na aaye
+    let rskLiveOrder = null; 
     let lastKnownStatus = "";
-
-    // 🔔 Long Bell Audio (Naya add kiya)
-    const royalBell = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
     function initDashboard() {
         const userName = localStorage.getItem('userName');
@@ -109,10 +107,9 @@
         }
     }
 
-    // --- LIVE ORDER & STATUS SYNC (Fixed with Tracker) ---
     function startTracking() {
         const phone = localStorage.getItem('userPhone');
-        // Aapka purana GAS URL
+        // UPDATE: Naya Script URL yahan daalein
         const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec?action=readAdmin";
 
         fetch(gasUrl)
@@ -122,21 +119,15 @@
                 const liveOrder = allMyOrders.find(o => !o.status.toLowerCase().includes('done') && !o.status.toLowerCase().includes('cancel'));
 
                 if (liveOrder) {
-                    currentActiveOrder = liveOrder;
+                    rskLiveOrder = liveOrder;
                     document.getElementById('live-tracker').style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
                     document.getElementById('order-status').innerText = liveOrder.status.toUpperCase();
                     document.getElementById('order-otp').innerText = liveOrder.otp || "WAIT";
 
-                    // 🔥 NEW: Royal Tracker Sync & Sound Logic
-                    syncRoyalTracker(liveOrder.status);
-                    
-                    if (lastKnownStatus !== liveOrder.status && lastKnownStatus !== "") {
-                        royalBell.play().catch(e => console.log("Sound Blocked"));
-                    }
-                    lastKnownStatus = liveOrder.status;
+                    // Naya Tracker Logic (Bina error ke)
+                    syncRoyalProgress(liveOrder.status);
 
-                    // 🔥 BUSINESS LOGIC: Status "Received" hote hi Cancel Timer band
                     const s = liveOrder.status.toLowerCase();
                     if (s !== "awaiting payment" && s !== "pending" && s !== "") {
                         const cancelBar = document.getElementById('cancel-bar');
@@ -149,22 +140,18 @@
                 } else {
                     document.getElementById('live-tracker').style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
-                    lastKnownStatus = ""; 
                 }
-
                 renderHistory(allMyOrders);
                 setTimeout(startTracking, 15000); 
             })
             .catch(err => console.log("Tracking Error:", err));
     }
 
-    // 🔥 NEW: Royal Tracker UI Logic (Bina kuch gayab kiye)
-    function syncRoyalTracker(status) {
+    function syncRoyalProgress(status) {
         const s = status.toLowerCase();
         const bar = document.getElementById('gold-progress');
-        if (!bar) return; // Agar tracker HTML mein nahi hai toh skip
-
-        if (s.includes('pending') || s.includes('awaiting')) bar.style.width = '5%';
+        if (!bar) return;
+        if (s.includes('pending')) bar.style.width = '5%';
         else if (s.includes('received')) bar.style.width = '25%';
         else if (s.includes('preparing')) bar.style.width = '50%';
         else if (s.includes('ready')) bar.style.width = '75%';
@@ -175,7 +162,6 @@
         const historyList = document.getElementById('history-list');
         let html = "";
         const historyItems = orders.filter(o => o.status.toLowerCase().includes('done') || o.status.toLowerCase().includes('cancel'));
-
         historyItems.forEach((order) => {
             const isCancelled = order.status.toLowerCase().includes('cancel');
             html += `
@@ -188,24 +174,12 @@
                         </div>
                         <div style="text-align: right;">
                             <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
-                            ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:none; border: 1px solid #d4af37; color:#d4af37; padding:4px 10px; border-radius:6px; font-size:10px; margin-top:8px; cursor:pointer;">BILL 📥</button>` : ''}
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
         historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
     }
-
-    window.saveRoyalProfile = function() {
-        const phoneVal = document.getElementById('new-phone').value;
-        const prefVal = document.getElementById('new-pref').value;
-        if (phoneVal.length < 10) return alert("Kripya 10 anko ka sahi number daalein!");
-        localStorage.setItem('userPhone', phoneVal);
-        if (prefVal) localStorage.setItem('userPreference', prefVal);
-        alert("Royal Profile Save Ho Gaya Hai! 👑");
-        location.reload(); 
-    };
 
     initDashboard();
 </script>
