@@ -572,21 +572,19 @@ startCancelTimer(300, true);
         }
 
         window.cancelOrder = function() {
-            const token = localStorage.getItem('lastTokenNo');
-            const name = localStorage.getItem('userName');
-            if(!token || !confirm("Aap ye order cancel karna chahte hain?")) return;
-            
-            fetch(bridgeUrl, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: new URLSearchParams({token, name, status: 'Cancelled By User'}).toString() 
-            });
+    const token = localStorage.getItem('lastTokenNo');
+    const uName = localStorage.getItem('userName');
+    if(!token || !confirm("Aap ye order cancel karna chahte hain?")) return;
+    
+    // Nayi entry karne ki jagah purani update hogi
+    fetch(bridgeUrl + "?action=updateStatus&token=" + token + "&status=Cancelled%20By%20User", { 
+        method: 'GET' // Status update ke liye GET safe hai
+    });
 
-            window.open(`https://wa.me/917489999890?text=*CANCELLED* ❌%0A*Token:* ${encodeURIComponent(token)}`, '_blank');
-            stopAndHideTimer(); 
-            alert("Cancelled Successfully!");
-        };
-
+    window.open(`https://wa.me/917489999890?text=*CANCELLED* ❌%0A*Token:* %23${token}`, '_blank');
+    stopAndHideTimer(); 
+    alert("Order Cancelled! Amount refund/adjust ho jayega.");
+};
         /**
          * 6. CART SYSTEM
          */
