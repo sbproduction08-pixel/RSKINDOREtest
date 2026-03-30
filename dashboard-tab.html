@@ -111,7 +111,8 @@
                 if (liveOrder) {
                     rskLiveOrder = liveOrder;
                     document.getElementById('live-tracker').style.display = 'block';
-                    document.getElementById('no-order').style.display = 'none';
+                    document.getElementById('order-status').innerText = live.status.toUpperCase();
+                    document.getElementById('order-otp').innerText = live.otp || "WAIT";
                     
                     // --- UPDATION: OTP Card Position Fix (Matches image_10.png) ---
                     renderLiveTracker(liveOrder);
@@ -130,9 +131,11 @@
                     document.getElementById('no-order').style.display = 'block';
                 }
                 renderHistory(allMyOrders);
-                setTimeout(startTracking, 15000); 
+                setTimeout(startTracking, 10000); 
             })
             .catch(err => console.log("Tracking Error:", err));
+             setTimeout(startTracking, 5000);
+            });
     }
 
     // --- UPDATION: OTP Card ABOVE Progress Line (Matches your request) ---
@@ -154,18 +157,27 @@
                 </div>
             </div>
         `;
-        syncRoyalProgress(liveOrder.status);
+        syncRoyalProgress(live.status);
+                } else {
+                    document.getElementById('live-tracker').style.display = 'none';
+                    document.getElementById('no-order').style.display = 'block';
+                }
+                renderHistory(allMyOrders);
     }
 
     function syncRoyalProgress(status) {
         const s = status.toLowerCase();
         const bar = document.getElementById('gold-progress');
         if (!bar) return;
-        if (s.includes('pending')) bar.style.width = '5%';
-        else if (s.includes('received')) bar.style.width = '25%';
-        else if (s.includes('preparing')) bar.style.width = '50%';
-        else if (s.includes('ready')) bar.style.width = '75%';
-        else if (s.includes('done')) bar.style.width = '100%';
+       if (s.includes('received')) bar.style.width = '33%';
+        else if (s.includes('preparing')) bar.style.width = '66%';
+        else if (s.includes('ready')) bar.style.width = '100%';
+        else if (s.includes('pending')) bar.style.width = '10%';
+
+        // Dots ko chamkana
+        if (s.includes('received')) document.getElementById('dot-received').style.background = 'var(--gold)';
+        if (s.includes('preparing')) document.getElementById('dot-cooking').style.background = 'var(--gold)';
+        if (s.includes('ready')) document.getElementById('dot-ready').style.background = 'var(--gold)';
     }
 
     function renderHistory(orders) {
@@ -239,5 +251,5 @@
         location.reload(); 
     };
 
-    initDashboard();
+    if(typeof initDashboard === 'function') initDashboard();
 </script>
