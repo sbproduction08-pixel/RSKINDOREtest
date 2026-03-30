@@ -495,16 +495,28 @@
                 await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
 
                 // Step 3: Confirmation
-                localStorage.setItem('lastTokenNo', nextToken);
-                let waMsg = `*ROYAL STREET KITCHEN* 👑%0A---------------------%0A*Token:* %23${nextToken}%0A*Order:* ${itemsStr}%0A*Total: ₹${total}*`;
-                window.open(`https://wa.me/917489999890?text=${waMsg}`, '_blank');
+                let rawMsg = `*ROYAL STREET KITCHEN* 👑\n` +
+             `----------------------------\n` +
+             `*Order Placed Successfully!*\n` +
+             `*Token:* #${nextToken}\n` +
+             `*Items:* ${itemsStr}\n` +
+             `----------------------------\n` +
+             `*Total Amount:* ₹${total}\n` +
+             `_Dosti aur swad ka wada_`;
 
-                alert("Waah! Order place ho gaya hai. Token #" + nextToken);
-                window.cart = []; 
-                updateCartUI();
-                showTab('dashboard'); 
-                startCancelTimer(300, true);
+// 2. ENCODING (Sabse zaroori: Isse message poora jayega)
+let encodedWaMsg = encodeURIComponent(rawMsg);
 
+// 3. WHATSAPP OPEN (Aapke number par ya customer ke number par)
+// Note: Agar customer ko bhejni hai toh uPhone use karein, agar khud ko toh purana number.
+window.open(`https://wa.me/91${uPhone}?text=${encodedWaMsg}`, '_blank');
+
+alert("Waah! Order place ho gaya hai. Token #" + nextToken);
+window.cart = []; 
+updateCartUI();
+showTab('dashboard'); 
+startCancelTimer(300, true);
+                
             } catch (err) {
                 console.error("Checkout Fail:", err);
                 alert("Technical Error! Dubara koshish karein.");
