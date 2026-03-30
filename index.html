@@ -495,21 +495,20 @@
                 await fetch(finalUrl, { method: 'POST', mode: 'no-cors' });
 
                 // Step 3: Confirmation
-                let rawMsg = `*ROYAL STREET KITCHEN* 👑\n` +
+                let itemsSummary = window.cart.map(i => `${i.name} x${i.qty}`).join(', ');
+let totalBill = window.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+let rawText = `*ROYAL STREET KITCHEN* 👑\n` +
              `----------------------------\n` +
              `*Order Placed Successfully!*\n` +
              `*Token:* #${nextToken}\n` +
-             `*Items:* ${itemsStr}\n` +
+             `*Items:* ${itemsSummary}\n` +
              `----------------------------\n` +
-             `*Total Amount:* ₹${total}\n` +
+             `*Total Amount:* ₹${totalBill}\n` +
              `_Dosti aur swad ka wada_`;
 
-// 2. ENCODING (Sabse zaroori: Isse message poora jayega)
-let encodedWaMsg = encodeURIComponent(rawMsg);
-
-// 3. WHATSAPP OPEN (Aapke number par ya customer ke number par)
-// Note: Agar customer ko bhejni hai toh uPhone use karein, agar khud ko toh purana number.
-window.open(`https://wa.me/91${uPhone}?text=${encodedWaMsg}`, '_blank');
+let encodedText = encodeURIComponent(rawText);
+window.open(`https://wa.me/91${uPhone}?text=${encodedText}`, '_blank');
 
 alert("Waah! Order place ho gaya hai. Token #" + nextToken);
 window.cart = []; 
