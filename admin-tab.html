@@ -66,8 +66,9 @@
     // --- 1. CONFIG & STATE ---
     const adminBridge = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
     let lastCount = 0;
+    const kitchenBell = new Audio('https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3');
 
-    // --- 2. NAVIGATION ENGINE (Original) ---
+    // --- 2. NAVIGATION ENGINE ---
     function showAdminSection(sec) {
         document.getElementById('admin-orders-view').style.display = (sec === 'orders') ? 'block' : 'none';
         document.getElementById('stock-manager-view').style.display = (sec === 'stock') ? 'block' : 'none';
@@ -81,14 +82,13 @@
         else refreshAdminData();
     }
 
-    // --- 3. LIVE ORDERS SYNC (Original) ---
+    // --- 3. LIVE ORDERS SYNC ---
     function refreshAdminData() {
         fetch(adminBridge + "?action=readAdmin")
             .then(res => res.json())
             .then(data => {
                 if (lastCount !== 0 && data.length > lastCount) {
-                    const bell = document.getElementById('kitchenBell');
-                    if(bell) bell.play().catch(e => {});
+                    kitchenBell.play().catch(e => console.log("Sound enabled after interaction"));
                 }
                 lastCount = data.length;
                 renderOrders(data);
@@ -112,7 +112,6 @@
             const isReady = status.toLowerCase() === "ready";
 
             let actionBtn = "";
-            // UPDATION: Status logic with Cancel button enabled until READY
             if (status === "Awaiting Payment" || status === "Pending") {
                 actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" class="action-btn" style="background:#3498db; color:white; width:100%; margin-top:10px; padding:12px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">RECEIVE PAYMENT ✅</button>`;
             } else if (status === "Received") {
@@ -147,7 +146,7 @@
         document.getElementById('admin-total-sale').innerText = sale.toLocaleString();
     }
 
-    // --- 4. 📄 PROFESSIONAL PDF LOGIC (Original) ---
+    // --- 4. PROFESSIONAL PDF LOGIC ---
     window.handleAdminBillPDF = function(order) {
         if (!window.jspdf) { alert("Library missing!"); return; }
         const { jsPDF } = window.jspdf;
@@ -160,50 +159,53 @@
         doc.save(`RSK_${order.token}.pdf`);
     };
 
-    // --- FIX: COMPLETE WHATSAPP MESSAGE ---
+    // --- 5. WHATSAPP COMPLETE MESSAGE ---
     window.handleAdminWAShare = function(order) {
         const rawMsg = `*ROYAL STREET KITCHEN* 👑\n----------------------------\n*Token:* #${order.token}\n*Items:* ${order.items}\n----------------------------\n*Total Bill:* ₹${order.total}\n*Status:* ${order.status}\n_Thank you for being Royal!_`;
         const waUrl = `https://wa.me/91${order.phone}?text=${encodeURIComponent(rawMsg)}`;
         window.open(waUrl, '_blank');
     };
 
-    // --- 6. 🥦 INVENTORY LOGIC (Fixed for Sync) ---
+    // --- 6. 🥦 INVENTORY LOGIC (Smooth Slider - No Popup) ---
     async function loadInventoryInAdmin() {
         const list = document.getElementById('admin-inventory-list');
-        list.innerHTML = "<div style='color:var(--gold); padding:20px; text-align:center;'>Syncing Inventory...</div>";
+        list.innerHTML = "<div style='color:var(--gold); padding:20px; text-align:center;'>Syncing Stock...</div>";
         try {
             const res = await fetch(adminBridge + "?action=getInventory");
             const data = await res.json();
-            
-            // Note: Make sure your Inventory HTML elements exist for mapping
-            if(typeof loadInventoryUI === "function") {
-                loadInventoryUI(data); 
-            } else {
-                // Fallback rendering if loadInventoryUI is missing
-                let html = "";
-                for(let item in data) {
-                    let isOut = data[item] === "Out";
-                    html += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333;">
-                        <span>${item}</span>
-                        <button onclick="toggleStockItem('${item}', ${isOut})" style="background:${isOut?'#ff4444':'#25D366'}; border:none; color:white; padding:5px; border-radius:5px;">${isOut?'Out':'In'}</button>
+            let html = "";
+            for(let item in data) {
+                let isOut = data[item] === "Out";
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.03); border-radius:12px; margin-bottom:10px; border:1px solid rgba(212,175,55,0.1);">
+                        <div style="font-weight:bold; color:#fff;">${item}</div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span id="lbl-${item.replace(/\s+/g, '')}" style="font-size:10px; font-weight:900; color:${isOut ? '#ff4444' : '#25D366'}">${isOut ? 'OUT' : 'IN'}</span>
+                            <label style="position:relative; display:inline-block; width:40px; height:22px;">
+                                <input type="checkbox" ${!isOut ? 'checked' : ''} onchange="toggleStockItem('${item}', this.checked)" style="opacity:0; width:0; height:0;">
+                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:${isOut ? '#444' : '#25D366'}; transition:.4s; border-radius:22px;">
+                                    <span style="position:absolute; content:''; height:16px; width:16px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%; ${!isOut ? 'transform:translateX(18px);' : ''}"></span>
+                                </span>
+                            </label>
+                        </div>
                     </div>`;
-                }
-                list.innerHTML = html;
             }
-        } catch(e) { list.innerHTML = "Error loading stock."; }
+            list.innerHTML = html;
+        } catch(e) { list.innerHTML = "<div style='color:#ff4444; text-align:center;'>Sync Error!</div>"; }
     }
 
-    // UPDATION: URL Parameters use karenge stock sync ke liye
-    window.toggleStockItem = function(name, check) {
-        const newStatus = check ? "In" : "Out";
+    window.toggleStockItem = function(name, isChecked) {
+        const newStatus = isChecked ? "In" : "Out";
+        const statusLabel = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
+        if(statusLabel) {
+            statusLabel.innerText = newStatus.toUpperCase();
+            statusLabel.style.color = isChecked ? "#25D366" : "#ff4444";
+        }
         const updateUrl = `${adminBridge}?action=updateInventory&itemName=${encodeURIComponent(name)}&newStatus=${newStatus}`;
-        
-        fetch(updateUrl, { method: 'GET' }) // Apps Script handles GET for simple updates easily
-        .then(() => alert(name + " updated to " + newStatus))
-        .catch(() => alert("Sync Failed!"));
+        fetch(updateUrl, { method: 'GET', mode: 'no-cors' }); // Instant sync in background
     };
 
-    // --- 7. 🔥 CORE STATUS UPDATE & OTP FIX ---
+    // --- 7. 🔥 CORE STATUS UPDATE & OTP ---
     window.updateStatus = function(token, status, btn, otp = "") {
         if(btn) btn.innerText = "⏳...";
         fetch(adminBridge, { 
@@ -222,11 +224,8 @@
 
     window.verifyOTP = function(token) {
         let otp = prompt("Customer OTP:");
-        if(otp) {
-            window.updateStatus(token, 'Done', null, otp);
-        } else {
-            alert("OTP is required for delivery!");
-        }
+        if(otp) { window.updateStatus(token, 'Done', null, otp); }
+        else { alert("OTP is required for delivery!"); }
     };
 
     function getStatusColor(s) {
