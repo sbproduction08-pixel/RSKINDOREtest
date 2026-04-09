@@ -109,8 +109,10 @@
             const status = (order.status || "Pending").trim();
             const isCancelled = status.toLowerCase().includes("cancel");
             const isDone = status.toLowerCase() === "done";
+            const isReady = status.toLowerCase() === "ready";
 
             let actionBtn = "";
+            // UPDATION: Status logic with Cancel button enabled until READY
             if (status === "Awaiting Payment" || status === "Pending") {
                 actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" class="action-btn" style="background:#3498db; color:white; width:100%; margin-top:10px; padding:12px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">RECEIVE PAYMENT ✅</button>`;
             } else if (status === "Received") {
@@ -133,6 +135,7 @@
                         <div style="display:flex; gap:8px;">
                             <button onclick='window.handleAdminBillPDF(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">📥 BILL</button>
                             ${!isCancelled ? `<button onclick='window.handleAdminWAShare(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">💬 SHARE</button>` : ""}
+                            ${(!isReady && !isDone && !isCancelled) ? `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer;">❌ CANCEL</button>` : ""}
                         </div>
                     </div>
                     ${actionBtn}
@@ -157,30 +160,47 @@
         doc.save(`RSK_${order.token}.pdf`);
     };
 
-    // --- FIX: COMPLETE WHATSAPP MESSAGE (Line breaks & encoding) ---
-window.handleAdminWAShare = function(order) {
-    const rawMsg = `*ROYAL STREET KITCHEN* 👑\n----------------------------\n*Token:* #${order.token}\n*Items:* ${order.items}\n----------------------------\n*Total Bill:* ₹${order.total}\n*Status:* ${order.status}\n_Thank you for being Royal!_`;
-    const waUrl = `https://wa.me/91${order.phone}?text=${encodeURIComponent(rawMsg)}`;
-    window.open(waUrl, '_blank');
-};
-    // --- 6. 🥦 INVENTORY LOGIC (Original) ---
+    // --- FIX: COMPLETE WHATSAPP MESSAGE ---
+    window.handleAdminWAShare = function(order) {
+        const rawMsg = `*ROYAL STREET KITCHEN* 👑\n----------------------------\n*Token:* #${order.token}\n*Items:* ${order.items}\n----------------------------\n*Total Bill:* ₹${order.total}\n*Status:* ${order.status}\n_Thank you for being Royal!_`;
+        const waUrl = `https://wa.me/91${order.phone}?text=${encodeURIComponent(rawMsg)}`;
+        window.open(waUrl, '_blank');
+    };
+
+    // --- 6. 🥦 INVENTORY LOGIC (Fixed for Sync) ---
     async function loadInventoryInAdmin() {
         const list = document.getElementById('admin-inventory-list');
-        list.innerHTML = "<div style='color:var(--gold);'>Syncing...</div>";
+        list.innerHTML = "<div style='color:var(--gold); padding:20px; text-align:center;'>Syncing Inventory...</div>";
         try {
-            const res = await fetch(adminBridge + "?action=readAdmin"); // Re-using readAdmin for simplicity if needed
-            const data = await fetch(adminBridge + "?action=getInventory").then(r => r.json());
-            // ... (Aapka original mapping logic)
-            loadInventoryUI(data); 
+            const res = await fetch(adminBridge + "?action=getInventory");
+            const data = await res.json();
+            
+            // Note: Make sure your Inventory HTML elements exist for mapping
+            if(typeof loadInventoryUI === "function") {
+                loadInventoryUI(data); 
+            } else {
+                // Fallback rendering if loadInventoryUI is missing
+                let html = "";
+                for(let item in data) {
+                    let isOut = data[item] === "Out";
+                    html += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333;">
+                        <span>${item}</span>
+                        <button onclick="toggleStockItem('${item}', ${isOut})" style="background:${isOut?'#ff4444':'#25D366'}; border:none; color:white; padding:5px; border-radius:5px;">${isOut?'Out':'In'}</button>
+                    </div>`;
+                }
+                list.innerHTML = html;
+            }
         } catch(e) { list.innerHTML = "Error loading stock."; }
     }
 
+    // UPDATION: URL Parameters use karenge stock sync ke liye
     window.toggleStockItem = function(name, check) {
-        fetch(adminBridge, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify({ action: "updateInventory", itemName: name, newStatus: check ? "In" : "Out" }) 
-        });
+        const newStatus = check ? "In" : "Out";
+        const updateUrl = `${adminBridge}?action=updateInventory&itemName=${encodeURIComponent(name)}&newStatus=${newStatus}`;
+        
+        fetch(updateUrl, { method: 'GET' }) // Apps Script handles GET for simple updates easily
+        .then(() => alert(name + " updated to " + newStatus))
+        .catch(() => alert("Sync Failed!"));
     };
 
     // --- 7. 🔥 CORE STATUS UPDATE & OTP FIX ---
@@ -192,7 +212,7 @@ window.handleAdminWAShare = function(order) {
             body: JSON.stringify({ 
                 token: token, 
                 status: status, 
-                otp: otp, // OTP support added
+                otp: otp,
                 updatedAt: new Date().toISOString() 
             }) 
         }).then(() => {
@@ -203,7 +223,7 @@ window.handleAdminWAShare = function(order) {
     window.verifyOTP = function(token) {
         let otp = prompt("Customer OTP:");
         if(otp) {
-            window.updateStatus(token, 'Done', null, otp); // Pass OTP to script
+            window.updateStatus(token, 'Done', null, otp);
         } else {
             alert("OTP is required for delivery!");
         }
