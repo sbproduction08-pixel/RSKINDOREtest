@@ -109,37 +109,51 @@
             .then(res => res.json())
             .then(data => {
                 const allMyOrders = data.filter(o => o.phone == phone).reverse();
-                const liveOrder = allMyOrders.find(o => !o.status.toLowerCase().includes('done') && !o.status.toLowerCase().includes('cancel'));
+                
+                // --- UPDATION: Multiple Live Orders Support ---
+                const liveOrders = allMyOrders.filter(o => 
+                    !o.status.toLowerCase().includes('done') && 
+                    !o.status.toLowerCase().includes('cancel')
+                );
 
-                if (liveOrder) {
-                    // ADDITION: Agar status change ho toh "Tring-Tring" bajao
-                    if (lastKnownStatus !== "" && lastKnownStatus !== liveOrder.status) {
-                        rskNotificationSound.play().catch(e => console.log("Sound enabled after first click"));
-                    }
-                    lastKnownStatus = liveOrder.status;
-                    
-                    rskLiveOrder = liveOrder;
-                    document.getElementById('live-tracker').style.display = 'block';
+                const trackerDiv = document.getElementById('live-tracker');
+
+                if (liveOrders.length > 0) {
+                    trackerDiv.style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
                     
-                    renderLiveTracker(liveOrder);
+                    // Clear previous to avoid duplication on refresh
+                    trackerDiv.innerHTML = ""; 
 
-                    // --- UPDATION: Received hote hi Cancel Button Gayab ---
-                    const s = liveOrder.status.toLowerCase();
-                    const cancelBar = document.getElementById('cancel-bar');
-                    
-                    if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
-                        if (cancelBar) {
-                            cancelBar.style.display = 'none';
-                            if (window.cancelInterval) clearInterval(window.cancelInterval);
-                            localStorage.removeItem('timerStartTime');
+                    liveOrders.forEach((order, index) => {
+                        // Sound logic on status change
+                        if (index === 0 && lastKnownStatus !== "" && lastKnownStatus !== order.status) {
+                            rskNotificationSound.play().catch(e => {});
                         }
-                    }
+                        if (index === 0) lastKnownStatus = order.status;
+
+                        // Render each order card
+                        trackerDiv.innerHTML += generateOrderCardHTML(order);
+
+                        // --- UPDATION: Cancel Button Auto-Hide per order ---
+                        const s = order.status.toLowerCase();
+                        if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
+                            // Agar is token ka timer chal raha hai toh hide karo
+                            const cancelBar = document.getElementById('cancel-bar');
+                            if (cancelBar && localStorage.getItem('lastTokenNo') === order.token) {
+                                cancelBar.style.display = 'none';
+                                if (window.cancelInterval) clearInterval(window.cancelInterval);
+                                localStorage.removeItem('timerStartTime');
+                            }
+                        }
+                    });
+
                 } else {
-                    document.getElementById('live-tracker').style.display = 'none';
+                    trackerDiv.style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
-                    lastKnownStatus = ""; // Reset status
+                    lastKnownStatus = "";
                 }
+                
                 renderHistory(allMyOrders);
                 setTimeout(startTracking, 10000); 
             })
@@ -149,37 +163,33 @@
             });
     }
 
-    function renderLiveTracker(liveOrder) {
-        const trackerDiv = document.getElementById('live-tracker');
-        const s = liveOrder.status.toLowerCase();
-        
-        trackerDiv.innerHTML = `
-            <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1.5px dashed #d4af37; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 0 15px rgba(212,175,55,0.2);">
-                <div style="font-size: 11px; color: #888; letter-spacing: 2px;">SHOW THIS OTP AT COUNTER</div>
-                <div style="font-size: 38px; font-weight: 900; color: #fff; margin: 10px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">${liveOrder.otp || 'WAIT'}</div>
-                <div style="font-size: 14px; color: #d4af37; font-weight: bold;">STATUS: <span id="order-status">${liveOrder.status.toUpperCase()}</span></div>
-            </div>
+    // Helper function to create HTML for each live order
+    function generateOrderCardHTML(order) {
+        const s = order.status.toLowerCase();
+        let progressWidth = '10%';
+        if (s.includes('received')) progressWidth = '33%';
+        else if (s.includes('preparing')) progressWidth = '66%';
+        else if (s.includes('ready')) progressWidth = '100%';
 
-            <div style="margin-bottom: 20px; padding: 0 10px;">
-                <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
-                    <div id="gold-progress" style="height: 100%; width: 0%; background: linear-gradient(90deg, #d4af37, #f1c40f); transition: width 1s ease;"></div>
+        return `
+            <div class="order-unit" style="margin-bottom: 25px; border-bottom: 1px dashed rgba(212,175,55,0.2); padding-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1.5px dashed #d4af37; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 10px; color: #d4af37; letter-spacing: 2px; font-weight:bold;">TOKEN #${order.token}</div>
+                    <div style="font-size: 36px; font-weight: 900; color: #fff; margin: 8px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">${order.otp || 'WAIT'}</div>
+                    <div style="font-size: 13px; color: #fff; opacity:0.9; font-style: italic;">${order.items}</div>
+                    <div style="font-size: 14px; color: #d4af37; font-weight: bold; margin-top:10px;">STATUS: ${order.status.toUpperCase()}</div>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 10px; color: #d4af37; margin-top: 8px; font-weight:bold;">
-                    <span id="step-received">RECEIVED</span><span id="step-cooking">PREPARING</span><span id="step-ready">READY</span>
+
+                <div style="padding: 0 10px;">
+                    <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: ${progressWidth}; background: linear-gradient(90deg, #d4af37, #f1c40f); transition: width 1s ease;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #d4af37; margin-top: 8px; font-weight:bold; opacity:0.7;">
+                        <span>RECEIVED</span><span>PREPARING</span><span>READY</span>
+                    </div>
                 </div>
             </div>
         `;
-        syncRoyalProgress(liveOrder.status);
-    }
-
-    function syncRoyalProgress(status) {
-        const s = status.toLowerCase();
-        const bar = document.getElementById('gold-progress');
-        if (!bar) return;
-        if (s.includes('received')) bar.style.width = '33%';
-        else if (s.includes('preparing')) bar.style.width = '66%';
-        else if (s.includes('ready')) bar.style.width = '100%';
-        else if (s.includes('pending')) bar.style.width = '10%';
     }
 
     function renderHistory(orders) {
