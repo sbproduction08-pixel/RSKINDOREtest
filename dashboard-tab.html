@@ -74,8 +74,10 @@
     // --- GLOBAL STATE ---
     var rskLiveOrder = null; 
     var lastKnownStatus = "";
-    // Apna Apps Script URL yahan check kar lena
     const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec";
+    
+    // ADDITION: Royal Notification Sound (Tring-Tring)
+    const rskNotificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3');
 
     function initDashboard() {
         const userName = localStorage.getItem('userName');
@@ -94,7 +96,7 @@
             } else {
                 document.getElementById('profile-setup').style.display = 'none';
                 document.getElementById('order-history-section').style.display = 'block';
-                startTracking(); // Yahan se auto-refresh loop shuru hoga
+                startTracking(); 
             }
         }
     }
@@ -110,17 +112,23 @@
                 const liveOrder = allMyOrders.find(o => !o.status.toLowerCase().includes('done') && !o.status.toLowerCase().includes('cancel'));
 
                 if (liveOrder) {
+                    // ADDITION: Agar status change ho toh "Tring-Tring" bajao
+                    if (lastKnownStatus !== "" && lastKnownStatus !== liveOrder.status) {
+                        rskNotificationSound.play().catch(e => console.log("Sound enabled after first click"));
+                    }
+                    lastKnownStatus = liveOrder.status;
+                    
                     rskLiveOrder = liveOrder;
                     document.getElementById('live-tracker').style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
                     
-                    // Dashboard UI Update (OTP & Progress Line)
                     renderLiveTracker(liveOrder);
 
-                    // Cancel Bar logic
+                    // --- UPDATION: Received hote hi Cancel Button Gayab ---
                     const s = liveOrder.status.toLowerCase();
-                    if (s !== "awaiting payment" && s !== "pending" && s !== "") {
-                        const cancelBar = document.getElementById('cancel-bar');
+                    const cancelBar = document.getElementById('cancel-bar');
+                    
+                    if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
                         if (cancelBar) {
                             cancelBar.style.display = 'none';
                             if (window.cancelInterval) clearInterval(window.cancelInterval);
@@ -130,21 +138,19 @@
                 } else {
                     document.getElementById('live-tracker').style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
+                    lastKnownStatus = ""; // Reset status
                 }
                 renderHistory(allMyOrders);
-                
-                // --- AUTO REFRESH: Har 10 second mein bina refresh kiye update ---
                 setTimeout(startTracking, 10000); 
             })
             .catch(err => {
                 console.log("Tracking Error:", err);
-                setTimeout(startTracking, 5000); // Error aane par 5 sec baad fir try karega
+                setTimeout(startTracking, 5000);
             });
     }
 
     function renderLiveTracker(liveOrder) {
         const trackerDiv = document.getElementById('live-tracker');
-        // Status matching for line
         const s = liveOrder.status.toLowerCase();
         
         trackerDiv.innerHTML = `
@@ -170,8 +176,6 @@
         const s = status.toLowerCase();
         const bar = document.getElementById('gold-progress');
         if (!bar) return;
-
-        // Progress logic: Ready par 100% (Full)
         if (s.includes('received')) bar.style.width = '33%';
         else if (s.includes('preparing')) bar.style.width = '66%';
         else if (s.includes('ready')) bar.style.width = '100%';
@@ -203,7 +207,6 @@
         historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
     }
 
-    // --- GST BILL PDF DOWNLOAD ---
     window.generateRoyalBill = function(order) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'mm', format: 'a5' });
@@ -227,6 +230,5 @@
         location.reload(); 
     };
 
-    // Initialize
     initDashboard();
 </script>
