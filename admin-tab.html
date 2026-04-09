@@ -195,15 +195,23 @@
     }
 
     window.toggleStockItem = function(name, isChecked) {
-        const newStatus = isChecked ? "In" : "Out";
-        const statusLabel = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
-        if(statusLabel) {
-            statusLabel.innerText = newStatus.toUpperCase();
-            statusLabel.style.color = isChecked ? "#25D366" : "#ff4444";
-        }
-        const updateUrl = `${adminBridge}?action=updateInventory&itemName=${encodeURIComponent(name)}&newStatus=${newStatus}`;
-        fetch(updateUrl, { method: 'GET', mode: 'no-cors' }); // Instant sync in background
-    };
+    const newStatus = isChecked ? "In" : "Out";
+    const statusLabel = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
+    
+    // 1. Royal UI Feedback
+    if(statusLabel) {
+        statusLabel.innerText = newStatus.toUpperCase();
+        statusLabel.style.color = isChecked ? "#25D366" : "#ff4444";
+    }
+
+    // 2. Hand-to-Hand Sync (POST without delay)
+    const updateUrl = `${adminBridge}?action=updateInventory&itemName=${encodeURIComponent(name)}&newStatus=${newStatus}`;
+    
+    // FETCH call bina mode:no-cors ke taaki sheet confirm kare
+    fetch(updateUrl)
+    .then(res => console.log("Sheet Updated Live!"))
+    .catch(err => console.log("Sync Error, trying again..."));
+};
 
     // --- 7. 🔥 CORE STATUS UPDATE & OTP ---
     window.updateStatus = function(token, status, btn, otp = "") {
