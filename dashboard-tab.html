@@ -73,10 +73,8 @@
 <script>
     // --- GLOBAL STATE ---
     var rskLiveOrders = []; 
-    var lastKnownStatuses = {}; // Har order ka status track karne ke liye
+    var lastKnownStatuses = {}; 
     const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec";
-    
-    // ADDITION: Royal Notification Sound (Tring-Tring)
     const rskNotificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3');
 
     function initDashboard() {
@@ -109,8 +107,6 @@
             .then(res => res.json())
             .then(data => {
                 const allMyOrders = data.filter(o => o.phone == phone).reverse();
-                
-                // --- UPDATION: Multiple Live Orders Support ---
                 const liveOrders = allMyOrders.filter(o => 
                     !o.status.toLowerCase().includes('done') && 
                     !o.status.toLowerCase().includes('cancel')
@@ -122,11 +118,11 @@
                     trackerDiv.style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
                     
-                    // Clear previous to avoid duplication on refresh
-                    trackerDiv.innerHTML = ""; 
+                    // Sab kuch clear karke naye sire se multiple orders render honge
+                    trackerDiv.innerHTML = `<div style="font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #d4af37; margin-bottom: 20px;">👑 Royal Live Tracking 👑</div>`; 
 
                     liveOrders.forEach((order, index) => {
-                        // Sound logic on status change (Per Order)
+                        // Sound logic on status change
                         if (lastKnownStatuses[order.token] && lastKnownStatuses[order.token] !== order.status) {
                             rskNotificationSound.play().catch(e => {});
                         }
@@ -135,7 +131,7 @@
                         // Render each order card
                         trackerDiv.innerHTML += generateOrderCardHTML(order);
 
-                        // --- UPDATION: Persistent Timer for this specific Token ---
+                        // Start individual persistent timer
                         initOrderTimer(order.token, order.status);
                     });
 
@@ -154,19 +150,16 @@
             });
     }
 
-    // --- NEW FEATURE: INDIVIDUAL PERSISTENT TIMER ---
     function initOrderTimer(token, status) {
         const s = status.toLowerCase();
         const storageKey = 'timer_start_' + token;
         let startTime = localStorage.getItem(storageKey);
 
-        // Agar order Received/Preparing/Ready ho gaya, toh cancel timer hata do
         if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
             localStorage.removeItem(storageKey);
             return;
         }
 
-        // Naya order hai toh start time save karo (Refresh proof)
         if (!startTime) {
             startTime = Date.now();
             localStorage.setItem(storageKey, startTime);
@@ -178,7 +171,7 @@
             if (!timerDisplay) return;
 
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
-            let remaining = 300 - elapsed; // 5 Minutes window
+            let remaining = 300 - elapsed;
 
             if (remaining <= 0) {
                 timerDisplay.innerText = "Cancellation window closed";
@@ -188,19 +181,17 @@
             } else {
                 let mins = Math.floor(remaining / 60);
                 let secs = remaining % 60;
-                timerDisplay.innerText = `Urgent Cancel window: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                timerDisplay.innerText = `Urgent Cancel: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
                 if(cancelBtn) cancelBtn.style.display = 'inline-block';
             }
         };
 
         updateTimerUI();
-        // Har second UI update karne ke liye
         if (!window['int_' + token]) {
             window['int_' + token] = setInterval(updateTimerUI, 1000);
         }
     }
 
-    // Helper function to create HTML for each live order
     function generateOrderCardHTML(order) {
         const s = order.status.toLowerCase();
         let progressWidth = '10%';
