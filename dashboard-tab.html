@@ -72,8 +72,8 @@
 
 <script>
     // --- GLOBAL STATE ---
-    var rskLiveOrder = null; 
-    var lastKnownStatus = "";
+    var rskLiveOrders = []; 
+    var lastKnownStatuses = {}; // Har order ka status track karne ke liye
     const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec";
     
     // ADDITION: Royal Notification Sound (Tring-Tring)
@@ -126,32 +126,23 @@
                     trackerDiv.innerHTML = ""; 
 
                     liveOrders.forEach((order, index) => {
-                        // Sound logic on status change
-                        if (index === 0 && lastKnownStatus !== "" && lastKnownStatus !== order.status) {
+                        // Sound logic on status change (Per Order)
+                        if (lastKnownStatuses[order.token] && lastKnownStatuses[order.token] !== order.status) {
                             rskNotificationSound.play().catch(e => {});
                         }
-                        if (index === 0) lastKnownStatus = order.status;
+                        lastKnownStatuses[order.token] = order.status;
 
                         // Render each order card
                         trackerDiv.innerHTML += generateOrderCardHTML(order);
 
-                        // --- UPDATION: Cancel Button Auto-Hide per order ---
-                        const s = order.status.toLowerCase();
-                        if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
-                            // Agar is token ka timer chal raha hai toh hide karo
-                            const cancelBar = document.getElementById('cancel-bar');
-                            if (cancelBar && localStorage.getItem('lastTokenNo') === order.token) {
-                                cancelBar.style.display = 'none';
-                                if (window.cancelInterval) clearInterval(window.cancelInterval);
-                                localStorage.removeItem('timerStartTime');
-                            }
-                        }
+                        // --- UPDATION: Persistent Timer for this specific Token ---
+                        initOrderTimer(order.token, order.status);
                     });
 
                 } else {
                     trackerDiv.style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
-                    lastKnownStatus = "";
+                    lastKnownStatuses = {};
                 }
                 
                 renderHistory(allMyOrders);
@@ -163,6 +154,52 @@
             });
     }
 
+    // --- NEW FEATURE: INDIVIDUAL PERSISTENT TIMER ---
+    function initOrderTimer(token, status) {
+        const s = status.toLowerCase();
+        const storageKey = 'timer_start_' + token;
+        let startTime = localStorage.getItem(storageKey);
+
+        // Agar order Received/Preparing/Ready ho gaya, toh cancel timer hata do
+        if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
+            localStorage.removeItem(storageKey);
+            return;
+        }
+
+        // Naya order hai toh start time save karo (Refresh proof)
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem(storageKey, startTime);
+        }
+
+        const updateTimerUI = () => {
+            const timerDisplay = document.getElementById('timer-' + token);
+            const cancelBtn = document.getElementById('btn-cancel-' + token);
+            if (!timerDisplay) return;
+
+            let elapsed = Math.floor((Date.now() - startTime) / 1000);
+            let remaining = 300 - elapsed; // 5 Minutes window
+
+            if (remaining <= 0) {
+                timerDisplay.innerText = "Cancellation window closed";
+                if(cancelBtn) cancelBtn.style.display = 'none';
+                localStorage.removeItem(storageKey);
+                clearInterval(window['int_' + token]);
+            } else {
+                let mins = Math.floor(remaining / 60);
+                let secs = remaining % 60;
+                timerDisplay.innerText = `Urgent Cancel window: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                if(cancelBtn) cancelBtn.style.display = 'inline-block';
+            }
+        };
+
+        updateTimerUI();
+        // Har second UI update karne ke liye
+        if (!window['int_' + token]) {
+            window['int_' + token] = setInterval(updateTimerUI, 1000);
+        }
+    }
+
     // Helper function to create HTML for each live order
     function generateOrderCardHTML(order) {
         const s = order.status.toLowerCase();
@@ -172,12 +209,18 @@
         else if (s.includes('ready')) progressWidth = '100%';
 
         return `
-            <div class="order-unit" style="margin-bottom: 25px; border-bottom: 1px dashed rgba(212,175,55,0.2); padding-bottom: 20px;">
+            <div class="order-unit" style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px solid rgba(212,175,55,0.1);">
                 <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1.5px dashed #d4af37; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 10px; color: #d4af37; letter-spacing: 2px; font-weight:bold;">TOKEN #${order.token}</div>
                     <div style="font-size: 36px; font-weight: 900; color: #fff; margin: 8px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">${order.otp || 'WAIT'}</div>
                     <div style="font-size: 13px; color: #fff; opacity:0.9; font-style: italic;">${order.items}</div>
                     <div style="font-size: 14px; color: #d4af37; font-weight: bold; margin-top:10px;">STATUS: ${order.status.toUpperCase()}</div>
+                    
+                    <div id="timer-${order.token}" style="font-size: 10px; color: #888; margin-top: 8px;"></div>
+                    <button id="btn-cancel-${order.token}" onclick="window.cancelOrder('${order.token}')" 
+                        style="background:rgba(255,68,68,0.1); color:#ff4444; border:1px solid #ff4444; padding:5px 12px; border-radius:12px; font-size:10px; margin-top:10px; cursor:pointer; display:none; font-weight:bold;">
+                        URGENT CANCEL ❌
+                    </button>
                 </div>
 
                 <div style="padding: 0 10px;">
