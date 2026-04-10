@@ -72,7 +72,6 @@
 
 <script>
     // --- GLOBAL STATE ---
-    var rskLiveOrders = []; 
     var lastKnownStatuses = {}; 
     const gasUrl = "https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec";
     const rskNotificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3');
@@ -81,8 +80,7 @@
         const userName = localStorage.getItem('userName');
         const userPhone = localStorage.getItem('userPhone');
         if (userName) {
-            const firstName = userName.split(' ')[0];
-            document.getElementById('welcome-name').innerText = "Namaste, " + firstName + "!";
+            document.getElementById('welcome-name').innerText = "Namaste, " + userName.split(' ')[0] + "!";
             document.getElementById('user-phone-disp').innerText = "📱 " + (userPhone || "No Phone Linked");
             if (!userPhone || userPhone === "" || userPhone === "null") {
                 document.getElementById('profile-setup').style.display = 'block';
@@ -114,11 +112,16 @@
                     trackerDiv.innerHTML = `<div style="font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #d4af37; margin-bottom: 20px;">👑 Royal Live Tracking 👑</div>`; 
 
                     liveOrders.forEach((order) => {
+                        // Sound on Status Change
                         if (lastKnownStatuses[order.token] && lastKnownStatuses[order.token] !== order.status) {
                             rskNotificationSound.play().catch(e => {});
                         }
                         lastKnownStatuses[order.token] = order.status;
+
+                        // Add Order UI
                         trackerDiv.innerHTML += generateOrderCardHTML(order);
+                        
+                        // Start/Sync Timer for this specific token
                         initOrderTimer(order.token, order.status);
                     });
                 } else {
@@ -130,77 +133,80 @@
             });
     }
 
-    // --- FIX: HAR ORDER KA ALAG CANCEL & TIMER LOGIC ---
+    // --- FIX: HAR ORDER KA APNA TIMER & AUTO-HIDE ---
     function initOrderTimer(token, status) {
         const s = status.toLowerCase();
         const storageKey = 'timer_start_' + token;
-        let startTime = localStorage.getItem(storageKey);
-
-        // Status Receive/Preparing/Ready hote hi Cancel button hide kar do
+        const cancelBtn = document.getElementById('btn-cancel-' + token);
+        const timerDisplay = document.getElementById('timer-' + token);
+        
+        // CRITICAL: Agar status "Received" ya usse aage hai, toh timer/button GAYAB karo
         if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
-            const btn = document.getElementById('btn-cancel-' + token);
-            if(btn) btn.style.display = 'none';
-            const tmr = document.getElementById('timer-' + token);
-            if(tmr) tmr.style.display = 'none';
+            if(cancelBtn) cancelBtn.style.display = 'none';
+            if(timerDisplay) timerDisplay.style.display = 'none';
             localStorage.removeItem(storageKey);
+            if (window['int_' + token]) clearInterval(window['int_' + token]);
             return;
         }
 
+        let startTime = localStorage.getItem(storageKey);
         if (!startTime) {
             startTime = Date.now();
             localStorage.setItem(storageKey, startTime);
         }
 
-        const updateTimerUI = () => {
-            const timerDisplay = document.getElementById('timer-' + token);
-            const cancelBtn = document.getElementById('btn-cancel-' + token);
-            if (!timerDisplay) return;
+        const runTimer = () => {
+            const currentTmrDisp = document.getElementById('timer-' + token);
+            const currentBtn = document.getElementById('btn-cancel-' + token);
+            if (!currentTmrDisp) return;
 
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
             let remaining = 300 - elapsed;
 
             if (remaining <= 0) {
-                timerDisplay.innerText = "Time Up";
-                if(cancelBtn) cancelBtn.style.display = 'none';
+                currentTmrDisp.innerText = "Order Locked 🔒";
+                if(currentBtn) currentBtn.style.display = 'none';
                 localStorage.removeItem(storageKey);
+                clearInterval(window['int_' + token]);
             } else {
                 let mins = Math.floor(remaining / 60);
                 let secs = remaining % 60;
-                timerDisplay.innerText = `Cancel window: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                if(cancelBtn) cancelBtn.style.display = 'inline-block';
+                currentTmrDisp.innerText = `Cancel window: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                if(currentBtn) currentBtn.style.display = 'inline-block';
             }
         };
 
-        updateTimerUI();
+        runTimer();
         if (!window['int_' + token]) {
-            window['int_' + token] = setInterval(updateTimerUI, 1000);
+            window['int_' + token] = setInterval(runTimer, 1000);
         }
     }
 
-    // --- FIX: SPECIFIC TOKEN CANCEL ---
+    // --- FIX: CANCEL BUTTON ACTION ---
     window.cancelOrder = function(token) {
         if (!confirm("Token #" + token + " Cancel Karein?")) return;
         
+        // Apps Script Update
         fetch(gasUrl + "?action=updateStatus&token=" + encodeURIComponent(token) + "&status=Cancelled%20By%20User");
         
-        // Admin ko alert bhejne ke liye WhatsApp (Optional)
-        window.open(`https://wa.me/917489999890?text=*ORDER CANCELLED* ❌%0A*Token:* ${token}`, '_blank');
+        // Admin Notification
+        window.open(`https://wa.me/917489999890?text=*ORDER CANCELLED* ❌%0A*Token:* %23${token}`, '_blank');
         
         localStorage.removeItem('timer_start_' + token);
-        alert("Request Sent!");
-        startTracking(); // Turant refresh
+        alert("Cancellation Request Sent!");
+        startTracking(); // Instant UI Refresh
     };
 
     function generateOrderCardHTML(order) {
         const s = order.status.toLowerCase();
         let progressWidth = s.includes('received') ? '33%' : s.includes('preparing') ? '66%' : s.includes('ready') ? '100%' : '10%';
-
+        
         return `
             <div class="order-unit" style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px solid rgba(212,175,55,0.1);">
                 <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1.5px dashed #d4af37; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 10px; color: #d4af37; font-weight:bold;">TOKEN #${order.token}</div>
                     <div style="font-size: 36px; font-weight: 900; color: #fff; margin: 8px 0;">${order.otp || 'WAIT'}</div>
-                    <div style="font-size: 13px; color: #fff; opacity:0.9;">${order.items}</div>
+                    <div style="font-size: 13px; color: #fff; opacity:0.8;">${order.items}</div>
                     <div style="font-size: 14px; color: #d4af37; font-weight: bold; margin-top:10px;">STATUS: ${order.status.toUpperCase()}</div>
                     
                     <div id="timer-${order.token}" style="font-size: 10px; color: #888; margin-top: 8px;"></div>
@@ -217,6 +223,7 @@
             </div>`;
     }
 
+    // --- BILL & HISTORY (Aapka original logic bina kisi change ke) ---
     function renderHistory(orders) {
         const historyList = document.getElementById('history-list');
         let html = "";
