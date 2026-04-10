@@ -80,20 +80,15 @@
     function initDashboard() {
         const userName = localStorage.getItem('userName');
         const userPhone = localStorage.getItem('userPhone');
-
         if (userName) {
             const firstName = userName.split(' ')[0];
             document.getElementById('welcome-name').innerText = "Namaste, " + firstName + "!";
             document.getElementById('user-phone-disp').innerText = "📱 " + (userPhone || "No Phone Linked");
-            
             if (!userPhone || userPhone === "" || userPhone === "null") {
                 document.getElementById('profile-setup').style.display = 'block';
                 document.getElementById('live-tracker').style.display = 'none';
-                document.getElementById('no-order').style.display = 'none';
-                document.getElementById('order-history-section').style.display = 'none';
             } else {
                 document.getElementById('profile-setup').style.display = 'none';
-                document.getElementById('order-history-section').style.display = 'block';
                 startTracking(); 
             }
         }
@@ -113,49 +108,40 @@
                 );
 
                 const trackerDiv = document.getElementById('live-tracker');
-
                 if (liveOrders.length > 0) {
                     trackerDiv.style.display = 'block';
                     document.getElementById('no-order').style.display = 'none';
-                    
-                    // Sab kuch clear karke naye sire se multiple orders render honge
                     trackerDiv.innerHTML = `<div style="font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #d4af37; margin-bottom: 20px;">👑 Royal Live Tracking 👑</div>`; 
 
-                    liveOrders.forEach((order, index) => {
-                        // Sound logic on status change
+                    liveOrders.forEach((order) => {
                         if (lastKnownStatuses[order.token] && lastKnownStatuses[order.token] !== order.status) {
                             rskNotificationSound.play().catch(e => {});
                         }
                         lastKnownStatuses[order.token] = order.status;
-
-                        // Render each order card
                         trackerDiv.innerHTML += generateOrderCardHTML(order);
-
-                        // Start individual persistent timer
                         initOrderTimer(order.token, order.status);
                     });
-
                 } else {
                     trackerDiv.style.display = 'none';
                     document.getElementById('no-order').style.display = 'block';
-                    lastKnownStatuses = {};
                 }
-                
                 renderHistory(allMyOrders);
                 setTimeout(startTracking, 10000); 
-            })
-            .catch(err => {
-                console.log("Tracking Error:", err);
-                setTimeout(startTracking, 5000);
             });
     }
 
+    // --- FIX: HAR ORDER KA ALAG CANCEL & TIMER LOGIC ---
     function initOrderTimer(token, status) {
         const s = status.toLowerCase();
         const storageKey = 'timer_start_' + token;
         let startTime = localStorage.getItem(storageKey);
 
+        // Status Receive/Preparing/Ready hote hi Cancel button hide kar do
         if (s.includes('received') || s.includes('preparing') || s.includes('ready')) {
+            const btn = document.getElementById('btn-cancel-' + token);
+            if(btn) btn.style.display = 'none';
+            const tmr = document.getElementById('timer-' + token);
+            if(tmr) tmr.style.display = 'none';
             localStorage.removeItem(storageKey);
             return;
         }
@@ -174,14 +160,13 @@
             let remaining = 300 - elapsed;
 
             if (remaining <= 0) {
-                timerDisplay.innerText = "Cancellation window closed";
+                timerDisplay.innerText = "Time Up";
                 if(cancelBtn) cancelBtn.style.display = 'none';
                 localStorage.removeItem(storageKey);
-                clearInterval(window['int_' + token]);
             } else {
                 let mins = Math.floor(remaining / 60);
                 let secs = remaining % 60;
-                timerDisplay.innerText = `Urgent Cancel: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                timerDisplay.innerText = `Cancel window: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
                 if(cancelBtn) cancelBtn.style.display = 'inline-block';
             }
         };
@@ -192,19 +177,30 @@
         }
     }
 
+    // --- FIX: SPECIFIC TOKEN CANCEL ---
+    window.cancelOrder = function(token) {
+        if (!confirm("Token #" + token + " Cancel Karein?")) return;
+        
+        fetch(gasUrl + "?action=updateStatus&token=" + encodeURIComponent(token) + "&status=Cancelled%20By%20User");
+        
+        // Admin ko alert bhejne ke liye WhatsApp (Optional)
+        window.open(`https://wa.me/917489999890?text=*ORDER CANCELLED* ❌%0A*Token:* ${token}`, '_blank');
+        
+        localStorage.removeItem('timer_start_' + token);
+        alert("Request Sent!");
+        startTracking(); // Turant refresh
+    };
+
     function generateOrderCardHTML(order) {
         const s = order.status.toLowerCase();
-        let progressWidth = '10%';
-        if (s.includes('received')) progressWidth = '33%';
-        else if (s.includes('preparing')) progressWidth = '66%';
-        else if (s.includes('ready')) progressWidth = '100%';
+        let progressWidth = s.includes('received') ? '33%' : s.includes('preparing') ? '66%' : s.includes('ready') ? '100%' : '10%';
 
         return `
             <div class="order-unit" style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px solid rgba(212,175,55,0.1);">
                 <div style="background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5)); border: 1.5px dashed #d4af37; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
-                    <div style="font-size: 10px; color: #d4af37; letter-spacing: 2px; font-weight:bold;">TOKEN #${order.token}</div>
-                    <div style="font-size: 36px; font-weight: 900; color: #fff; margin: 8px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5);">${order.otp || 'WAIT'}</div>
-                    <div style="font-size: 13px; color: #fff; opacity:0.9; font-style: italic;">${order.items}</div>
+                    <div style="font-size: 10px; color: #d4af37; font-weight:bold;">TOKEN #${order.token}</div>
+                    <div style="font-size: 36px; font-weight: 900; color: #fff; margin: 8px 0;">${order.otp || 'WAIT'}</div>
+                    <div style="font-size: 13px; color: #fff; opacity:0.9;">${order.items}</div>
                     <div style="font-size: 14px; color: #d4af37; font-weight: bold; margin-top:10px;">STATUS: ${order.status.toUpperCase()}</div>
                     
                     <div id="timer-${order.token}" style="font-size: 10px; color: #888; margin-top: 8px;"></div>
@@ -213,40 +209,33 @@
                         URGENT CANCEL ❌
                     </button>
                 </div>
-
                 <div style="padding: 0 10px;">
                     <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
                         <div style="height: 100%; width: ${progressWidth}; background: linear-gradient(90deg, #d4af37, #f1c40f); transition: width 1s ease;"></div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #d4af37; margin-top: 8px; font-weight:bold; opacity:0.7;">
-                        <span>RECEIVED</span><span>PREPARING</span><span>READY</span>
-                    </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     function renderHistory(orders) {
         const historyList = document.getElementById('history-list');
         let html = "";
         const historyItems = orders.filter(o => o.status.toLowerCase().includes('done') || o.status.toLowerCase().includes('cancel'));
-        
         historyItems.forEach((order) => {
             const isCancelled = order.status.toLowerCase().includes('cancel');
-            html += `
-                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 10px; color: #888;">TOKEN ${order.token}</div>
-                            <div style="font-size: 12px; color: #fff; margin: 3px 0;">${order.items}</div>
-                            <div style="font-size: 10px; font-weight: bold; color: ${isCancelled ? '#ff4444' : '#25D366'}">${order.status.toUpperCase()}</div>
+            html += `<div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid ${isCancelled ? '#ff4444' : '#d4af37'}; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 10px; color: #888;">TOKEN ${order.token}</div>
+                                <div style="font-size: 12px; color: #fff; margin: 3px 0;">${order.items}</div>
+                                <div style="font-size: 10px; font-weight: bold; color: ${isCancelled ? '#ff4444' : '#25D366'}">${order.status.toUpperCase()}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
+                                ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:var(--gold); color:#000; border:none; padding:5px 12px; border-radius:8px; font-size:11px; margin-top:8px; cursor:pointer; font-weight:bold;">BILL 📥</button>` : ''}
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="color: #d4af37; font-weight: bold;">₹${order.total}</div>
-                            ${!isCancelled ? `<button onclick='window.generateRoyalBill(${JSON.stringify(order)})' style="background:var(--gold); color:#000; border:none; padding:5px 12px; border-radius:8px; font-size:11px; margin-top:8px; cursor:pointer; font-weight:bold;">BILL 📥</button>` : ''}
-                        </div>
-                    </div>
-                </div>`;
+                    </div>`;
         });
         historyList.innerHTML = html || "<p style='font-size:11px; opacity:0.5; text-align:center;'>No past orders found.</p>";
     }
@@ -254,15 +243,10 @@
     window.generateRoyalBill = function(order) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'mm', format: 'a5' });
-        try {
-            doc.addImage('https://sbproduction08-pixel.github.io/royalstreetkitchen.png', 'PNG', 0, 0, 148, 25);
-        } catch(e) { 
-            doc.setFontSize(18); doc.text("ROYAL STREET KITCHEN", 74, 15, {align: "center"}); 
-        }
-        doc.setFontSize(10); doc.text("GSTIN: 23ABCDE1234F1Z5", 74, 35, {align: "center"});
+        try { doc.addImage('https://sbproduction08-pixel.github.io/royalstreetkitchen.png', 'PNG', 0, 0, 148, 25); } catch(e) { }
         doc.text(`Token: #${order.token}`, 12, 48);
         doc.text(`Description: ${order.items}`, 12, 60);
-        doc.setFontSize(14); doc.text(`TOTAL: ₹${order.total}/-`, 135, 90, { align: "right" });
+        doc.text(`TOTAL: ₹${order.total}/-`, 135, 90, { align: "right" });
         doc.save(`RSK_Bill_${order.token}.pdf`);
     };
 
