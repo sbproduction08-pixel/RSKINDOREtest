@@ -46,59 +46,54 @@
     </div>
 </div>
 
-<audio id="kitchenBell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+<audio id="kitchenBell" src="https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3" preload="auto"></audio>
 
 <style>
     .order-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.15); padding: 20px; border-radius: 20px; position: relative; transition: 0.3s; }
     .status-badge { font-size: 9px; padding: 5px 12px; border-radius: 50px; text-transform: uppercase; font-weight: 800; position: absolute; top: 18px; right: 18px; letter-spacing: 1px; }
     .action-btn { width: 100%; margin-top: 15px; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
     .action-btn:active { transform: scale(0.98); }
-    
-   /* Premium Royal Slider */
-.switch { position: relative; display: inline-block; width: 44px; height: 22px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider {
-  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #333; transition: .4s; border-radius: 34px;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-}
-.slider:before {
-  position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 2px;
-  background: linear-gradient(145deg, #d4af37, #b8860b); /* Royal Gold Circle */
-  transition: .4s; border-radius: 50%;
-  box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-}
-input:checked + .slider { background-color: rgba(37, 211, 102, 0.2); border-color: #25D366; }
-input:checked + .slider:before { transform: translateX(20px); background: #25D366; }
+
+    /* Premium Royal Slider Switch */
+    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #222; transition: .4s; border-radius: 34px;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+    }
+    .slider:before {
+        position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 2px;
+        background: linear-gradient(145deg, #d4af37, #b8860b);
+        transition: .4s; border-radius: 50%;
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+    }
+    input:checked + .slider { background-color: rgba(37, 211, 102, 0.15); border-color: #25D366; }
+    input:checked + .slider:before { transform: translateX(20px); background: #25D366; }
 </style>
 
 <script>
-    // --- 1. CONFIG & STATE ---
     const adminBridge = 'https://script.google.com/macros/s/AKfycbzW74ZcMwYcbBsXa9YTExua--mx-AiY5dLmZsde9Qqpikrtkp_8OU8rjeJhy-FQiBM/exec';
     let lastCount = 0;
-    const kitchenBell = new Audio('https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3');
+    const kitchenBell = document.getElementById('kitchenBell');
 
-    // --- 2. NAVIGATION ENGINE ---
     function showAdminSection(sec) {
         document.getElementById('admin-orders-view').style.display = (sec === 'orders') ? 'block' : 'none';
         document.getElementById('stock-manager-view').style.display = (sec === 'stock') ? 'block' : 'none';
-        
         document.getElementById('btn-view-orders').style.background = (sec === 'orders') ? 'var(--gold)' : 'rgba(255,255,255,0.05)';
         document.getElementById('btn-view-orders').style.color = (sec === 'orders') ? '#000' : 'var(--gold)';
         document.getElementById('btn-view-stock').style.background = (sec === 'stock') ? 'var(--gold)' : 'rgba(255,255,255,0.05)';
         document.getElementById('btn-view-stock').style.color = (sec === 'stock') ? '#000' : 'var(--gold)';
-        
         if(sec === 'stock') loadInventoryInAdmin();
         else refreshAdminData();
     }
 
-    // --- 3. LIVE ORDERS SYNC ---
     function refreshAdminData() {
         fetch(adminBridge + "?action=readAdmin")
             .then(res => res.json())
             .then(data => {
                 if (lastCount !== 0 && data.length > lastCount) {
-                    kitchenBell.play().catch(e => console.log("Sound enabled after interaction"));
+                    kitchenBell.play().catch(e => {});
                 }
                 lastCount = data.length;
                 renderOrders(data);
@@ -123,63 +118,40 @@ input:checked + .slider:before { transform: translateX(20px); background: #25D36
 
             let actionBtn = "";
             if (status === "Awaiting Payment" || status === "Pending") {
-                actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" class="action-btn" style="background:#3498db; color:white; width:100%; margin-top:10px; padding:12px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">RECEIVE PAYMENT ✅</button>`;
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Received', this)" class="action-btn" style="background:#3498db; color:white;">RECEIVE PAYMENT ✅</button>`;
             } else if (status === "Received") {
-                actionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" class="action-btn" style="background:#e67e22; color:white; width:100%; margin-top:10px; padding:12px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">START COOKING 👨‍🍳</button>`;
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Preparing', this)" class="action-btn" style="background:#e67e22; color:white;">START COOKING 👨‍🍳</button>`;
             } else if (status === "Preparing") {
-                actionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" class="action-btn" style="background:#f1c40f; color:black; width:100%; margin-top:10px; padding:12px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">MARK AS READY 🔔</button>`;
+                actionBtn = `<button onclick="updateStatus('${order.token}', 'Ready', this)" class="action-btn" style="background:#f1c40f; color:black;">MARK AS READY 🔔</button>`;
             } else if (status === "Ready") {
-                actionBtn = `<button onclick="window.verifyOTP('${order.token}')" class="action-btn" style="background:#25D366; color:white; width:100%; margin-top:10px; padding:12px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">DELIVER 🎁</button>`;
+                actionBtn = `<button onclick="window.verifyOTP('${order.token}')" class="action-btn" style="background:#25D366; color:white;">DELIVER 🎁</button>`;
             }
 
             html += `
-                <div class="order-card" style="border-left: 5px solid ${getStatusColor(status)}; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:20px; border-radius:15px; position:relative;">
-                    <span class="status-badge" style="background:${getStatusColor(status)}; color:${status === 'Ready' ? '#000':'#fff'}; font-size:9px; padding:4px 10px; border-radius:50px; position:absolute; top:15px; right:15px;">${status}</span>
+                <div class="order-card" style="border-left: 5px solid ${getStatusColor(status)}; margin-bottom:15px;">
+                    <span class="status-badge" style="background:${getStatusColor(status)}; color:${status === 'Ready' ? '#000':'#fff'};">${status}</span>
                     <div style="color:var(--gold); font-size:11px; font-weight:bold;">TOKEN #${order.token}</div>
                     <div style="font-size:18px; font-weight:bold; color:#fff; margin:5px 0;">${order.name}</div>
-                    <div style="font-size:10px; color:#888; margin-bottom:10px;">📅 Order: ${new Date(order.date).toLocaleTimeString()}</div>
-                    <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:12px; border-radius:12px; margin-bottom:15px; color:#ddd;">${order.items}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div style="font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:12px; margin:10px 0; color:#ddd;">${order.items}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="font-size:22px; font-weight:900; color:var(--gold);">₹${order.total}</div>
                         <div style="display:flex; gap:8px;">
-                            <button onclick='window.handleAdminBillPDF(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">📥 BILL</button>
-                            ${!isCancelled ? `<button onclick='window.handleAdminWAShare(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:bold;">💬 SHARE</button>` : ""}
+                            <button onclick='window.handleAdminBillPDF(${JSON.stringify(order)})' style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer;">📥 BILL</button>
+                            ${!isCancelled ? `<button onclick='window.handleAdminWAShare(${JSON.stringify(order)})' style="background:none; border:1px solid #25D366; color:#25D366; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer;">💬 SHARE</button>` : ""}
                             ${(!isReady && !isDone && !isCancelled) ? `<button onclick="updateStatus('${order.token}', 'Cancelled By Admin', this)" style="background:rgba(255,68,68,0.1); border:1px solid #ff4444; color:#ff4444; font-size:10px; padding:6px 12px; border-radius:8px; cursor:pointer;">❌ CANCEL</button>` : ""}
                         </div>
                     </div>
                     ${actionBtn}
                 </div>`;
         });
-        
         list.innerHTML = html || "<div style='text-align:center; padding:50px; opacity:0.3;'>No orders today.</div>";
         document.getElementById('admin-total-orders').innerText = count;
         document.getElementById('admin-total-sale').innerText = sale.toLocaleString();
     }
 
-    // --- 4. PROFESSIONAL PDF LOGIC ---
-    window.handleAdminBillPDF = function(order) {
-        if (!window.jspdf) { alert("Library missing!"); return; }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(22); doc.text("ROYAL STREET KITCHEN", 105, 20, { align: "center" });
-        doc.setFontSize(10); doc.text(`Token: #${order.token}`, 20, 40);
-        doc.text(`Customer: ${order.name}`, 20, 50);
-        doc.text(`Items: ${order.items}`, 20, 60);
-        doc.setFontSize(14); doc.text(`Total: Rs. ${order.total}/-`, 20, 80);
-        doc.save(`RSK_${order.token}.pdf`);
-    };
-
-    // --- 5. WHATSAPP COMPLETE MESSAGE ---
-    window.handleAdminWAShare = function(order) {
-        const rawMsg = `*ROYAL STREET KITCHEN* 👑\n----------------------------\n*Token:* #${order.token}\n*Items:* ${order.items}\n----------------------------\n*Total Bill:* ₹${order.total}\n*Status:* ${order.status}\n_Thank you for being Royal!_`;
-        const waUrl = `https://wa.me/91${order.phone}?text=${encodeURIComponent(rawMsg)}`;
-        window.open(waUrl, '_blank');
-    };
-
-    // --- 6. 🥦 INVENTORY LOGIC (Smooth Slider - No Popup) ---
     async function loadInventoryInAdmin() {
         const list = document.getElementById('admin-inventory-list');
-        list.innerHTML = "<div style='color:var(--gold); padding:20px; text-align:center;'>Syncing Stock...</div>";
+        list.innerHTML = "<div style='color:var(--gold); padding:20px; text-align:center;'>👑 Syncing Inventory...</div>";
         try {
             const res = await fetch(adminBridge + "?action=getInventory");
             const data = await res.json();
@@ -187,63 +159,50 @@ input:checked + .slider:before { transform: translateX(20px); background: #25D36
             for(let item in data) {
                 let isOut = data[item] === "Out";
                 html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.03); border-radius:12px; margin-bottom:10px; border:1px solid rgba(212,175,55,0.1);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.03); border-radius:15px; margin-bottom:10px; border:1px solid rgba(212,175,55,0.1);">
                         <div style="font-weight:bold; color:#fff;">${item}</div>
                         <div style="display:flex; align-items:center; gap:12px;">
                             <span id="lbl-${item.replace(/\s+/g, '')}" style="font-size:10px; font-weight:900; color:${isOut ? '#ff4444' : '#25D366'}">${isOut ? 'OUT' : 'IN'}</span>
-                            <label style="position:relative; display:inline-block; width:40px; height:22px;">
-                                <input type="checkbox" ${!isOut ? 'checked' : ''} onchange="toggleStockItem('${item}', this.checked)" style="opacity:0; width:0; height:0;">
-                                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:${isOut ? '#444' : '#25D366'}; transition:.4s; border-radius:22px;">
-                                    <span style="position:absolute; content:''; height:16px; width:16px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%; ${!isOut ? 'transform:translateX(18px);' : ''}"></span>
-                                </span>
+                            <label class="switch">
+                                <input type="checkbox" ${!isOut ? 'checked' : ''} onchange="toggleStockItem('${item}', this.checked)">
+                                <span class="slider"></span>
                             </label>
                         </div>
                     </div>`;
             }
             list.innerHTML = html;
-        } catch(e) { list.innerHTML = "<div style='color:#ff4444; text-align:center;'>Sync Error!</div>"; }
+        } catch(e) { list.innerHTML = "Error loading stock."; }
     }
 
     window.toggleStockItem = function(name, isChecked) {
-    const newStatus = isChecked ? "In" : "Out";
-    const statusLabel = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
-    
-    // 1. Royal UI Feedback
-    if(statusLabel) {
-        statusLabel.innerText = newStatus.toUpperCase();
-        statusLabel.style.color = isChecked ? "#25D366" : "#ff4444";
-    }
+        const newStatus = isChecked ? "In" : "Out";
+        const statusLabel = document.getElementById('lbl-' + name.replace(/\s+/g, ''));
+        if(statusLabel) {
+            statusLabel.innerText = newStatus.toUpperCase();
+            statusLabel.style.color = isChecked ? "#25D366" : "#ff4444";
+        }
+        const updateUrl = `${adminBridge}?action=updateInventory&itemName=${encodeURIComponent(name)}&newStatus=${newStatus}`;
+        fetch(updateUrl).then(() => console.log(name + " synced!"));
+    };
 
-    // 2. Hand-to-Hand Sync (POST without delay)
-    const updateUrl = `${adminBridge}?action=updateInventory&itemName=${encodeURIComponent(name)}&newStatus=${newStatus}`;
-    
-    // FETCH call bina mode:no-cors ke taaki sheet confirm kare
-    fetch(updateUrl)
-    .then(res => console.log("Sheet Updated Live!"))
-    .catch(err => console.log("Sync Error, trying again..."));
-};
-
-    // --- 7. 🔥 CORE STATUS UPDATE & OTP ---
     window.updateStatus = function(token, status, btn, otp = "") {
         if(btn) btn.innerText = "⏳...";
         fetch(adminBridge, { 
             method: 'POST', 
             mode: 'no-cors', 
-            body: JSON.stringify({ 
-                token: token, 
-                status: status, 
-                otp: otp,
-                updatedAt: new Date().toISOString() 
-            }) 
-        }).then(() => {
-            setTimeout(refreshAdminData, 1500);
-        });
+            body: JSON.stringify({ token: token, status: status, otp: otp, updatedAt: new Date().toISOString() }) 
+        }).then(() => { setTimeout(refreshAdminData, 1500); });
     };
 
     window.verifyOTP = function(token) {
         let otp = prompt("Customer OTP:");
         if(otp) { window.updateStatus(token, 'Done', null, otp); }
         else { alert("OTP is required for delivery!"); }
+    };
+
+    window.handleAdminWAShare = function(order) {
+        const rawMsg = `*ROYAL STREET KITCHEN* 👑\n----------------------------\n*Token:* #${order.token}\n*Items:* ${order.items}\n----------------------------\n*Total Bill:* ₹${order.total}\n*Status:* ${order.status}\n_Thank you for being Royal!_`;
+        window.open(`https://wa.me/91${order.phone}?text=${encodeURIComponent(rawMsg)}`, '_blank');
     };
 
     function getStatusColor(s) {
